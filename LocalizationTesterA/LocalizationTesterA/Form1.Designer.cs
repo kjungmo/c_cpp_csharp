@@ -55,7 +55,7 @@ namespace LocalizationTesterA
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
+            this.button1.Text = "버튼1";
             this.button1.UseVisualStyleBackColor = true;
             // 
             // button2
@@ -64,7 +64,7 @@ namespace LocalizationTesterA
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 1;
-            this.button2.Text = "button2";
+            this.button2.Text = "버튼2";
             this.button2.UseVisualStyleBackColor = true;
             // 
             // button3
@@ -73,7 +73,7 @@ namespace LocalizationTesterA
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 2;
-            this.button3.Text = "button3";
+            this.button3.Text = "버튼3";
             this.button3.UseVisualStyleBackColor = true;
             // 
             // button4
@@ -82,7 +82,7 @@ namespace LocalizationTesterA
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 3;
-            this.button4.Text = "button4";
+            this.button4.Text = "버튼4";
             this.button4.UseVisualStyleBackColor = true;
             // 
             // richTextBox1
@@ -102,7 +102,7 @@ namespace LocalizationTesterA
             this.groupBox1.Size = new System.Drawing.Size(212, 221);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Testing";
+            this.groupBox1.Text = "테스트";
             // 
             // textBox2
             // 
@@ -123,40 +123,41 @@ namespace LocalizationTesterA
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(134, 373);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 15);
+            this.label1.Size = new System.Drawing.Size(38, 15);
             this.label1.TabIndex = 7;
-            this.label1.Text = "label1";
+            this.label1.Text = "라벨1";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(134, 414);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(39, 15);
+            this.label2.Size = new System.Drawing.Size(38, 15);
             this.label2.TabIndex = 8;
-            this.label2.Text = "label2";
+            this.label2.Text = "라벨2";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(134, 452);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(39, 15);
+            this.label3.Size = new System.Drawing.Size(38, 15);
             this.label3.TabIndex = 9;
-            this.label3.Text = "label3";
+            this.label3.Text = "라벨3";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(134, 491);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 15);
+            this.label4.Size = new System.Drawing.Size(38, 15);
             this.label4.TabIndex = 10;
-            this.label4.Text = "label4";
+            this.label4.Text = "라벨4";
             // 
             // korLang
             // 
             this.korLang.AutoSize = true;
+            this.korLang.Checked = true;
             this.korLang.Location = new System.Drawing.Point(441, 22);
             this.korLang.Name = "korLang";
             this.korLang.Size = new System.Drawing.Size(61, 19);
@@ -230,7 +231,7 @@ namespace LocalizationTesterA
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "폼1";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
