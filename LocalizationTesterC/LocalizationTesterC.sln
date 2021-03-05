@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalizationTesterC", "LocalizationTesterC.csproj", "{3BBF8AD0-C87F-45B9-BE53-396A2F459E32}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3BBF8AD0-C87F-45B9-BE53-396A2F459E32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BBF8AD0-C87F-45B9-BE53-396A2F459E32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BBF8AD0-C87F-45B9-BE53-396A2F459E32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BBF8AD0-C87F-45B9-BE53-396A2F459E32}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {226F9647-7BA4-4074-A1FF-612A35B5DAC2}
+	EndGlobalSection
+EndGlobal
