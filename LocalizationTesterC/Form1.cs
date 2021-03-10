@@ -20,14 +20,34 @@ namespace LocalizationTesterC
             InitializeComponent();
         }
 
+        
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBox1.SelectedIndex)
+            {
+                case 0: Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ko-KR");break;
+                case 1: Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en");break;
+            }
+            this.Controls.Clear();
+            InitializeComponent();
+            Form1_Load(sender, e);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            comboBox1.Items.Add("한국어");
+            comboBox1.Items.Add("English");
+        }
+
+
         private void button1_Click(object sender, EventArgs e)
         {
             switch (Thread.CurrentThread.CurrentUICulture.IetfLanguageTag)
             {
                 case "ko-KR": Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en"); break;
                 case "en": Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ko-KR"); break;
-                //default:
-                //    break;
+                    //default:
+                    //    break;
             }
             this.Controls.Clear();
             Console.Write("IetfLanguageTag : ");
@@ -49,24 +69,8 @@ namespace LocalizationTesterC
             Console.Write("NativeName : ");
             Console.WriteLine(CultureInfo.CurrentCulture.NativeName);
             InitializeComponent();
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (comboBox1.SelectedIndex)
-            {
-                case 0: Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ko-KR");break;
-                case 1: Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en");break;
-            }
-            this.Controls.Clear();
-            InitializeComponent();
             Form1_Load(sender, e);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            comboBox1.Items.Add("한국어");
-            comboBox1.Items.Add("English");
-        }
     }
 }

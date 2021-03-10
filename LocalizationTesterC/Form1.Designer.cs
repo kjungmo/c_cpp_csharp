@@ -29,7 +29,6 @@ namespace LocalizationTesterC
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -42,54 +41,83 @@ namespace LocalizationTesterC
             // 
             // button1
             // 
-            resources.ApplyResources(this.button1, "button1");
+            this.button1.Location = new System.Drawing.Point(101, 68);
             this.button1.Name = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Size = new System.Drawing.Size(149, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = Resource.button1_Text; // 번역
+            this.button1.UseVisualStyleBackColor = true; 
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
             // 
-            resources.ApplyResources(this.label1, "label1");
+            this.label1.Location = new System.Drawing.Point(25, 29);
             this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(69, 12);
+            this.label1.TabIndex = 1;
+            this.label1.Text = Resource.label1_Text; //언어
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox1
             // 
-            resources.ApplyResources(this.comboBox1, "comboBox1");
             this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(129, 26);
             this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 20);
+            this.comboBox1.TabIndex = 2;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // button2
             // 
-            resources.ApplyResources(this.button2, "button2");
+            this.button2.AutoSize = true;
+            this.button2.Location = new System.Drawing.Point(27, 182);
             this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(129, 23);
+            this.button2.TabIndex = 3;
+            this.button2.Text = Resource.button2_Text; //열기
+            this.button2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button2.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
-            resources.ApplyResources(this.label2, "label2");
+            this.label2.Location = new System.Drawing.Point(25, 124);
             this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(79, 12);
+            this.label2.TabIndex = 4;
+            this.label2.Text = Resource.label2_Text; //"라벨2";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label3
             // 
-            resources.ApplyResources(this.label3, "label3");
+            this.label3.Location = new System.Drawing.Point(25, 154);
             this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(79, 12);
+            this.label3.TabIndex = 5;
+            this.label3.Text = Resource.label3_Text; // "라벨3";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // richTextBox1
             // 
-            resources.ApplyResources(this.richTextBox1, "richTextBox1");
+            this.richTextBox1.Location = new System.Drawing.Point(27, 222);
             this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(100, 96);
+            this.richTextBox1.TabIndex = 6;
+            this.richTextBox1.Text = Resource.richTextBox1_Text; // "닫기";
             // 
             // button3
             // 
-            resources.ApplyResources(this.button3, "button3");
+            this.button3.Location = new System.Drawing.Point(110, 119);
             this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 7;
+            this.button3.Text = Resource.button3_Text; // "버튼";
             this.button3.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
-            resources.ApplyResources(this, "$this");
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(273, 338);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.label3);
@@ -99,6 +127,7 @@ namespace LocalizationTesterC
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
+            this.Text = Resource.this_Text; // "한국어 폼";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
