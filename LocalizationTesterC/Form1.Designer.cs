@@ -37,6 +37,7 @@ namespace LocalizationTesterC
             this.label3 = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -45,8 +46,8 @@ namespace LocalizationTesterC
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(149, 23);
             this.button1.TabIndex = 0;
-            this.button1.Text = Resource.button1_Text; // 번역
-            this.button1.UseVisualStyleBackColor = true; 
+            this.button1.Text = global::LocalizationTesterC.Resource.button1_Text;
+            this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
@@ -55,7 +56,7 @@ namespace LocalizationTesterC
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 12);
             this.label1.TabIndex = 1;
-            this.label1.Text = Resource.label1_Text; //언어
+            this.label1.Text = "User Language";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox1
@@ -74,7 +75,7 @@ namespace LocalizationTesterC
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(129, 23);
             this.button2.TabIndex = 3;
-            this.button2.Text = Resource.button2_Text; //열기
+            this.button2.Text = global::LocalizationTesterC.Resource.button2_Text;
             this.button2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button2.UseVisualStyleBackColor = true;
             // 
@@ -84,7 +85,7 @@ namespace LocalizationTesterC
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 12);
             this.label2.TabIndex = 4;
-            this.label2.Text = Resource.label2_Text; //"라벨2";
+            this.label2.Text = "label2";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label3
@@ -93,7 +94,7 @@ namespace LocalizationTesterC
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(79, 12);
             this.label3.TabIndex = 5;
-            this.label3.Text = Resource.label3_Text; // "라벨3";
+            this.label3.Text = "label3";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // richTextBox1
@@ -102,7 +103,7 @@ namespace LocalizationTesterC
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(100, 96);
             this.richTextBox1.TabIndex = 6;
-            this.richTextBox1.Text = Resource.richTextBox1_Text; // "닫기";
+            this.richTextBox1.Text = "close";
             // 
             // button3
             // 
@@ -110,14 +111,24 @@ namespace LocalizationTesterC
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 7;
-            this.button3.Text = Resource.button3_Text; // "버튼";
+            this.button3.Text = global::LocalizationTesterC.Resource.button3_Text;
             this.button3.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(110, 148);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 8;
+            this.button4.Text = "button4";
+            this.button4.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(273, 338);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.label3);
@@ -127,7 +138,7 @@ namespace LocalizationTesterC
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
-            this.Text = Resource.this_Text; // "한국어 폼";
+            this.Text = "Form default";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -144,6 +155,7 @@ namespace LocalizationTesterC
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
     }
 }
 
