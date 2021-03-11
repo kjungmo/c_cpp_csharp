@@ -14,6 +14,7 @@ namespace LocalizationTesterD
 {
     public partial class Form1 : Form
     {
+
         public Form1()
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
@@ -27,10 +28,7 @@ namespace LocalizationTesterD
                 case 0: Thread.CurrentThread.CurrentUICulture = new CultureInfo("ko-KR"); break;
                 case 1: Thread.CurrentThread.CurrentUICulture = new CultureInfo("en"); break;
             }
-            this.Controls.Clear();
-            InitializeComponent();
             SetChangedLanguageComponents();
-            Form1_Load(sender, e);
         }
 
         private void SetChangedLanguageComponents()
@@ -43,15 +41,5 @@ namespace LocalizationTesterD
             this.richTextBox1.Text = Languages.Resource.richTextBox1_Text;
 
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            List<string> languages = new List<string>(new string[] { "한국어", "English", "日本語" });
-            foreach (var item in languages)
-            {
-                comboBox1.Items.Add(item);
-            }
-        }
-
     }
 }

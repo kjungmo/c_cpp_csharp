@@ -91,7 +91,12 @@ namespace LocalizationTesterD
             // 
             // comboBox1
             // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "한국어",
+            "English",
+            "日本語"});
             this.comboBox1.Location = new System.Drawing.Point(450, 33);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.comboBox1.Name = "comboBox1";
@@ -121,8 +126,7 @@ namespace LocalizationTesterD
             this.Controls.Add(this.button1);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
-            this.Text = Languages.Resource.this_Text;
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Text = "Form";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
