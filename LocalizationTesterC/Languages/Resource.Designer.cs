@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LocalizationTesterC {
+namespace LocalizationTesterC.Languages {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace LocalizationTesterC {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LocalizationTesterC.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LocalizationTesterC.Languages.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -79,11 +79,20 @@ namespace LocalizationTesterC {
         }
         
         /// <summary>
-        ///   button과(와) 유사한 지역화된 문자열을 찾습니다.
+        ///   button3과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string button3_Text {
             get {
                 return ResourceManager.GetString("button3.Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   button4과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string button4_Text {
+            get {
+                return ResourceManager.GetString("button4.Text", resourceCulture);
             }
         }
         

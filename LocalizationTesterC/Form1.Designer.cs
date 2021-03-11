@@ -46,7 +46,7 @@ namespace LocalizationTesterC
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(149, 23);
             this.button1.TabIndex = 0;
-            this.button1.Text = global::LocalizationTesterC.Resource.button1_Text;
+            this.button1.Text = Languages.Resource.button1_Text;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -56,7 +56,7 @@ namespace LocalizationTesterC
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 12);
             this.label1.TabIndex = 1;
-            this.label1.Text = "User Language";
+            this.label1.Text = Languages.Resource.label1_Text;
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox1
@@ -75,7 +75,7 @@ namespace LocalizationTesterC
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(129, 23);
             this.button2.TabIndex = 3;
-            this.button2.Text = global::LocalizationTesterC.Resource.button2_Text;
+            this.button2.Text = Languages.Resource.button2_Text;
             this.button2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button2.UseVisualStyleBackColor = true;
             // 
@@ -85,7 +85,7 @@ namespace LocalizationTesterC
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 12);
             this.label2.TabIndex = 4;
-            this.label2.Text = "label2";
+            this.label2.Text = Languages.Resource.label2_Text;
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label3
@@ -94,7 +94,7 @@ namespace LocalizationTesterC
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(79, 12);
             this.label3.TabIndex = 5;
-            this.label3.Text = "label3";
+            this.label3.Text = Languages.Resource.label3_Text;
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // richTextBox1
@@ -103,7 +103,7 @@ namespace LocalizationTesterC
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(100, 96);
             this.richTextBox1.TabIndex = 6;
-            this.richTextBox1.Text = "close";
+            this.richTextBox1.Text = Languages.Resource.richTextBox1_Text;
             // 
             // button3
             // 
@@ -111,7 +111,7 @@ namespace LocalizationTesterC
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 7;
-            this.button3.Text = global::LocalizationTesterC.Resource.button3_Text;
+            this.button3.Text = Languages.Resource.button3_Text;
             this.button3.UseVisualStyleBackColor = true;
             // 
             // button4
@@ -120,7 +120,7 @@ namespace LocalizationTesterC
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 8;
-            this.button4.Text = "button4";
+            this.button4.Text = Languages.Resource.button4_Text;
             this.button4.UseVisualStyleBackColor = true;
             // 
             // Form1
@@ -138,7 +138,7 @@ namespace LocalizationTesterC
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
-            this.Text = "Form default";
+            this.Text = Languages.Resource.this_Text;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
