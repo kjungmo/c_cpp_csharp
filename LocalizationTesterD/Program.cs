@@ -7,6 +7,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics;
+using System.Security.Permissions;
 
 namespace LocalizationTesterD
 {
@@ -15,19 +16,41 @@ namespace LocalizationTesterD
     /// <summary>
     /// 해당 애플리케이션의 주 진입점입니다.
     /// </summary>
-    [STAThread]
+    [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
         static void Main()
         {
 
-            Application.ThreadException += Application_ThreadException;
-            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            //Application.ThreadException += Application_ThreadException;
+            //Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
+            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            throw new Exception("UI 생성 전 Exception throw.");
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledEX);
+
+            //throw new Exception("UI 생성 전 Exception throw.");
+
+            try
+            {
+                throw new Exception("1");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Catch clause caught : {e.Message}");
+            }
+
+            throw new Exception("2");
+
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
+        }
+
+        static void UnhandledEX(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+            Console.WriteLine($"UnhandledEX caught : {e.Message}");
+            Console.WriteLine($"Runtime terminating : {args.IsTerminating}");
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

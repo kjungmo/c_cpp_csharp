@@ -40,12 +40,28 @@ namespace LocalizationTesterD.Tools
 
         public void Write(string data)
         {
-
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(_path, true)) // true means to append, not overwrites existing files
+                {
+                    writer.Write(data); // Write method from StreamWriter Class
+                }
+            }
+            catch (Exception ex)
+            { }
         }
 
         public void WriteLine(string data)
         {
-
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(_path, true))
+                {
+                    writer.WriteLine(DateTime.Now.ToString("yyyyMMdd HH:mm:ss/t") + data);  // writeLine method from StreamWriter class
+                }
+            }
+            catch (Exception ex)
+            { }
         }
         #endregion
     }
