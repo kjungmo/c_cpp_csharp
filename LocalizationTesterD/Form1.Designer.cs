@@ -48,7 +48,7 @@ namespace LocalizationTesterD
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 18);
             this.button1.TabIndex = 0;
-            this.button1.Text = "버튼1eng";
+            this.button1.Text = "버튼";
             this.button1.UseVisualStyleBackColor = true;
             // 
             // richTextBox1
@@ -70,7 +70,7 @@ namespace LocalizationTesterD
             this.groupBox1.Size = new System.Drawing.Size(212, 177);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "테스트eng";
+            this.groupBox1.Text = "테스트";
             // 
             // textBox1
             // 
@@ -85,9 +85,9 @@ namespace LocalizationTesterD
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(284, 223);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 12);
+            this.label1.Size = new System.Drawing.Size(29, 12);
             this.label1.TabIndex = 7;
-            this.label1.Text = "라벨1eng";
+            this.label1.Text = "라벨";
             // 
             // comboBox1
             // 

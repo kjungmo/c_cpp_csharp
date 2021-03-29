@@ -17,8 +17,12 @@ namespace LocalizationTesterD
 
         public Form1()
         {
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("ko-KR");
             InitializeComponent();
+            SetChangedLanguageComponents();
+
+            label1.Text = "라벨 원";
+            label1.Text = Languages.Resource.ResourceManager.GetString("Label1");
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
