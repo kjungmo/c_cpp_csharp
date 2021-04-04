@@ -23,14 +23,11 @@ namespace ZipTester
 
             string[] arguments = Environment.GetCommandLineArgs();
             arguments = arguments.Where(condition => condition != arguments[0]).ToArray();
-            foreach (string arg in arguments)
-            {
-                Console.WriteLine(arg);
-            }
+            List<string> userInput = arguments.ToList();
 
             //ZipTester.exe zip f:\Github\ .log/.jpg daily
 
-            switch (arguments[0].ToLower())
+            switch (userInput[0].ToLower())
             {
                 case "zip":
                     Console.WriteLine("Zip Mode Selected!");
@@ -41,6 +38,26 @@ namespace ZipTester
                 default:
                     break;
             }
+
+            // [TEST] for when default directory is needed
+            if (userInput.Count() != 2 )
+            {
+                userInput.Add(Directory.GetCurrentDirectory()); 
+            }
+            Console.WriteLine(userInput.Count());
+
+
+            foreach (string input in userInput)
+            {
+                Console.WriteLine(input);
+            }
+            
+            // when user input directory does not exist
+            if(!Directory.Exists(userInput[1]))
+            {
+                Directory.CreateDirectory(userInput[1]);
+            }
+
             //Console.Write("Log Directory : ");
             //string logDir = Console.ReadLine();
             //Console.Write("Zipfile Name : ");
