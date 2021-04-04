@@ -18,8 +18,9 @@ namespace ZipTester
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
-            Console.WriteLine("[ZIP MODE] [Directory] [File Extension Type] [Interval] ");
-            Console.WriteLine("[UNZIP MODE] [Directory]");
+            Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Extension Type] [Zip Interval] "); //count 5
+            Console.WriteLine("[UNZIP MODE] [Zipfile Directory] [Unzip Directory]"); // count 3
+            Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
 
             string[] arguments = Environment.GetCommandLineArgs();
             arguments = arguments.Where(condition => condition != arguments[0]).ToArray();
@@ -27,20 +28,30 @@ namespace ZipTester
 
             //ZipTester.exe zip f:\Github\ .log/.jpg daily
 
+            Console.WriteLine($"arguments count : {userInput.Count()}");
             switch (userInput[0].ToLower())
             {
                 case "zip":
                     Console.WriteLine("Zip Mode Selected!");
+                    if (userInput.Count() != 5)
+                    {
+                        Console.WriteLine("Arguments Error! Check again.");
+                        break;
+                    }
+
                     break;
                 case "unzip":
                     Console.WriteLine("Unzip Mode Selected!");
-                    break;
-                default:
+                    if (userInput.Count() != 3)
+                    {
+                        Console.WriteLine("Arguments Error! Check again.");
+                        break;
+                    }
                     break;
             }
 
             // [TEST] for when default directory is needed
-            if (userInput.Count() != 2 )
+            if (userInput.Count() < 2 )
             {
                 userInput.Add(Directory.GetCurrentDirectory()); 
             }
@@ -57,6 +68,10 @@ namespace ZipTester
             {
                 Directory.CreateDirectory(userInput[1]);
             }
+
+            //string zipName = 
+            //CompressZipByIO(userInput[1], MakeZipDir(userInput[1], zipname));
+
 
             //Console.Write("Log Directory : ");
             //string logDir = Console.ReadLine();
