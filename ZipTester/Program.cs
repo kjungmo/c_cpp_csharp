@@ -18,42 +18,66 @@ namespace ZipTester
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
-            Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Extension Type] [Zip Interval] "); //count 5
+            Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Extension Type] [Zip Separation(default ] [Zip Interval] "); //count 6
             Console.WriteLine("[UNZIP MODE] [Zipfile Directory] [Unzip Directory]"); // count 3
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
 
+
+            // Time-Interval applied ( Daily / Weekly / Monthly / 
+            //string path = Directory.GetCurrentDirectory();
+            //string folderFullname = new DirectoryInfo(path).FullName;
+            //string folderName = new DirectoryInfo(path).Name;
+            //DirectoryInfo folder = new DirectoryInfo(path).Parent;
+            //Console.WriteLine($"path: {path}");
+            //Console.WriteLine($"FolderFullName : {folderFullname}");
+            //Console.WriteLine($"FolderName : {folderName}");
+            //Console.WriteLine($"path 's parent directory is {folder}");
+
+
+
+            #region CommandLineArgs
             string[] arguments = Environment.GetCommandLineArgs();
-            arguments = arguments.Where(condition => condition != arguments[0]).ToArray();
+            arguments = args.Where(condition => condition != args[0]).ToArray();
             List<string> userInput = arguments.ToList();
 
-            //ZipTester.exe zip f:\Github\ .log/.jpg daily
+            //ZipTester.exe zip d:\ZipTest zipper .log 
+            string mode = userInput[0];
+            string path = userInput[1];
+            string zipName = userInput[2];
+            string logs = userInput[3];
+            //string interval = userInput[4];
+
 
             Console.WriteLine($"arguments count : {userInput.Count()}");
-            switch (userInput[0].ToLower())
+            if (userInput[0].ToLower() == "zip")
             {
-                case "zip":
-                    Console.WriteLine("Zip Mode Selected!");
-                    if (userInput.Count() != 5)
-                    {
-                        Console.WriteLine("Arguments Error! Check again.");
-                        break;
-                    }
 
-                    break;
-                case "unzip":
-                    Console.WriteLine("Unzip Mode Selected!");
-                    if (userInput.Count() != 3)
-                    {
-                        Console.WriteLine("Arguments Error! Check again.");
-                        break;
-                    }
-                    break;
+                Console.WriteLine("Zip Mode Selected!");
+                if (userInput.Count() < 4)
+                {
+                    Console.WriteLine("Arguments Error! Check again.");
+                    return;
+                }
+                CompressZipByIO(path, MakeZipDir(path, zipName), CompressionLevel.Optimal);
+
+            }
+            else if (userInput[0].ToLower() == "unzip")
+            {
+                Console.WriteLine("Unzip Mode Selected!");
+                if (userInput.Count() != 3)
+                {
+                    Console.WriteLine("Arguments Error! Check again.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Select an appropriate Mode first.");
             }
 
             // [TEST] for when default directory is needed
-            if (userInput.Count() < 2 )
+            if (userInput.Count() < 2)
             {
-                userInput.Add(Directory.GetCurrentDirectory()); 
+                userInput.Add(Directory.GetCurrentDirectory());
             }
             Console.WriteLine(userInput.Count());
 
@@ -62,9 +86,9 @@ namespace ZipTester
             {
                 Console.WriteLine(input);
             }
-            
+
             // when user input directory does not exist
-            if(!Directory.Exists(userInput[1]))
+            if (!Directory.Exists(userInput[1]))
             {
                 Directory.CreateDirectory(userInput[1]);
             }
@@ -93,15 +117,47 @@ namespace ZipTester
 
 
             //}
-
+            #endregion
             Console.WriteLine("press any key...");
             Console.ReadKey();
         }
 
-        private static string MakeZipDir(string folderName, string fileName)
+        private static string MakeZipDir(string folderName, string fileName, string timeInterval = "daily")
         {
             string fileType = ".zip";
-            string directory = folderName + "\\" + fileName + fileType;
+            string directory = "";
+            DateTime dateToday = DateTime.Now;
+            string year = "";
+            string month = "";
+            switch (timeInterval.ToLower())
+            {
+                case "daily":
+                    string today = string.Format("{0:d}", dateToday);
+                    string daily = string.Concat(today, "_");
+                    directory = folderName + "\\" + daily + fileName + fileType;
+                    break;
+                case "weekly":
+                    break;
+                case "monthly":
+                    month = dateToday.ToString("yyyy-MM");
+                    string monthly = string.Concat(month, "_");
+                    directory = folderName + "\\" + monthly + fileName + fileType;
+                    break;
+                case "quarter":
+                    directory = folderName + "\\" + fileName + fileType;
+                    break;
+                case "half":
+                    directory = folderName + "\\" + fileName + fileType;
+                    break;
+                case "yearly":
+                    year = dateToday.Year.ToString();
+                    string yearly = string.Concat(year, "_");
+                    directory = folderName + "\\" + yearly + fileName + fileType;
+                    break;
+
+            }
+            
+
             return directory;
         }
 
@@ -135,7 +191,7 @@ namespace ZipTester
         }
 
 
-        private static void CompressZipByIO(string sourcePath, string zipPath)
+        private static void CompressZipByIO(string sourcePath, string zipPath, CompressionLevel compressionLevel)
         {
             var fileList = GetFileList(sourcePath, new List<string>());
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
@@ -144,16 +200,20 @@ namespace ZipTester
                 {
                     foreach (string file in fileList)
                     {
-                        string path = file.Substring(sourcePath.Length + 1);
-                        try
+                        if(Path.GetExtension(file) == ".log" || Path.GetExtension(file) == ".jpg")
                         {
-                            zipArchive.CreateEntryFromFile(file, path); // if already exists, thros IOException
-                        }
-                        catch (Exception e)
-                        {
+                            string path = file.Substring(sourcePath.Length + 1);
+                            try
+                            {
+                                zipArchive.CreateEntryFromFile(file, path); // if already exists, throws IOException
+                            }
+                            catch (Exception e)
+                            {
 
+                            }
                         }
                     }
+                    DeleteFile(sourcePath);
                 }
                 Console.WriteLine("Created!");
             }
@@ -163,9 +223,10 @@ namespace ZipTester
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
 
-            foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension != ".zip"))
+            //foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension != ".zip"))
+            foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
             {
-                Console.WriteLine(file.FullName);
+                //Console.WriteLine(file.FullName);
                 file.Delete();
             }
 
