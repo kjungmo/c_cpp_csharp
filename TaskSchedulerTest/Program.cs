@@ -12,24 +12,32 @@ namespace TaskSchedulerTest
     {
         static void Main(string[] args)
         {
-            string date1 = DateTime.Today.AddDays(0).ToString();
-            string date2 = DateTime.Today.AddDays(-7).ToString();
-            string date3 = DateTime.Today.AddDays(-14).ToString();
-            Console.WriteLine($"date1 : {date1}");
-            Console.WriteLine($"date2 : {date2}");
-            Console.WriteLine($"date3 : {date3}");
-            Console.WriteLine($"date1.compared to date1 : {date1.CompareTo(date1)}");
-            Console.WriteLine($"date1.compared to date2 : {date1.CompareTo(date2)}");
-            Console.WriteLine($"date1.compared to date3 : {date1.CompareTo(date3)}");
-            Console.WriteLine($"date2.compared to date1 : {date2.CompareTo(date1)}");
-            Console.WriteLine($"date2.compared to date2 : {date2.CompareTo(date2)}");
-            Console.WriteLine($"date2.compared to date3 : {date2.CompareTo(date3)}");
-            Console.WriteLine($"date3.compared to date1 : {date3.CompareTo(date1)}");
-            Console.WriteLine($"date3.compared to date2 : {date3.CompareTo(date2)}");
-            Console.WriteLine($"date3.compared to date3 : {date3.CompareTo(date3)}");
+            //string dateWeekAgo = DateTime.Today.AddDays(-7).ToString();
 
+            //dateWeekAgo.CompareTo(DateTime.Today.a.ToString());
+            //string date2 = DateTime.Today.AddDays(-7).ToString();
+            //string date3 = DateTime.Today.AddDays(-14).ToString();
+            //Console.WriteLine($"date1 : {date1}");
+            //Console.WriteLine($"date2 : {date2}");
+            //Console.WriteLine($"date3 : {date3}");
+            //Console.WriteLine($"date1.compared to date1 : {date1.CompareTo(date1)}");
+            //Console.WriteLine($"date1.compared to date2 : {date1.CompareTo(date2)}");
+            //Console.WriteLine($"date1.compared to date3 : {date1.CompareTo(date3)}");
+            //Console.WriteLine($"date2.compared to date1 : {date2.CompareTo(date1)}");
+            //Console.WriteLine($"date2.compared to date2 : {date2.CompareTo(date2)}");
+            //Console.WriteLine($"date2.compared to date3 : {date2.CompareTo(date3)}");
+            //Console.WriteLine($"date3.compared to date1 : {date3.CompareTo(date1)}");
+            //Console.WriteLine($"date3.compared to date2 : {date3.CompareTo(date2)}");
+            //Console.WriteLine($"date3.compared to date3 : {date3.CompareTo(date3)}");
+
+            DateTime dateToday = DateTime.Today;
+            Console.WriteLine($"Today : {dateToday}");
+
+            string today = string.Format("{0:d}", dateToday);
+            string lastWeek = string.Format("{0:d}", dateToday.AddDays(-7));
+            Console.WriteLine($"today : {today}");
+            Console.WriteLine($"lastWeek : {lastWeek}");
             Console.ReadLine();
-
 
             //// Create a new task definition for the local machine and assign properties
             //TaskDefinition td = TaskService.Instance.NewTask();
