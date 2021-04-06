@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO.Compression;
 using System.IO;
+using Microsoft.Win32.TaskScheduler;
 
 namespace ZipTester
 {
@@ -21,7 +22,7 @@ namespace ZipTester
             Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Extension Type] [Zip Separation(default ] [Zip Interval] "); //count 6
             Console.WriteLine("[UNZIP MODE] [Zipfile Directory] [Unzip Directory]"); // count 3
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
-
+            Console.WriteLine($"Task Scheduler Library version : {TaskService.LibraryVersion}");
 
             // Time-Interval applied ( Daily / Weekly / Monthly / 
             //string path = Directory.GetCurrentDirectory();
@@ -36,20 +37,29 @@ namespace ZipTester
 
 
             #region CommandLineArgs
-            string[] arguments = Environment.GetCommandLineArgs();
-            arguments = args.Where(condition => condition != args[0]).ToArray();
-            List<string> userInput = arguments.ToList();
+            // when deploying, must use Environment.GetCommandLineArgs()
+            //string[] cmdArgs = Environment.GetCommandLineArgs();
+            //List<string> myArgs = cmdArgs.Where(arg => arg != cmdArgs[0]).ToList();
 
-            //ZipTester.exe zip d:\ZipTest zipper .log 
+            
+            List<string> userInput = args.Where(condition => condition != args[0]).ToList();
+            foreach (var item in userInput)
+            {
+                Console.Write(item + "\t");
+            }
+            Console.WriteLine();
+
+            //ZipTester.exe zip d:\ZipTest zipp .log monthly
             string mode = userInput[0];
             string path = userInput[1];
-            string zipName = userInput[2];
-            string logs = userInput[3];
+            //string zipName = userInput[2];
+            //string logs = userInput[3];
             //string interval = userInput[4];
-
+            //ZipTester.exe unzip ‪D:\ZipTest\2021-04_zipp.zip
 
             Console.WriteLine($"arguments count : {userInput.Count()}");
-            if (userInput[0].ToLower() == "zip")
+
+            if (mode.ToLower() == "zip")
             {
 
                 Console.WriteLine("Zip Mode Selected!");
@@ -58,16 +68,17 @@ namespace ZipTester
                     Console.WriteLine("Arguments Error! Check again.");
                     return;
                 }
-                CompressZipByIO(path, MakeZipDir(path, zipName), CompressionLevel.Optimal);
+                //CompressZipByIO(path, MakeZipDir(path, zipName, interval), CompressionLevel.Optimal);
 
             }
-            else if (userInput[0].ToLower() == "unzip")
+            else if (mode.ToLower() == "unzip")
             {
                 Console.WriteLine("Unzip Mode Selected!");
-                if (userInput.Count() != 3)
+                if (userInput.Count() != 2)
                 {
                     Console.WriteLine("Arguments Error! Check again.");
                 }
+                ExtractZIPFile(path);
             }
             else
             {
@@ -79,8 +90,6 @@ namespace ZipTester
             {
                 userInput.Add(Directory.GetCurrentDirectory());
             }
-            Console.WriteLine(userInput.Count());
-
 
             foreach (string input in userInput)
             {
@@ -88,41 +97,17 @@ namespace ZipTester
             }
 
             // when user input directory does not exist
-            if (!Directory.Exists(userInput[1]))
-            {
-                Directory.CreateDirectory(userInput[1]);
-            }
-
-            //string zipName = 
-            //CompressZipByIO(userInput[1], MakeZipDir(userInput[1], zipname));
-
-
-            //Console.Write("Log Directory : ");
-            //string logDir = Console.ReadLine();
-            //Console.Write("Zipfile Name : ");
-            //string zipName = Console.ReadLine();
-            //CompressZipByIO(logDir, MakeZipDir(logDir, zipName));
-            //Console.Write("Delete Compressed Files? (Y/N) : ");
-
-            //switch(Console.ReadLine())
+            //if (!Directory.Exists(userInput[1]))
             //{
-            //    case "y":
-            //    case "Y":
-            //        DeleteFile(logDir);
-            //        break;
-            //    case "n":
-            //    case "N":
-            //        Console.WriteLine("Files Left.");
-            //        break;
-
-
+            //    Directory.CreateDirectory(userInput[1]);
             //}
+
             #endregion
             Console.WriteLine("press any key...");
             Console.ReadKey();
         }
 
-        private static string MakeZipDir(string folderName, string fileName, string timeInterval = "daily")
+        private static string MakeZipDir(string folderName, string fileName, string timeInterval)
         {
             string fileType = ".zip";
             string directory = "";
@@ -154,10 +139,7 @@ namespace ZipTester
                     string yearly = string.Concat(year, "_");
                     directory = folderName + "\\" + yearly + fileName + fileType;
                     break;
-
             }
-            
-
             return directory;
         }
 
@@ -205,7 +187,7 @@ namespace ZipTester
                             string path = file.Substring(sourcePath.Length + 1);
                             try
                             {
-                                zipArchive.CreateEntryFromFile(file, path); // if already exists, throws IOException
+                                zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
                             }
                             catch (Exception e)
                             {
@@ -222,15 +204,92 @@ namespace ZipTester
         private static void DeleteFile(string sourcePath)
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
-
-            //foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension != ".zip"))
             foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
             {
-                //Console.WriteLine(file.FullName);
+                Console.WriteLine(file.FullName);
                 file.Delete();
             }
 
             Console.WriteLine("Deleted!");
         }
+
+        #region Extraction
+        //ExtractZIPFile(backupFolderPath, zipFilePath) 
+        
+        private static void ExtractZIPFile(string zipFilePath) 
+        {
+            string destinationFolder = Path.Combine(Path.GetDirectoryName(zipFilePath), Path.GetFileNameWithoutExtension(zipFilePath));
+            if (!Directory.Exists(destinationFolder))
+            {
+                Directory.CreateDirectory(destinationFolder);
+            }
+            
+            using(ZipArchive zipArchive = ZipFile.OpenRead(zipFilePath)) 
+            {
+                foreach(ZipArchiveEntry zipArchiveEntry in zipArchive.Entries) 
+                {
+                    try
+                    {
+                        var filePath = Path.Combine(destinationFolder, zipArchiveEntry.FullName);
+                        var subDir = Path.GetDirectoryName(filePath);
+                        if (!Directory.Exists(subDir))
+                        {
+                            Directory.CreateDirectory(subDir);
+                        }
+                        zipArchiveEntry.ExtractToFile(filePath);
+                    }
+                    catch(PathTooLongException)
+                    { }
+                } 
+            } 
+        }
+        #endregion
+
+        //#region Task Scheduler
+        //public void TaskSchedule(string description, string startTime, string duration, string timeInterval)
+        //{
+
+        //    int start = Convert.ToInt32(startTime);
+        //    // Create a new task definition for the local machine and assign properties
+        //    TaskDefinition td = TaskService.Instance.NewTask();
+        //    td.RegistrationInfo.Description = "Does something";
+        //    TimeSpan timeSpan;
+        //    switch (timeInterval)
+        //    {
+        //        case "daily":
+        //            DailyTrigger dayy;
+        //            break;
+        //        case "weekly":
+        //            WeeklyTrigger weekk;
+        //            break;
+        //        case "monthly":
+        //            MonthlyTrigger monthh;
+        //            break;
+        //    }
+
+            
+            
+        //    // Add a trigger that, starting tomorrow, will fire every other week on Monday
+        //    // and Saturday and repeat every 10 minutes for the following 11 hours
+        //    WeeklyTrigger wt = new WeeklyTrigger();
+        //    wt.StartBoundary = DateTime.Now.AddSeconds(5);
+        //    wt.DaysOfWeek = DaysOfTheWeek.AllDays;
+        //    wt.WeeksInterval = 3;
+        //    wt.Repetition.Duration = TimeSpan.FromHours(.5);
+        //    wt.Repetition.Interval = TimeSpan.FromSeconds(20);
+        //    td.Triggers.Add(wt);
+
+        //    // Create an action that will launch Notepad whenever the trigger fires
+        //    ExecAction CogAplex = new ExecAction();
+        //    CogAplex.Path = "zip";
+        //    CogAplex.Arguments = "d";
+        //    CogAplex.WorkingDirectory = "";
+
+        //    td.Actions.Add("notepad.exe", "d:\\test.log");
+
+        //    // Register the task in the root folder of the local machine
+        //    TaskService.Instance.RootFolder.RegisterTaskDefinition("Test", td);
+        //}
+        //#endregion
     }
 }
