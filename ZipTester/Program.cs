@@ -18,22 +18,10 @@ namespace ZipTester
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
-            Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Zip Interval] "); //count 4  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
+            Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
             Console.WriteLine("[UNZIP MODE] [Zipfile Directory] "); // count 2
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
             Console.WriteLine($"Task Scheduler Library version : {TaskService.LibraryVersion}");
-
-            // Time-Interval applied ( Daily / Weekly / Monthly / 
-            //string path = Directory.GetCurrentDirectory();
-            //string folderFullname = new DirectoryInfo(path).FullName;
-            //string folderName = new DirectoryInfo(path).Name;
-            //DirectoryInfo folder = new DirectoryInfo(path).Parent;
-            //Console.WriteLine($"path: {path}");
-            //Console.WriteLine($"FolderFullName : {folderFullname}");
-            //Console.WriteLine($"FolderName : {folderName}");
-            //Console.WriteLine($"path 's parent directory is {folder}");
-
-
 
             #region CommandLineArgs
             // when deploying, must use 
@@ -41,20 +29,17 @@ namespace ZipTester
             //string[] cmdArgs = Environment.GetCommandLineArgs();
             //List<string> userInput = cmdArgs.Where(arg => arg != cmdArgs[0]).ToList();
 
-            
+            #region deleteAfterDevel.
             List<string> userInput = args.Where(condition => condition != args[0]).ToList();
             foreach (var item in userInput)
             {
                 Console.Write(item + "\t");
             }
             Console.WriteLine();
-
-            //ZipTester.exe zip d:\ZipTest zipp monthly
-
-            //ZipTester.exe unzip ‪D:\ZipTest\2021-04_zipp.zip
-
             Console.WriteLine($"arguments count : {userInput.Count()}");
-            
+            #endregion
+            //ZipTester.exe zip d:\ZipTest zipp monthly
+            //ZipTester.exe unzip ‪D:\ZipTest\2021-04_zipp.zip
             switch (userInput[0].ToLower())
             {
                 case "zip":
@@ -65,6 +50,7 @@ namespace ZipTester
                         return;
                     }
                     CompressZIPFile(userInput[1], MakeZipDir(userInput[1], userInput[2], userInput[3]), CompressionLevel.Optimal);
+                    DeleteZIPFile(userInput[1], userInput[3]);
                     AddTaskSchedule(userInput[3]);
                     break;
 
@@ -82,14 +68,8 @@ namespace ZipTester
                     break;
             }
 
-            foreach (string input in userInput)
-            {
-                Console.WriteLine(input);
-            }
-
-
             #endregion
-            Console.WriteLine("press any key...");
+            Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
 
@@ -168,7 +148,7 @@ namespace ZipTester
         #endregion
 
         #region Compressing Files into Zipfile
-        private static void CompressZIPFile(string sourcePath, string zipPath, CompressionLevel compressionLevel)
+        private static void CompressZIPFile(string sourcePath, string zipPath, CompressionLevel compressionLevel = CompressionLevel.Fastest)
         {
             var fileList = GetFileList(sourcePath, new List<string>());
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
@@ -193,7 +173,6 @@ namespace ZipTester
                     DeleteFile(sourcePath);
                 }
                 Console.WriteLine("Created!");
-                DeleteZIPFile(sourcePath);
             }
         }
         #endregion
@@ -212,16 +191,31 @@ namespace ZipTester
         }
         #endregion
 
-        #region Deleting Zipfiles after certain amount of time
-        private static void DeleteZIPFile(string sourcePath, int deleteInterval = -5)
+        #region Deleting Zipfiles after a certain amount of time
+        private static void DeleteZIPFile(string sourcePath, string deleteInterval) // deleteInterval = { "daily", "weekly", "monthly" }
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
+            DateTime pivot = DateTime.Today;
+            switch (deleteInterval)
+            {
+
+                case "daily":
+                    pivot = pivot.AddDays(-1);
+                    break;
+                case "weekly":
+                    pivot = pivot.AddDays(-7);
+                    break;
+                case "monthly":
+                    pivot = pivot.AddMonths(-1);
+                    break;
+            }
+
             if(dirInfo.Exists)
             {
                 FileInfo[] files = dirInfo.GetFiles();
                 foreach (FileInfo file in files)
                 {
-                    if (DateTime.Today.AddDays(deleteInterval).ToString("yyyy-MM-dd").CompareTo(file.LastWriteTime.ToString("yyyy-MM-dd")) == 0)
+                    if (pivot.ToString("yyyy-MM-dd").CompareTo(file.LastWriteTime.ToString("yyyy-MM-dd")) == 0)
                     {
                         if (System.Text.RegularExpressions.Regex.IsMatch(file.Name, ".zip"))
                         {
@@ -233,26 +227,6 @@ namespace ZipTester
                 }
                 
             }
-
-            //string zipFile = File.GetLastWriteTime(sourcePath).ToString("yyyy-MM-dd");
-            //string date = "";
-            //switch (interval)
-            //{
-            //    case "daily":
-            //    case "weekly":
-            //        date = DateTime.Today.AddMonths(-6).ToString("yyyy-MM-dd");
-            //        if (date.CompareTo(zipFile) == 0 )
-            //        {
-
-            //        }
-            //        break;
-                    
-            //    case "monthly":
-            //        break;
-            //    default:
-            //        break;
-            
-
         }
         #endregion
 
@@ -306,61 +280,69 @@ namespace ZipTester
         #endregion
 
         #region Task Scheduler
-        private static void AddTaskSchedule(string timeInterval)
+        private static void AddTaskSchedule(string timeInterval, string stopFlag = "true")
         {
             // Create a new task definition for the local machine and assign properties
             TaskDefinition td = TaskService.Instance.NewTask();
             td.RegistrationInfo.Description = "Compressing Log files.";
+
+            // trigger settings
             switch (timeInterval)
             {
                 case "daily":
-                    // Create a trigger that runs every other day and will start randomly between 10 a.m. and 12 p.m.
-                    DailyTrigger dt = new DailyTrigger();
-                    dt.StartBoundary = DateTime.Today + TimeSpan.FromHours(10);
-                    dt.DaysInterval = 2;
-                    dt.RandomDelay = TimeSpan.FromHours(2);
+                    DailyTrigger dTrigger = new DailyTrigger();
+                    dTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
+                    dTrigger.DaysInterval = 1;
+                    td.Triggers.Add(dTrigger);
+                    if (stopFlag.ToLower() == "false")
+                    {
+                        dTrigger.Enabled = false;
+                    }
+                    dTrigger.Enabled = false;
                     break;
                 case "weekly":
-                    // Create a trigger that runs on Monday every third week just after midnight.
                     WeeklyTrigger wTrigger = new WeeklyTrigger();
-                    wTrigger.StartBoundary = DateTime.Today + TimeSpan.FromSeconds(15);
+                    wTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
                     wTrigger.DaysOfWeek = DaysOfTheWeek.Monday;
-                    wTrigger.WeeksInterval = 3;
+                    wTrigger.WeeksInterval = 1;
+                    td.Triggers.Add(wTrigger);
+                    if (stopFlag.ToLower() == "false")
+                    {
+                        wTrigger.Enabled = false;
+                    }
                     break;
                 case "monthly":
-                    // Create a trigger that will run at 10 a.m. on the 10th, 20th and last days of July and November
+                    // starts 2 seconds later, triggers on the first day of every month, doesn't run on the last day of the month
                     MonthlyTrigger mTrigger = new MonthlyTrigger();
-                    mTrigger.StartBoundary = DateTime.Today + TimeSpan.FromHours(10);
-                    mTrigger.DaysOfMonth = new int[]{ 10, 20 };
-                    mTrigger.MonthsOfYear = MonthsOfTheYear.July | MonthsOfTheYear.November;
-                    mTrigger.RunOnLastDayOfMonth = true; // V2 only
-
-                    // Create a trigger that runs Saturday in the first and last week of January and Decemeber at 1 a.m.
+                    mTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
+                    mTrigger.DaysOfMonth = new int[]{ 1 };
+                    mTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
+                    mTrigger.RunOnLastDayOfMonth = false; // V2 only
+                    td.Triggers.Add(mTrigger);
+                    if (stopFlag.ToLower() == "false")
+                    {
+                        mTrigger.Enabled = false;
+                    }
+                    //OR starts 2 seconds later, triggers on the first week's monday of every month
                     MonthlyDOWTrigger mdTrigger = new MonthlyDOWTrigger();
-                    mdTrigger.StartBoundary = DateTime.Today + TimeSpan.FromHours(1);
-                    mdTrigger.DaysOfWeek = DaysOfTheWeek.Saturday;
-                    mdTrigger.MonthsOfYear = MonthsOfTheYear.January | MonthsOfTheYear.December;
-                    mdTrigger.WeeksOfMonth = WhichWeek.FirstWeek | WhichWeek.LastWeek;
+                    mdTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
+                    mdTrigger.DaysOfWeek = DaysOfTheWeek.Monday;
+                    mdTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
+                    mdTrigger.WeeksOfMonth = WhichWeek.FirstWeek;
+                    td.Triggers.Add(mdTrigger);
+                    if (stopFlag.ToLower() == "false")
+                    {
+                        mdTrigger.Enabled = false;
+                    }
+
                     break;
             }
-
-
-
-            // Add a trigger that, starting tomorrow, will fire every other week on Monday
-            // and Saturday and repeat every 10 minutes for the following 11 hours
-            //WeeklyTrigger wt = new WeeklyTrigger();
-            //wt.StartBoundary = DateTime.Now.AddSeconds(5);
-            //wt.DaysOfWeek = DaysOfTheWeek.AllDays;
-            //wt.WeeksInterval = 3;
-            //wt.Repetition.Duration = TimeSpan.FromHours(.5);
-            //wt.Repetition.Interval = TimeSpan.FromSeconds(20);
-            //td.Triggers.Add(wt);
-
             
+            // action settings 
             ExecAction CogAplex = new ExecAction();
-            CogAplex.Path = "zip";
-            CogAplex.Arguments = "d";
-            CogAplex.WorkingDirectory = "";
+            CogAplex.Path = "zip"; // where exe is located ( full address ) 
+            CogAplex.Arguments = "d";  // arguments
+            CogAplex.WorkingDirectory = ""; // directory of exe? arguments? 
 
             td.Actions.Add("notepad.exe", "d:\\test.log");
 
