@@ -12,6 +12,10 @@ namespace TaskSchedulerTest
     {
         static void Main(string[] args)
         {
+
+            string path = @"d:\ZipTest";
+            GetFileList(path, new List<string>());
+            Console.ReadKey();
             //string dateWeekAgo = DateTime.Today.AddDays(-7).ToString();
 
             //dateWeekAgo.CompareTo(DateTime.Today.a.ToString());
@@ -30,17 +34,18 @@ namespace TaskSchedulerTest
             //Console.WriteLine($"date3.compared to date2 : {date3.CompareTo(date2)}");
             //Console.WriteLine($"date3.compared to date3 : {date3.CompareTo(date3)}");
 
-            DateTime dateToday = DateTime.Today;
-            Console.WriteLine($"Today : {dateToday}");
+            //DateTime dateToday = DateTime.Today;
+            //Console.WriteLine($"Today : {dateToday}");
 
-            string today = string.Format("{0:d}", dateToday);
-            string lastWeek = string.Format("{0:d}", dateToday.AddDays(-7));
-            Console.WriteLine($"today : {today}");
-            Console.WriteLine($"lastWeek : {lastWeek}");
-            Console.ReadLine();
+            //string today = string.Format("{0:d}", dateToday);
+            //string lastWeek = string.Format("{0:d}", dateToday.AddDays(-7));
+            //Console.WriteLine($"today : {today}");
+            //Console.WriteLine($"lastWeek : {lastWeek}");
+            //Console.ReadLine();
 
-            //// Create a new task definition for the local machine and assign properties
+            // Create a new task definition for the local machine and assign properties
             //TaskDefinition td = TaskService.Instance.NewTask();
+
             //td.RegistrationInfo.Description = "Does something";
 
             //// Add a trigger that, starting tomorrow, will fire every other week on Monday
@@ -50,14 +55,16 @@ namespace TaskSchedulerTest
             //wt.DaysOfWeek = DaysOfTheWeek.AllDays;
             //wt.WeeksInterval = 3;
             //wt.Repetition.Duration = TimeSpan.FromHours(.5);
-            //wt.Repetition.Interval = TimeSpan.FromSeconds(20);
+            //wt.Repetition.Interval = TimeSpan.FromMinutes(10);
             //td.Triggers.Add(wt);
+            //wt.Enabled = false;
 
             //// Create an action that will launch Notepad whenever the trigger fires
             //td.Actions.Add("notepad.exe", "d:\\test.log");
 
             //// Register the task in the root folder of the local machine
             //TaskService.Instance.RootFolder.RegisterTaskDefinition("Test", td);
+
 
 
 
@@ -108,6 +115,43 @@ namespace TaskSchedulerTest
             //    // registration
             //    taskService.RootFolder.RegisterTaskDefinition("Our Stream Task", taskDefinition);
             //}
+        }
+        private static List<string> GetFileList(String rootPath, List<String> fileList)
+        {
+            if (fileList == null)
+            {
+                return null;
+            }
+
+            var attr = File.GetAttributes(rootPath);
+            Console.WriteLine("-------------------------");
+            Console.WriteLine($"attr from File.GetAttributes(rootPath) : {attr}");
+            Console.WriteLine($"FileAttributes.Directory : {FileAttributes.Directory}");
+
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            {
+                var dirInfo = new DirectoryInfo(rootPath);
+                Console.WriteLine($"dirInfo from  new DirectoryInfo(rootPath) : {dirInfo}");
+                int count = 1;
+                Console.WriteLine($"dirInfo.GetDirectories().Length : {dirInfo.GetDirectories().Length}");
+                foreach (var dir in dirInfo.GetDirectories())
+                {
+                    GetFileList(dir.FullName, fileList);
+                    Console.WriteLine($"dir : {dir}");
+                    count++;
+                }
+                Console.WriteLine($"count completed : count({count})");
+                foreach (var file in dirInfo.GetFiles())
+                {
+                    GetFileList(file.FullName, fileList);
+                }
+            }
+            else
+            {
+                var fileInfo = new FileInfo(rootPath);
+                fileList.Add(fileInfo.FullName);
+            }
+            return fileList;
         }
     }
 }
