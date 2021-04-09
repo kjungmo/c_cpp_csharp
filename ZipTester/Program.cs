@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using System.IO;
 using Microsoft.Win32.TaskScheduler;
+using System.Windows.Forms;
 
 namespace ZipTester
 {
@@ -14,6 +15,10 @@ namespace ZipTester
 
         static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Form form = new Form();
+
             Console.Title = "CogAplex Log File Management System";
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
@@ -55,6 +60,7 @@ namespace ZipTester
                     break;
 
                 case "unzip":
+                    Application.Run(form);
                     Console.WriteLine("Unzip Mode Selected!");
                     if (userInput.Count() != 2)
                     {
@@ -125,17 +131,25 @@ namespace ZipTester
             }
 
             var attr = File.GetAttributes(rootPath);
-            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            Console.WriteLine("-------------------------");
+            Console.WriteLine($"attr from File.GetAttributes(rootPath) : {attr}");
+
+            if (attr == FileAttributes.Directory)
             {
                 var dirInfo = new DirectoryInfo(rootPath);
+                Console.WriteLine($"dirInfo from  new DirectoryInfo(rootPath) : {dirInfo}");
+                int count = 1;
+                Console.WriteLine($"dirInfo.GetDirectories().Length : {dirInfo.GetDirectories().Length}");
                 foreach (var dir in dirInfo.GetDirectories())
                 {
                     GetFileList(dir.FullName, fileList);
+                    Console.WriteLine($"dir : {dir}");
+                    count++;
                 }
-
-                foreach (var file in dirInfo.GetFiles())
+                Console.WriteLine($"count completed : count({count})");
+                foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
                 {
-                    GetFileList(file.FullName, fileList);
+                     GetFileList(file.FullName, fileList);
                 }
             }
             else
@@ -152,7 +166,7 @@ namespace ZipTester
         {
             var fileList = GetFileList(sourcePath, new List<string>());
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
-            {
+            {            
                 using (ZipArchive zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create))
                 {
                     foreach (string file in fileList)
@@ -163,6 +177,7 @@ namespace ZipTester
                             try
                             {
                                 zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
+                                // file( actual file's path ) , path( entry path which is archived as in ZipArchive )
                             }
                             catch (Exception e)
                             {
@@ -233,6 +248,7 @@ namespace ZipTester
         #region Extracting Zipfiles to its own directory        
         private static void ExtractZIPFile(string zipFilePath) 
         {
+            
             string extractPath = Path.Combine(Path.GetDirectoryName(zipFilePath), Path.GetFileNameWithoutExtension(zipFilePath));
             try
             {
@@ -283,8 +299,8 @@ namespace ZipTester
         private static void AddTaskSchedule(string timeInterval, string stopFlag = "true")
         {
             // Create a new task definition for the local machine and assign properties
-            TaskDefinition td = TaskService.Instance.NewTask();
-            td.RegistrationInfo.Description = "Compressing Log files.";
+            TaskDefinition taskDefinition = TaskService.Instance.NewTask();
+            taskDefinition.RegistrationInfo.Description = "Compressing Log files.";
 
             // trigger settings
             switch (timeInterval)
@@ -293,7 +309,7 @@ namespace ZipTester
                     DailyTrigger dTrigger = new DailyTrigger();
                     dTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
                     dTrigger.DaysInterval = 1;
-                    td.Triggers.Add(dTrigger);
+                    taskDefinition.Triggers.Add(dTrigger);
                     if (stopFlag.ToLower() == "false")
                     {
                         dTrigger.Enabled = false;
@@ -305,7 +321,7 @@ namespace ZipTester
                     wTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
                     wTrigger.DaysOfWeek = DaysOfTheWeek.Monday;
                     wTrigger.WeeksInterval = 1;
-                    td.Triggers.Add(wTrigger);
+                    taskDefinition.Triggers.Add(wTrigger);
                     if (stopFlag.ToLower() == "false")
                     {
                         wTrigger.Enabled = false;
@@ -318,7 +334,7 @@ namespace ZipTester
                     mTrigger.DaysOfMonth = new int[]{ 1 };
                     mTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
                     mTrigger.RunOnLastDayOfMonth = false; // V2 only
-                    td.Triggers.Add(mTrigger);
+                    taskDefinition.Triggers.Add(mTrigger);
                     if (stopFlag.ToLower() == "false")
                     {
                         mTrigger.Enabled = false;
@@ -329,7 +345,7 @@ namespace ZipTester
                     mdTrigger.DaysOfWeek = DaysOfTheWeek.Monday;
                     mdTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
                     mdTrigger.WeeksOfMonth = WhichWeek.FirstWeek;
-                    td.Triggers.Add(mdTrigger);
+                    taskDefinition.Triggers.Add(mdTrigger);
                     if (stopFlag.ToLower() == "false")
                     {
                         mdTrigger.Enabled = false;
@@ -344,10 +360,9 @@ namespace ZipTester
             CogAplex.Arguments = "d";  // arguments
             CogAplex.WorkingDirectory = ""; // directory of exe? arguments? 
 
-            td.Actions.Add("notepad.exe", "d:\\test.log");
-
+            taskDefinition.Actions.Add(CogAplex);
             // Register the task in the root folder of the local machine
-            TaskService.Instance.RootFolder.RegisterTaskDefinition("Test", td);
+            TaskService.Instance.RootFolder.RegisterTaskDefinition("CogAplex Log Management System", taskDefinition);
         }
         #endregion
     }
