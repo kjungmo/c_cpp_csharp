@@ -259,6 +259,7 @@ namespace ZipTester
 
             }
 
+
             //string destinationFolder = Path.Combine(Path.GetDirectoryName(zipFilePath), Path.GetFileNameWithoutExtension(zipFilePath));
             //if (!Directory.Exists(destinationFolder))
             //{
@@ -295,6 +296,49 @@ namespace ZipTester
         }
         #endregion
 
+        #region Finding Daily Zipfiles
+        private static void SearchDailyData(string path, string dailyRecord, string extractPath) // dailyRecord = yyyy-MM-dd
+        {
+            DirectoryInfo dir = new DirectoryInfo(path);
+            IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
+
+            // from path, get all files( and using LINQ, search especially for .zip)
+            // from there, get the zip which matches the date in its name
+            var MatchedZipfile =
+                from file in fileList
+                where file.Extension == ".zip"
+                let fileText = GetFileText(file.FullName)
+                where fileText.Contains(dailyRecord)
+                select file.FullName;
+
+            // when the matched zipfile is found, 
+            // extract where the zip entries has date in its name
+            foreach(string filename in MatchedZipfile)
+            {
+                Console.WriteLine(filename);
+                using (ZipArchive archive = ZipFile.OpenRead(filename))
+                {
+                    foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains("a")))
+                    {
+                        entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
+                    }
+                }
+            }
+
+            
+        }
+        #endregion
+
+        private static string GetFileText(string name)
+        {
+            string fileContents = String.Empty;
+
+            if (File.Exists(name))
+            {
+                fileContents = File.ReadAllText(name);
+            }
+            return fileContents;
+        }
         #region Task Scheduler
         private static void AddTaskSchedule(string timeInterval, string stopFlag = "true")
         {
