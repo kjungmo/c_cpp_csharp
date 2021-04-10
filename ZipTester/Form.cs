@@ -16,5 +16,17 @@ namespace ZipTester
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            string filePath = "";
+            openFileDialog1.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                filePath = openFileDialog1.FileName;
+                
+            }
+        }
     }
 }

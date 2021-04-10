@@ -12,7 +12,7 @@ namespace ZipTester
 {
     class Program
     {
-
+        [STAThread]
         static void Main(string[] args)
         {
             Application.EnableVisualStyles();
@@ -23,8 +23,8 @@ namespace ZipTester
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
-            Console.WriteLine("[ZIP MODE] [Directory] [Zipfile Name] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
-            Console.WriteLine("[UNZIP MODE] [Zipfile Directory] "); // count 2
+            Console.WriteLine("[ZIP MODE] [DIR to Save Zipfile] [Log DIR] [Img DIR] [Zipfile Name] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
+            Console.WriteLine("[UNZIP MODE] [Zipfile Directory] [Zip Interval] [Date]"); // count 4
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
             Console.WriteLine($"Task Scheduler Library version : {TaskService.LibraryVersion}");
 
@@ -66,7 +66,7 @@ namespace ZipTester
                     {
                         Console.WriteLine("Arguments Error! Check again.");
                     }
-                    ExtractZIPFile(userInput[1]);
+                    ExtractZIPFile(userInput[1], userInput[2], userInput[3]);
                     break;
 
                 default:
@@ -246,7 +246,7 @@ namespace ZipTester
         #endregion
 
         #region Extracting Zipfiles to its own directory        
-        private static void ExtractZIPFile(string zipFilePath) 
+        private static void ExtractZIPFile(string zipFilePath, string zipInterval, string date) 
         {
             
             string extractPath = Path.Combine(Path.GetDirectoryName(zipFilePath), Path.GetFileNameWithoutExtension(zipFilePath));
