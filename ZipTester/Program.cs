@@ -24,7 +24,7 @@ namespace ZipTester
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
             Console.WriteLine("[ZIP MODE] [DIR to Save Zipfile] [Log DIR] [Img DIR] [Zipfile Name] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
-            Console.WriteLine("[UNZIP MODE] [Zipfile Directory] [Zip Interval] [Date]"); // count 4
+            Console.WriteLine("[UNZIP MODE] [Zipfiles(plural) Directory] [Zip Interval] [Date]"); // count 4
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
             Console.WriteLine($"Task Scheduler Library version : {TaskService.LibraryVersion}");
 
@@ -62,7 +62,7 @@ namespace ZipTester
                 case "unzip":
                     Application.Run(form);
                     Console.WriteLine("Unzip Mode Selected!");
-                    if (userInput.Count() != 2)
+                    if (userInput.Count() < 4)
                     {
                         Console.WriteLine("Arguments Error! Check again.");
                     }
@@ -246,13 +246,14 @@ namespace ZipTester
         #endregion
 
         #region Extracting Zipfiles to its own directory        
-        private static void ExtractZIPFile(string zipFilePath, string zipInterval, string date) 
+        private static void ExtractZIPFile(string zipFilesPath, string zipInterval, string date) 
         {
-            
-            string extractPath = Path.Combine(Path.GetDirectoryName(zipFilePath), Path.GetFileNameWithoutExtension(zipFilePath));
+            string zipfile = SearchDailyData(zipFilesPath, date);
+            string extractPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile));
+
             try
             {
-                ZipFile.ExtractToDirectory(zipFilePath, extractPath);
+                ZipFile.ExtractToDirectory(zipfile, extractPath);
             }
             catch(Exception e)
             {
@@ -297,48 +298,47 @@ namespace ZipTester
         #endregion
 
         #region Finding Daily Zipfiles
-        private static void SearchDailyData(string path, string dailyRecord, string extractPath) // dailyRecord = yyyy-MM-dd
+        private static string SearchDailyData(string path, string dailyRecord, string extractPath = "") // dailyRecord = yyyy-MM-dd
         {
             DirectoryInfo dir = new DirectoryInfo(path);
             IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
 
             // from path, get all files( and using LINQ, search especially for .zip)
             // from there, get the zip which matches the date in its name
-            var MatchedZipfile =
+            IEnumerable<FileInfo> matchedFileQuery =
                 from file in fileList
                 where file.Extension == ".zip"
-                let fileText = GetFileText(file.FullName)
-                where fileText.Contains(dailyRecord)
-                select file.FullName;
+                orderby file.Name
+                where file.Name.Contains(dailyRecord)
+                select file;
+
+            string selectedZipfile = "";
+            foreach (var item in matchedFileQuery)
+            {
+                selectedZipfile = item.FullName;
+            }
+
+            Console.WriteLine($"Matched : {selectedZipfile}");
+            return selectedZipfile;
 
             // when the matched zipfile is found, 
             // extract where the zip entries has date in its name
-            foreach(string filename in MatchedZipfile)
-            {
-                Console.WriteLine(filename);
-                using (ZipArchive archive = ZipFile.OpenRead(filename))
-                {
-                    foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains("a")))
-                    {
-                        entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
-                    }
-                }
-            }
+            //foreach(string filename in MatchedZipfile)
+            //{
+            //    Console.WriteLine(filename);
+            //    using (ZipArchive archive = ZipFile.OpenRead(filename))
+            //    {
+            //        foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains("a")))
+            //        {
+            //            entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
+            //        }
+            //    }
+            //}
 
             
         }
         #endregion
 
-        private static string GetFileText(string name)
-        {
-            string fileContents = String.Empty;
-
-            if (File.Exists(name))
-            {
-                fileContents = File.ReadAllText(name);
-            }
-            return fileContents;
-        }
         #region Task Scheduler
         private static void AddTaskSchedule(string timeInterval, string stopFlag = "true")
         {
