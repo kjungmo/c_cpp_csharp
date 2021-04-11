@@ -97,7 +97,7 @@ namespace ZipTester
                     break;
                 case "weekly":
                     today = string.Format("{0:d}", dateToday);
-                    string lastWeek = string.Format("{0:d}", dateToday.AddDays(-7));
+                    string lastWeek = string.Format("{0:d}", dateToday.AddDays(-6));
                     string weekly = string.Concat(lastWeek, "_", today, "_");
                     directory = folderName + "\\" + weekly +  fileName + fileType;
                     break;
@@ -248,17 +248,29 @@ namespace ZipTester
         #region Extracting Zipfiles to its own directory        
         private static void ExtractZIPFile(string zipFilesPath, string zipInterval, string date) 
         {
-            string zipfile = SearchDailyData(zipFilesPath, date);
-            string extractPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile));
-
-            try
+            switch (zipInterval.ToLower())
             {
-                ZipFile.ExtractToDirectory(zipfile, extractPath);
-            }
-            catch(Exception e)
-            {
+                case "daily":
+                    string zipfile = SearchDailyData(zipFilesPath, date);
+                    string extractPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile));
+                    try
+                    {
+                        ZipFile.ExtractToDirectory(zipfile, extractPath);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                    break;
+
+                case "weekly":
+                    break;
+
+                case "monthly":
+                    break;
 
             }
+            
 
 
             //string destinationFolder = Path.Combine(Path.GetDirectoryName(zipFilePath), Path.GetFileNameWithoutExtension(zipFilePath));
@@ -298,7 +310,7 @@ namespace ZipTester
         #endregion
 
         #region Finding Daily Zipfiles
-        private static string SearchDailyData(string path, string dailyRecord, string extractPath = "") // dailyRecord = yyyy-MM-dd
+        private static string SearchDailyData(string path, string dailyRecord) // dailyRecord = yyyy-MM-dd
         {
             DirectoryInfo dir = new DirectoryInfo(path);
             IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
@@ -328,16 +340,59 @@ namespace ZipTester
             //    Console.WriteLine(filename);
             //    using (ZipArchive archive = ZipFile.OpenRead(filename))
             //    {
-            //        foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains("a")))
+            //        foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains(dailyRecord)))
             //        {
             //            entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
             //        }
             //    }
             //}
 
-            
+
         }
         #endregion
+
+        #region Finding Monthly Zipfiles
+        private static string SearchMontylyData(string path, string monthlyRecord) // monthlyRecord = yyyy-MM
+        {
+            DirectoryInfo dir = new DirectoryInfo(path);
+            IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
+
+            // from path, get all files( and using LINQ, search especially for .zip)
+            // from there, get the zip which matches the date in its name
+            IEnumerable<FileInfo> matchedFileQuery =
+                from file in fileList
+                where file.Extension == ".zip"
+                orderby file.Name
+                where file.Name.Contains(monthlyRecord)
+                select file;
+
+            string selectedZipfile = "";
+            foreach (var item in matchedFileQuery)
+            {
+                selectedZipfile = item.FullName;
+            }
+
+            Console.WriteLine($"Matched : {selectedZipfile}");
+            return selectedZipfile;
+
+            // when the matched zipfile is found, 
+            // extract where the zip entries has date in its name
+            //foreach(string filename in MatchedZipfile)
+            //{
+            //    Console.WriteLine(filename);
+            //    using (ZipArchive archive = ZipFile.OpenRead(filename))
+            //    {
+            //        foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains(monthlyRecord)))
+            //        {
+            //            entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
+            //        }
+            //    }
+            //}
+
+
+        }
+        #endregion
+
 
         #region Task Scheduler
         private static void AddTaskSchedule(string timeInterval, string stopFlag = "true")
