@@ -44,6 +44,7 @@ namespace ZipTester
             Console.WriteLine($"arguments count : {userInput.Count()}");
             #endregion
             //ZipTester.exe zip d:\ZipTest zipp monthly
+            //ZipTester.exe zip d:\ZipTest d:\ZipTest\log d:\ZipTest\img weekly
             //ZipTester.exe unzip ‪D:\ZipTest\2021-04_zipp.zip
             switch (userInput[0].ToLower())
             {
@@ -143,47 +144,31 @@ namespace ZipTester
         #region Compressing Files into Zipfile
         private static void CompressZIPFile(string zipPath, string logPath, string imgPath,  CompressionLevel compressionLevel = CompressionLevel.Fastest)
         {
-            var fileList_log = GetFileList(logPath, new List<string>()); // brings logfiles paths in List form
-            var fileList_img = GetFileList(imgPath, new List<string>());
-
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
             {
                 using (ZipArchive zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create))
                 {
-                    foreach (string file in fileList_log)
+                    List<string> logImgPaths = new List<string> { logPath, imgPath };
+                    foreach (var logOrImg in logImgPaths)
                     {
-                        if (Path.GetExtension(file) == ".log")
+                        foreach (var file in GetFileList(logOrImg, new List<string>()))
                         {
-                            string path = file.Substring(logPath.Length + 1);
-                            try
+                            if (Path.GetExtension(file) == ".log" || Path.GetExtension(file) == ".jpg")
                             {
-                                zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
-                                // file( actual file's path ) , path( entry path which is archived as in ZipArchive )
-                            }
-                            catch (Exception e)
-                            {
+                                string path = file.Substring(logOrImg.Length + 1);
+                                try
+                                {
+                                    zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
+                                                                                                  // file( actual file's path ) , path( entry path which is archived as in ZipArchive )
+                                }
+                                catch (Exception e)
+                                {
 
+                                }
                             }
                         }
+                        DeleteFile(logOrImg);
                     }
-                    DeleteFile(logPath);
-                    foreach (string file in fileList_img)
-                    {
-                        if (Path.GetExtension(file) == ".jpg")
-                        {
-                            string path = file.Substring(logPath.Length + 1);
-                            try
-                            {
-                                zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
-                                                                                              // file( actual file's path ) , path( entry path which is archived as in ZipArchive )
-                            }
-                            catch (Exception e)
-                            {
-
-                            }
-                        }
-                    }
-                    DeleteFile(imgPath);
                     Console.WriteLine("Created!");
                 }
             }
