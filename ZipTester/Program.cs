@@ -23,7 +23,7 @@ namespace ZipTester
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
-            Console.WriteLine("[ZIP MODE] [DIR to Save Zipfile] [Log DIR] [Img DIR] [Zipfile Name] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
+            Console.WriteLine("[ZIP MODE] [DIR to Save Zipfile] [Log DIR] [Img DIR] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
             Console.WriteLine("[UNZIP MODE] [Zipfiles(plural) Directory] [Zip Interval] [Date]"); // count 4
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
             Console.WriteLine($"Task Scheduler Library version : {TaskService.LibraryVersion}");
@@ -49,23 +49,23 @@ namespace ZipTester
             {
                 case "zip":
                     Console.WriteLine("Zip Mode Selected!");
-                    if (userInput.Count() < 4)
-                    {
-                        Console.WriteLine("Arguments Error! Check again.");
-                        return;
-                    }
-                    CompressZIPFile(userInput[1], MakeZipDir(userInput[1], userInput[2], userInput[3]), CompressionLevel.Optimal);
-                    DeleteZIPFile(userInput[1], userInput[3]);
-                    AddTaskSchedule(userInput[3]);
+                    //if (userInput.Count() < 4)
+                    //{
+                    //    Console.WriteLine("Arguments Error! Check again.");
+                    //    return;
+                    //}
+                    CompressZIPFile(MakeZipDir(userInput[1], userInput[4]),userInput[2], userInput[3],  CompressionLevel.Optimal);
+                    //DeleteZIPFile(userInput[1], userInput[3]);
+                    //AddTaskSchedule(userInput[3]);
                     break;
 
                 case "unzip":
                     Application.Run(form);
                     Console.WriteLine("Unzip Mode Selected!");
-                    if (userInput.Count() < 4)
-                    {
-                        Console.WriteLine("Arguments Error! Check again.");
-                    }
+                    //if (userInput.Count() < 4)
+                    //{
+                    //    Console.WriteLine("Arguments Error! Check again.");
+                    //}
                     ExtractZIPFile(userInput[1], userInput[2], userInput[3]);
                     break;
 
@@ -80,43 +80,29 @@ namespace ZipTester
         }
 
         #region Makeing Zip File directory
-        private static string MakeZipDir(string folderName, string fileName, string timeInterval)
+        private static string MakeZipDir(string folderName, string timeInterval , string fileName = "logs.zip")
         {
-            string fileType = ".zip";
             string directory = "";
+            string today;
             DateTime dateToday = DateTime.Today;
-            string today = "";
-            string year = "";
-            string month = "";
             switch (timeInterval.ToLower())
             {
                 case "daily":
                     today = string.Format("{0:d}", dateToday);   // {0:d} -> yyyy-MM-dd format
                     string daily = string.Concat(today, "_");
-                    directory = folderName + "\\" + daily + fileName + fileType;
+                    directory = folderName + "\\" + daily + fileName;  // yyyy-MM-dd_logs.zip
                     break;
                 case "weekly":
                     today = string.Format("{0:d}", dateToday);
                     string lastWeek = string.Format("{0:d}", dateToday.AddDays(-6));
                     string weekly = string.Concat(lastWeek, "_", today, "_");
-                    directory = folderName + "\\" + weekly +  fileName + fileType;
+                    directory = folderName + "\\" + weekly +  fileName; // yyyy-MM-dd_yyyy-MM-dd_logs.zip
                     break;
                 case "monthly":
-                    month = dateToday.ToString("yyyy-MM");
+                    string month = dateToday.ToString("yyyy-MM");
                     string monthly = string.Concat(month, "_");
-                    directory = folderName + "\\" + monthly + fileName + fileType;
+                    directory = folderName + "\\" + monthly + fileName; // yyyy-MM_logs.zip
                     break;
-                //case "quarter":
-                //    directory = folderName + "\\" + fileName + fileType;
-                //    break;
-                //case "half":
-                //    directory = folderName + "\\" + fileName + fileType;
-                //   break;
-                //case "yearly":
-                //   year = dateToday.Year.ToString();
-                //    string yearly = string.Concat(year, "_");
-                //    directory = folderName + "\\" + yearly + fileName + fileType;
-                //   break;
             }
             return directory;
         }
@@ -125,34 +111,27 @@ namespace ZipTester
         #region getting File Lists
         private static List<string> GetFileList(String rootPath, List<String> fileList)
         {
-            if (fileList == null)
+            if (fileList == null) // validity inspection
             {
                 return null;
             }
 
-            var attr = File.GetAttributes(rootPath);
-            Console.WriteLine("-------------------------");
-            Console.WriteLine($"attr from File.GetAttributes(rootPath) : {attr}");
+            var attr = File.GetAttributes(rootPath); // whether the rootPath is either a Directory or an Archive
 
             if (attr == FileAttributes.Directory)
             {
                 var dirInfo = new DirectoryInfo(rootPath);
-                Console.WriteLine($"dirInfo from  new DirectoryInfo(rootPath) : {dirInfo}");
-                int count = 1;
-                Console.WriteLine($"dirInfo.GetDirectories().Length : {dirInfo.GetDirectories().Length}");
                 foreach (var dir in dirInfo.GetDirectories())
                 {
                     GetFileList(dir.FullName, fileList);
-                    Console.WriteLine($"dir : {dir}");
-                    count++;
                 }
-                Console.WriteLine($"count completed : count({count})");
+
                 foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
                 {
                      GetFileList(file.FullName, fileList);
                 }
             }
-            else
+            else if (attr == FileAttributes.Archive) // if it's a compressed or a zipfile, it becomes excluded
             {
                 var fileInfo = new FileInfo(rootPath);
                 fileList.Add(fileInfo.FullName);
@@ -162,18 +141,20 @@ namespace ZipTester
         #endregion
 
         #region Compressing Files into Zipfile
-        private static void CompressZIPFile(string sourcePath, string zipPath, CompressionLevel compressionLevel = CompressionLevel.Fastest)
+        private static void CompressZIPFile(string zipPath, string logPath, string imgPath,  CompressionLevel compressionLevel = CompressionLevel.Fastest)
         {
-            var fileList = GetFileList(sourcePath, new List<string>());
+            var fileList_log = GetFileList(logPath, new List<string>()); // brings logfiles paths in List form
+            var fileList_img = GetFileList(imgPath, new List<string>());
+
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
-            {            
+            {
                 using (ZipArchive zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create))
                 {
-                    foreach (string file in fileList)
+                    foreach (string file in fileList_log)
                     {
-                        if(Path.GetExtension(file) == ".log" || Path.GetExtension(file) == ".jpg")
+                        if (Path.GetExtension(file) == ".log")
                         {
-                            string path = file.Substring(sourcePath.Length + 1);
+                            string path = file.Substring(logPath.Length + 1);
                             try
                             {
                                 zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
@@ -185,9 +166,26 @@ namespace ZipTester
                             }
                         }
                     }
-                    DeleteFile(sourcePath);
+                    DeleteFile(logPath);
+                    foreach (string file in fileList_img)
+                    {
+                        if (Path.GetExtension(file) == ".jpg")
+                        {
+                            string path = file.Substring(logPath.Length + 1);
+                            try
+                            {
+                                zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
+                                                                                              // file( actual file's path ) , path( entry path which is archived as in ZipArchive )
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+                        }
+                    }
+                    DeleteFile(imgPath);
+                    Console.WriteLine("Created!");
                 }
-                Console.WriteLine("Created!");
             }
         }
         #endregion
@@ -201,7 +199,6 @@ namespace ZipTester
                 Console.WriteLine(file.FullName);
                 file.Delete();
             }
-
             Console.WriteLine("Deleted!");
         }
         #endregion
@@ -248,14 +245,20 @@ namespace ZipTester
         #region Extracting Zipfiles to its own directory        
         private static void ExtractZIPFile(string zipFilesPath, string zipInterval, string date) 
         {
+            string zipfile = "";
+            string extractFolderPath = "";
             switch (zipInterval.ToLower())
             {
                 case "daily":
-                    string zipfile = SearchDailyData(zipFilesPath, date);
-                    string extractPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile));
+                    zipfile = SearchDailyData(zipFilesPath, date);
+                    extractFolderPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile));
+                    if(!Directory.Exists(extractFolderPath))
+                    {
+                        Directory.CreateDirectory(extractFolderPath);
+                    }
                     try
                     {
-                        ZipFile.ExtractToDirectory(zipfile, extractPath);
+                        ZipFile.ExtractToDirectory(zipfile, extractFolderPath);
                     }
                     catch (Exception e)
                     {
@@ -264,9 +267,34 @@ namespace ZipTester
                     break;
 
                 case "weekly":
+                    zipfile = SearchWeeklyData(zipFilesPath, date);
+                    extractFolderPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile));
+                    try
+                    {
+                        //extractToFile
+                        ZipFile.ExtractToDirectory(zipfile, extractFolderPath);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
                     break;
 
                 case "monthly":
+                    zipfile = SearchMonthlyData(zipFilesPath, date);
+                    extractFolderPath = Path.Combine(Path.GetDirectoryName(zipfile), Path.GetFileNameWithoutExtension(zipfile), "[", date, "]");
+                    if (!Directory.Exists(extractFolderPath))
+                    {
+                        Directory.CreateDirectory(extractFolderPath);
+                    }
+                    try
+                    {
+                        ZipFile.ExtractToDirectory(zipfile, extractFolderPath);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
                     break;
 
             }
@@ -332,6 +360,62 @@ namespace ZipTester
 
             Console.WriteLine($"Matched : {selectedZipfile}");
             return selectedZipfile;
+        }
+        #endregion
+
+        #region Finding Weekly Zipfiles
+        private static string SearchWeeklyData(string path, string weeklyRecord) // weeklyRecord = yyyy-MM-dd
+        {
+            string selectedZipfile = "";
+            DirectoryInfo dir = new DirectoryInfo(path);
+            IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
+
+            DateTime convertedFromString = DateTime.Parse(weeklyRecord);
+            List<string> daysInAWeek = new List<string>
+            { convertedFromString.AddDays(-1).ToString("yyyy-MM-dd"),
+              convertedFromString.AddDays(-2).ToString("yyyy-MM-dd"),
+              convertedFromString.AddDays(-3).ToString("yyyy-MM-dd"),
+              convertedFromString.AddDays(-4).ToString("yyyy-MM-dd"),
+              convertedFromString.AddDays(-5).ToString("yyyy-MM-dd")
+            };
+
+            // from path, get all files( and using LINQ, search especially for .zip)
+            // from there, get the zip which matches the date in its name
+            IEnumerable<FileInfo> matchedFileQuery1 =
+                from file in fileList
+                where file.Extension == ".zip"
+                orderby file.Name
+                where file.Name.Contains(weeklyRecord)
+                select file;
+
+            if(matchedFileQuery1.Count() != 0)
+            {
+                foreach (var item in matchedFileQuery1)
+                {
+                    selectedZipfile = item.FullName;
+                }
+
+                Console.WriteLine($"Matched : {selectedZipfile}");
+                return selectedZipfile;
+            }
+            else
+            {
+                IEnumerable<FileInfo> matchedFileQuery2 =
+                    from file in fileList
+                    where file.Extension == ".zip"
+                    orderby file.Name
+                    where daysInAWeek.Any(date => file.Name.Contains(date))
+                    select file;
+
+                foreach (var item in matchedFileQuery2)
+                {
+                    selectedZipfile = item.FullName;
+                }
+
+                Console.WriteLine($"Matched : {selectedZipfile}");
+                return selectedZipfile;
+            }
+
 
             // when the matched zipfile is found, 
             // extract where the zip entries has date in its name
@@ -340,7 +424,7 @@ namespace ZipTester
             //    Console.WriteLine(filename);
             //    using (ZipArchive archive = ZipFile.OpenRead(filename))
             //    {
-            //        foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains(dailyRecord)))
+            //        foreach (ZipArchiveEntry entry in archive.Entries.Where(e => e.FullName.Contains(monthlyRecord)))
             //        {
             //            entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
             //        }
@@ -352,8 +436,9 @@ namespace ZipTester
         #endregion
 
         #region Finding Monthly Zipfiles
-        private static string SearchMontylyData(string path, string monthlyRecord) // monthlyRecord = yyyy-MM
+        private static string SearchMonthlyData(string path, string monthlyRecord) // monthlyRecord = yyyy-MM-dd
         {
+            string monthZipfile = monthlyRecord.Substring(0, 6);
             DirectoryInfo dir = new DirectoryInfo(path);
             IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
 
@@ -363,9 +448,10 @@ namespace ZipTester
                 from file in fileList
                 where file.Extension == ".zip"
                 orderby file.Name
-                where file.Name.Contains(monthlyRecord)
+                where file.Name.Contains(monthZipfile)
                 select file;
-
+            // handling monthly zip file 
+            // but how to get certain date's data into certain date's folder
             string selectedZipfile = "";
             foreach (var item in matchedFileQuery)
             {
@@ -404,9 +490,9 @@ namespace ZipTester
             // trigger settings
             switch (timeInterval)
             {
-                case "daily":
+                case "daily": // 오늘분을 저장해야 하니까 하루가 지나서 실행되어야 한다?
                     DailyTrigger dTrigger = new DailyTrigger();
-                    dTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
+                    dTrigger.StartBoundary = DateTime.Today.AddDays(1);
                     dTrigger.DaysInterval = 1;
                     taskDefinition.Triggers.Add(dTrigger);
                     if (stopFlag.ToLower() == "false")
