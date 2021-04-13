@@ -53,8 +53,8 @@ namespace ZipTester
                     Console.WriteLine("Zip Mode Selected!");
 
                     CompressZIPFile(MakeZipDir(userInput[1], userInput[4]), userInput[2], userInput[3], userInput[4], CompressionLevel.Optimal);
-                    //DeleteZIPFile(userInput[1], userInput[3]);
-                    
+                    //DeleteLogFiles(userInput[1], userInput[3]);
+
                     break;
 
                 case "unzip":
@@ -163,7 +163,7 @@ namespace ZipTester
                                     try
                                     {
                                         zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
-                                                                                                      // file( actual file's path ) , path( entry name(or path in ziparchive) which is archived as in ZipArchive )
+                                        File.Delete(file);                                                        // file( actual file's path ) , path( entry name(or path in ziparchive) which is archived as in ZipArchive )
                                     }
                                     catch (Exception e)
                                     {
@@ -178,7 +178,7 @@ namespace ZipTester
                                 break;
                         }
 
-                        //DeleteFile(logOrImg, zipInterval);
+                        //DeleteLogFiles(logOrImg, zipInterval);
                     }
                 }
                 Console.WriteLine("Created!");
@@ -187,25 +187,37 @@ namespace ZipTester
         #endregion
 
         #region Deleting Files after the files has been Compressed
-        private static void DeleteFile(string sourcePath, string deleteInterval)
+        private static void DeleteLogFiles(string sourcePath, string deleteInterval)
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
-            foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
+
+            switch (deleteInterval.ToLower())
             {
-                Console.WriteLine(file.FullName);
-                file.Delete();
+                case "daily":
+                    foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
+                    {
+                        Console.WriteLine(file.FullName);
+                        file.Delete();
+                    }
+                    Console.WriteLine("Deleted!");
+                    break;
+                case "weekly":
+                    break;
+                case "monthly":
+                    break;
             }
-            Console.WriteLine("Deleted!");
+            
+            
         }
         #endregion
 
         #region Deleting Zipfiles after a certain amount of time
-        private static void DeleteZIPFile(string sourcePath, string deleteInterval) // deleteInterval = { "daily", "weekly", "monthly" }
+        private static void DeleteZIPFiles(string sourcePath, string deleteInterval) // deleteInterval = { "daily", "weekly", "monthly" }
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
             
             DateTime pivot = DateTime.Today;
-            switch (deleteInterval)
+            switch (deleteInterval.ToLower())
             {
 
                 case "daily":

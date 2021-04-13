@@ -13,9 +13,23 @@ namespace TaskSchedulerTest
         static void Main(string[] args)
         {
 
-            string path = @"d:\ZipTest";
-            GetFileList(path, new List<string>());
+            //string path = @"d:\ZipTest";
+            //GetFileList(path, new List<string>());
+
+            string file = @"C:\Users\kangj\Downloads\새 폴더\2021-03-04.log";
+            //new FileInfo(file).CreationTime.CompareTo(DateTime.Now);
+            //Console.WriteLine(new FileInfo(file).CreationTime);
+            //Console.WriteLine(DateTime.Today);
+            //Console.WriteLine(new FileInfo(file).CreationTime.CompareTo(DateTime.Today));
+            string format = "yyyy-MM-dd";
+            DateTime today = DateTime.Today;
+            DateTime yesterday = DateTime.Today.AddDays(-1);
+            Console.WriteLine(today.ToString(format));
+            Console.WriteLine(yesterday.ToString(format));
+
+
             Console.ReadKey();
+
             //string dateWeekAgo = DateTime.Today.AddDays(-7).ToString();
 
             //dateWeekAgo.CompareTo(DateTime.Today.a.ToString());
@@ -126,15 +140,16 @@ namespace TaskSchedulerTest
             var attr = File.GetAttributes(rootPath);
             Console.WriteLine("-------------------------");
             Console.WriteLine($"attr from File.GetAttributes(rootPath) : {attr}");
-            Console.WriteLine($"FileAttributes.Directory : {FileAttributes.Directory}");
 
-            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            // if an attribute is a Folder(Directory)
+            if (attr == FileAttributes.Directory)
             {
                 var dirInfo = new DirectoryInfo(rootPath);
                 Console.WriteLine($"dirInfo from  new DirectoryInfo(rootPath) : {dirInfo}");
                 int count = 1;
-                Console.WriteLine($"dirInfo.GetDirectories().Length : {dirInfo.GetDirectories().Length}");
-                foreach (var dir in dirInfo.GetDirectories())
+                Console.WriteLine($"dirInfo.GetDirectories().Length : {dirInfo.GetDirectories().Length}"); // directory(folder) numbers
+                Console.WriteLine($"dirInfo.GetFiles().Length : {dirInfo.GetFiles().Length}"); // directory(folder) numbers
+                foreach (var dir in dirInfo.GetDirectories()) // accessing every folder inside the rootPath [ when the number is 0 it means that there are no folders inside ]
                 {
                     GetFileList(dir.FullName, fileList);
                     Console.WriteLine($"dir : {dir}");
@@ -146,10 +161,11 @@ namespace TaskSchedulerTest
                     GetFileList(file.FullName, fileList);
                 }
             }
+            //if the attribute is not a folder, it adds File(Archive) fullpath to FileList
             else
             {
-                var fileInfo = new FileInfo(rootPath);
-                fileList.Add(fileInfo.FullName);
+                var fileInfo = new FileInfo(rootPath); // type is FileInfo
+                fileList.Add(fileInfo.FullName); // FileInfo.FullName returns string 
             }
             return fileList;
         }
