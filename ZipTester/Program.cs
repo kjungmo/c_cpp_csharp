@@ -23,8 +23,9 @@ namespace ZipTester
             Console.WriteLine("CogAplex Log File Management System\r");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("<<<  Modes  >>>   ZIP   ||  UNZIP ");
-            Console.WriteLine("[ZIP MODE] [DIR to Save Zipfile] [Log DIR] [Img DIR] [Zip Interval] [Task Scheduler Interval] [Task Scheduler StopFlag]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
+            Console.WriteLine("[ZIP MODE] [DIR to Save Zipfile] [Log DIR] [Img DIR] [Zip Interval]"); //count 5  -> [ZIP MODE] [Log Directory] [Img Directory] [Zip Directory] [Zipfile Name] [Zip Interval] 
             Console.WriteLine("[UNZIP MODE] [Zipfiles(plural) Directory] [Zip Interval] [Date]"); // count 4
+            Console.WriteLine("[TASK ENROLL MODE] [Task Scheduler Interval] [Task Scheduler StopFlag]");
             Console.WriteLine("Put your value in \" \" for more than two things as one argument. ");
             Console.WriteLine($"Task Scheduler Library version : {TaskService.LibraryVersion}");
 
@@ -50,24 +51,21 @@ namespace ZipTester
             {
                 case "zip":
                     Console.WriteLine("Zip Mode Selected!");
-                    //if (userInput.Count() < 4)
-                    //{
-                    //    Console.WriteLine("Arguments Error! Check again.");
-                    //    return;
-                    //}
-                    CompressZIPFile(MakeZipDir(userInput[1], userInput[4]),userInput[2], userInput[3],  CompressionLevel.Optimal);
+
+                    CompressZIPFile(MakeZipDir(userInput[1], userInput[4]), userInput[2], userInput[3], userInput[4], CompressionLevel.Optimal);
                     //DeleteZIPFile(userInput[1], userInput[3]);
-                    //AddTaskSchedule(userInput[3]);
+                    
                     break;
 
                 case "unzip":
                     Application.Run(form);
                     Console.WriteLine("Unzip Mode Selected!");
-                    //if (userInput.Count() < 4)
-                    //{
-                    //    Console.WriteLine("Arguments Error! Check again.");
-                    //}
+
                     ExtractZIPFile(userInput[1], userInput[2], userInput[3]);
+                    break;
+
+                case "task":
+                    AddTaskSchedule(userInput[3]);
                     break;
 
                 default:
@@ -81,7 +79,7 @@ namespace ZipTester
         }
 
         #region Makeing Zip File directory
-        private static string MakeZipDir(string folderName, string timeInterval , string fileName = "logs.zip")
+        private static string MakeZipDir(string folderName, string timeInterval, string fileName = "logs.zip")
         {
             string directory = "";
             string today;
@@ -97,7 +95,7 @@ namespace ZipTester
                     today = string.Format("{0:d}", dateToday);
                     string lastWeek = string.Format("{0:d}", dateToday.AddDays(-6));
                     string weekly = string.Concat(lastWeek, "_", today, "_");
-                    directory = folderName + "\\" + weekly +  fileName; // yyyy-MM-dd_yyyy-MM-dd_logs.zip
+                    directory = folderName + "\\" + weekly + fileName; // yyyy-MM-dd_yyyy-MM-dd_logs.zip
                     break;
                 case "monthly":
                     string month = dateToday.ToString("yyyy-MM");
@@ -129,7 +127,7 @@ namespace ZipTester
 
                 foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
                 {
-                     GetFileList(file.FullName, fileList);
+                    GetFileList(file.FullName, fileList);
                 }
             }
             else if (attr == FileAttributes.Archive) // if it's a compressed or a zipfile, it becomes excluded
@@ -142,7 +140,7 @@ namespace ZipTester
         #endregion
 
         #region Compressing Files into Zipfile
-        private static void CompressZIPFile(string zipPath, string logPath, string imgPath,  CompressionLevel compressionLevel = CompressionLevel.Fastest)
+        private static void CompressZIPFile(string zipPath, string logPath, string imgPath, string zipInterval, CompressionLevel compressionLevel = CompressionLevel.Fastest)
         {
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
             {
@@ -151,32 +149,45 @@ namespace ZipTester
                     List<string> logImgPaths = new List<string> { logPath, imgPath };
                     foreach (var logOrImg in logImgPaths)
                     {
-                        foreach (var file in GetFileList(logOrImg, new List<string>()))
+                        switch (zipInterval.ToLower())
                         {
-                            if (Path.GetExtension(file) == ".log" || Path.GetExtension(file) == ".jpg")
-                            {
-                                string path = file.Substring(logOrImg.Length + 1);
-                                try
-                                {
-                                    zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
-                                                                                                  // file( actual file's path ) , path( entry path which is archived as in ZipArchive )
-                                }
-                                catch (Exception e)
-                                {
+                            case "daily":
+                                var matchedFileQuery = (from file in GetFileList(logOrImg, new List<string>())
+                                                        where Path.GetExtension(file) == ".log" || Path.GetExtension(file) == ".jpg"
+                                                        where file.Contains(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"))
+                                                        select file).ToList();
 
+                                foreach (var file in matchedFileQuery)
+                                {
+                                    string path = file.Substring(logOrImg.Length + 1);
+                                    try
+                                    {
+                                        zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
+                                                                                                      // file( actual file's path ) , path( entry name(or path in ziparchive) which is archived as in ZipArchive )
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
                                 }
-                            }
+                                break;
+
+                            case "weekly":
+                                break;
+                            case "monthly":
+                                break;
                         }
-                        DeleteFile(logOrImg);
+
+                        //DeleteFile(logOrImg, zipInterval);
                     }
-                    Console.WriteLine("Created!");
                 }
+                Console.WriteLine("Created!");
             }
         }
         #endregion
 
         #region Deleting Files after the files has been Compressed
-        private static void DeleteFile(string sourcePath)
+        private static void DeleteFile(string sourcePath, string deleteInterval)
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
             foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
@@ -192,12 +203,28 @@ namespace ZipTester
         private static void DeleteZIPFile(string sourcePath, string deleteInterval) // deleteInterval = { "daily", "weekly", "monthly" }
         {
             DirectoryInfo dirInfo = new DirectoryInfo(sourcePath);
+            
             DateTime pivot = DateTime.Today;
             switch (deleteInterval)
             {
 
                 case "daily":
-                    pivot = pivot.AddDays(-1);
+                    if (dirInfo.Exists)
+                    {
+                        FileInfo[] files = dirInfo.GetFiles();
+                        foreach (FileInfo file in files)
+                        {
+                            if (System.Text.RegularExpressions.Regex.IsMatch(file.Name, ".zip"))
+                            {
+                                if (pivot.AddDays(-1).ToString("yyyy-MM-dd").CompareTo(file.CreationTime.ToString("yyyy-MM-dd")) == 0)
+                                {
+                                    Console.WriteLine(dirInfo + "\\" + file.Name);
+                                    File.Delete(dirInfo + "\\" + file.Name);
+                                    Console.WriteLine("Deleted");
+                                }
+                            }
+                        }
+                    }
                     break;
                 case "weekly":
                     pivot = pivot.AddDays(-7);
@@ -207,23 +234,7 @@ namespace ZipTester
                     break;
             }
 
-            if(dirInfo.Exists)
-            {
-                FileInfo[] files = dirInfo.GetFiles();
-                foreach (FileInfo file in files)
-                {
-                    if (pivot.ToString("yyyy-MM-dd").CompareTo(file.LastWriteTime.ToString("yyyy-MM-dd")) == 0)
-                    {
-                        if (System.Text.RegularExpressions.Regex.IsMatch(file.Name, ".zip"))
-                        {
-                            Console.WriteLine(dirInfo + "\\" + file.Name);
-                            File.Delete(dirInfo + "\\" + file.Name);
-                            Console.WriteLine("Deleted");
-                        }
-                    }
-                }
-                
-            }
+            
         }
         #endregion
 
