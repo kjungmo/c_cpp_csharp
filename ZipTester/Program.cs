@@ -51,7 +51,7 @@ namespace ZipTester
             {
                 case "zip":
                     Console.WriteLine("Zip Mode Selected!");
-
+                    List<string> fileLists = GetFileList(userInput[1], userInput[4])
                     CompressZIPFile(MakeZipDir(userInput[1], userInput[4]), userInput[2], userInput[3], userInput[4], CompressionLevel.Optimal);
                     //DeleteLogFiles(userInput[1], userInput[3]);
 
@@ -92,9 +92,9 @@ namespace ZipTester
                     directory = folderName + "\\" + daily + fileName;  // yyyy-MM-dd_logs.zip
                     break;
                 case "weekly":
-                    today = string.Format("{0:d}", dateToday);
-                    string lastWeek = string.Format("{0:d}", dateToday.AddDays(-6));
-                    string weekly = string.Concat(lastWeek, "_", today, "_");
+                    string week1 = string.Format("{0:d}", dateToday.AddDays(-7));
+                    string week7 = string.Format("{0:d}", dateToday.AddDays(-1));
+                    string weekly = string.Concat(week1, "_", week7, "_");
                     directory = folderName + "\\" + weekly + fileName; // yyyy-MM-dd_yyyy-MM-dd_logs.zip
                     break;
                 case "monthly":
@@ -133,7 +133,9 @@ namespace ZipTester
             else if (attr == FileAttributes.Archive) // if it's a compressed or a zipfile, it becomes excluded
             {
                 var fileInfo = new FileInfo(rootPath);
-                fileList.Add(fileInfo.FullName);
+                if (fileInfo.Extension == ".log" || fileInfo.Extension == ".jpg")
+                    fileList.Add(fileInfo.FullName);
+                
             }
             return fileList;
         }
@@ -173,6 +175,33 @@ namespace ZipTester
                                 break;
 
                             case "weekly":
+                                List<string> weekdays = new List<string> {
+                                    DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"),
+                                    DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"),
+                                    DateTime.Today.AddDays(-3).ToString("yyyy-MM-dd"),
+                                    DateTime.Today.AddDays(-4).ToString("yyyy-MM-dd"),
+                                    DateTime.Today.AddDays(-5).ToString("yyyy-MM-dd"),
+                                    DateTime.Today.AddDays(-6).ToString("yyyy-MM-dd"),
+                                    DateTime.Today.AddDays(-7).ToString("yyyy-MM-dd")
+                                };
+                                matchedFileQuery = (from file in GetFileList(logOrImg, new List<string>())
+                                                        where Path.GetExtension(file) == ".log" || Path.GetExtension(file) == ".jpg"
+                                                        where weekdays.Contains(File.GetCreationTime(file).ToString("yyyy-MM-dd"))
+                                                        select file).ToList();
+
+                                foreach (var file in matchedFileQuery)
+                                {
+                                    string path = file.Substring(logOrImg.Length + 1);
+                                    try
+                                    {
+                                        zipArchive.CreateEntryFromFile(file, path, compressionLevel); // if already exists, throws IOException
+                                        File.Delete(file);                                                        // file( actual file's path ) , path( entry name(or path in ziparchive) which is archived as in ZipArchive )
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                }
                                 break;
                             case "monthly":
                                 break;
@@ -193,14 +222,14 @@ namespace ZipTester
 
             switch (deleteInterval.ToLower())
             {
-                case "daily":
-                    foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
-                    {
-                        Console.WriteLine(file.FullName);
-                        file.Delete();
-                    }
-                    Console.WriteLine("Deleted!");
-                    break;
+                //case "daily":
+                //    foreach (FileInfo file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
+                //    {
+                //        Console.WriteLine(file.FullName);
+                //        file.Delete();
+                //    }
+                //    Console.WriteLine("Deleted!");
+                //    break;
                 case "weekly":
                     break;
                 case "monthly":

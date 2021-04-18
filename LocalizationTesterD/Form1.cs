@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace LocalizationTesterD
 {
-    [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
+
     public partial class Form1 : Form
     {
 
