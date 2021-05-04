@@ -5,18 +5,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Net;
-using System.Security.Cryptography;
 
 namespace Encrypter
 {
     class Program
     {
-        static void Main(string[] args)
         public static void Main()
         {
-<<<<<<< HEAD
             string OriStr = "7085C231FBC4";
             string EncStr = Encrypt(OriStr);
             string DecStr = Decrypt(EncStr);
@@ -101,7 +96,6 @@ namespace Encrypter
 
             //암호화 한 데이터를 스트링으로 변환해서 리턴 
             return Encoding.UTF8.GetString(ms.GetBuffer());
-=======
             try
             {
 
@@ -213,7 +207,6 @@ namespace Encrypter
             }
 
             return plaintext;
->>>>>>> 9ecd2e19b8dbc4f532c0da801906b17bd0bea7ea
         }
     }
 }
