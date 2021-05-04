@@ -141,7 +141,9 @@ namespace ZipTester
         }
         #endregion
 
-        #region Compressing Files into Zipfile
+        #region Compressing Files into Zipfile 
+        // arguments needs to be modified
+        // (zipPath's Parent Dir , logPath, imgPath, Interval, compressionLevel ) 
         private static void CompressZIPFile(string zipPath, string logPath, string imgPath, string zipInterval, CompressionLevel compressionLevel = CompressionLevel.Fastest)
         {
             using (FileStream fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.ReadWrite))
