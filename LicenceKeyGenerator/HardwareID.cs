@@ -10,6 +10,10 @@ namespace LicenceKeyGenerator
     class HardwareID
     {
         public static string GET_HARDWAREID => ReturnHardwareID().Result;
+        public static string MbSerial { get; private set; }
+
+        public static List<string> MACAddress = new List<string>();
+        public static List<string> Diskdrives = new List<string>();
         private static async Task<string> ReturnHardwareID()
         {
             byte[] bytes;
@@ -24,6 +28,7 @@ namespace LicenceKeyGenerator
                 foreach (ManagementObject obj in mBoard_Collection)
                 {
                     sb.Append(obj["SerialNumber"].ToString() + "-");
+                    MbSerial = obj["SerialNumber"].ToString();
                     break;
                 }
 
@@ -37,6 +42,7 @@ namespace LicenceKeyGenerator
                         continue;
                     }
                     sb.Append(obj["MACAddress"].ToString() + "-");
+                    MACAddress.Add(obj["MACAddress"].ToString());
                 }
 
                 ManagementObjectSearcher diskDrive = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
@@ -45,6 +51,7 @@ namespace LicenceKeyGenerator
                 foreach (ManagementObject obj in diskDrive_Collection)
                 {
                     sb.Append(obj["SerialNumber"].ToString() + "/");
+                    Diskdrives.Add(obj["SerialNumber"].ToString() + "\r");
                 }
             });
             Task.WaitAll(task);

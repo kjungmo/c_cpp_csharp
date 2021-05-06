@@ -16,11 +16,7 @@ namespace LicenceKeyGenerator
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-
-            string hwid = HardwareID.GET_HARDWAREID;
-            Console.WriteLine(hwid);
-            Console.ReadKey();
+            Application.Run(new LicenseKeyGenerator());
         }
     }
 }
