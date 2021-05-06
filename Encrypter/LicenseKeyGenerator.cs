@@ -4,21 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Management;
-using System.Net.NetworkInformation;
-using Microsoft.Win32;
-using System.Text.RegularExpressions;
 
-namespace LicenceKeyGenerator
+namespace Encrypter
 {
-    class HardwareID
+    class LicenseKeyGenerator
     {
         public static string MbSerial { get; set; }
 
         public static List<string> MACAddress = new List<string>();
         public static List<string> Diskdrives = new List<string>();
 
-
-        public static string KeyGenerator(string macAddress)
+        public static string KeyGenerator()
         {
             byte[] bytes;
             byte[] hasedBytes;
@@ -33,11 +29,20 @@ namespace LicenceKeyGenerator
                 MbSerial = obj["SerialNumber"].ToString();
                 break;
             }
-            if (string.IsNullOrEmpty(macAddress))
+
+            ManagementObjectSearcher net = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapter");
+            ManagementObjectCollection net_Collection = net.Get();
+
+            foreach (ManagementObject obj in net_Collection)
             {
-                return null;
+                if (obj["DeviceID"].ToString() != "3")
+                {
+                    continue;
+                }
+                sb.Append(obj["MACAddress"].ToString() + "-");
+                MACAddress.Add(obj["MACAddress"].ToString());
             }
-            sb.Append(macAddress);
+
             ManagementObjectSearcher diskDrive = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
             ManagementObjectCollection diskDrive_Collection = diskDrive.Get();
 
@@ -51,7 +56,5 @@ namespace LicenceKeyGenerator
             hasedBytes = System.Security.Cryptography.SHA256.Create().ComputeHash(bytes);
             return Convert.ToBase64String(hasedBytes);
         }
-
-        
     }
 }
