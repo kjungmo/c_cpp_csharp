@@ -42,7 +42,7 @@ namespace LicenceKeyGenerator
                 Diskdrives.Add(obj["SerialNumber"].ToString() + "\r");
             }
 
-            bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString().Substring(0, sb.ToString().Length - 1));
+            bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
             hasedBytes = System.Security.Cryptography.SHA256.Create().ComputeHash(bytes);
             return Convert.ToBase64String(hasedBytes);
         }
