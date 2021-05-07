@@ -1,14 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net.NetworkInformation;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LicenceKeyGenerator
@@ -43,6 +37,7 @@ namespace LicenceKeyGenerator
             {
                 tbDiskdrive.Text += item;
             }
+            RegeditHelper.Register("License Key", tbLicense.Text);
         }
 
         public NetworkInterface GetCurrentOnlineNetworkInterface()
@@ -85,12 +80,13 @@ namespace LicenceKeyGenerator
                     {
                         if (subKey.GetValue("NetworkAddress") == null)
                         {
-                            return targetInterface.GetPhysicalAddress().ToString();
+                            mac = targetInterface.GetPhysicalAddress().ToString();
+                            return mac;
                         }
-                        return null;
+                        return mac;
                     }
                 }
-                return null;
+                return mac;
             }
         }
     }

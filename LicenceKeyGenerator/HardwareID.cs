@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Management;
-using System.Net.NetworkInformation;
-using Microsoft.Win32;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace LicenceKeyGenerator
 {
@@ -29,7 +24,7 @@ namespace LicenceKeyGenerator
 
             foreach (ManagementObject obj in mBoard_Collection)
             {
-                sb.Append(obj["SerialNumber"].ToString() + "-");
+                sb.Append(obj["SerialNumber"].ToString());
                 MbSerial = obj["SerialNumber"].ToString();
                 break;
             }
@@ -43,7 +38,7 @@ namespace LicenceKeyGenerator
 
             foreach (ManagementObject obj in diskDrive_Collection)
             {
-                sb.Append(obj["SerialNumber"].ToString() + "/");
+                sb.Append(obj["SerialNumber"].ToString());
                 Diskdrives.Add(obj["SerialNumber"].ToString() + "\r");
             }
 
