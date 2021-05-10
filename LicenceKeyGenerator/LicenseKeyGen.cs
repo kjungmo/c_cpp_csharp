@@ -1,13 +1,10 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace LicenceKeyGenerator
 {
-    public partial class LicenseKeyGenerator : Form
+	public partial class LicenseKeyGenerator : Form
     {
         public LicenseKeyGenerator()
         {
@@ -26,68 +23,20 @@ namespace LicenceKeyGenerator
                     (ctrlTextBox as TextBox).Text = "";
                 }
             }
-
             
-            tbLicense.Text = HardwareID.KeyGenerator(getMACAddress());
+            tbLicense.Text = HardwareID.KeyGenerator(HardwareID.MACAddress.ToString());
 
             tbMb.Text = HardwareID.MbSerial;
-            tbMac.Text = getMACAddress();
-
+			foreach (var item in HardwareID.MACAddress)
+			{
+                tbMac.Text += item;
+			}
             foreach (var item in HardwareID.Diskdrives)
             {
                 tbDiskdrive.Text += item;
             }
             RegeditHelper.Register("License Key", tbLicense.Text);
-        }
-
-        public NetworkInterface GetCurrentOnlineNetworkInterface()
-        {
-            for (var i = 0; i < NetworkInterface.GetAllNetworkInterfaces().Length; i++)
-            {
-                var ni = NetworkInterface.GetAllNetworkInterfaces()[i];
-
-                if (ni.OperationalStatus == OperationalStatus.Up &&
-                    ni.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
-                    ni.NetworkInterfaceType != NetworkInterfaceType.Tunnel &&
-                    ni.NetworkInterfaceType != NetworkInterfaceType.Wireless80211 &&
-                    !ni.Name.ToLower().Contains("loopback"))
-                    return ni;
-            }
-            return null;
-        }
-
-        public string getMACAddress()
-        {
-            var targetInterface = GetCurrentOnlineNetworkInterface();
-            var guid = targetInterface.Id;
-            string mac = "";
-            using (var reg = Registry.LocalMachine.OpenSubKey("SYSTEM").
-                OpenSubKey("CurrentControlSet").
-                OpenSubKey("Control").
-                OpenSubKey("Class").
-                OpenSubKey("{4d36e972-e325-11ce-bfc1-08002be10318}"))
-            {
-                var subKeyNames = reg.GetSubKeyNames();
-
-                foreach (var subKeyName in subKeyNames)
-                {
-                    if (!Regex.IsMatch(subKeyName, @"\d{4}"))
-                    {
-                        continue;
-                    }
-
-                    using (var subKey = reg.OpenSubKey(subKeyName, true))
-                    {
-                        if (subKey.GetValue("NetworkAddress") == null)
-                        {
-                            mac = targetInterface.GetPhysicalAddress().ToString();
-                            return mac;
-                        }
-                        return mac;
-                    }
-                }
-                return mac;
-            }
+            //Console.WriteLine(HardwareID.ssbb);
         }
     }
 }
