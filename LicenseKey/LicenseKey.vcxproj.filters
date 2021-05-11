@@ -15,10 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LicenseKey.cpp">
+    <ClCompile Include="Encrypter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="KeyGenerator.cpp">
+    <ClCompile Include="Registry.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="HardwareSN.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

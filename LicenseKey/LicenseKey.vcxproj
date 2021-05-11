@@ -141,8 +141,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="KeyGenerator.cpp" />
-    <ClCompile Include="LicenseKey.cpp" />
+    <ClCompile Include="Encrypter.cpp" />
+    <ClCompile Include="HardwareSN.cpp" />
+    <ClCompile Include="Registry.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
