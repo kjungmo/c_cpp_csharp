@@ -1,32 +1,34 @@
-#define _WIN32_DCOM
+//#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
+#include <iomanip>
 #include <comdef.h>
 #include <WbemIdl.h>
 #include <Windows.h>
-#include <stdio.h>
 #include <assert.h>
 #include <iphlpapi.h>
-#include <sstream>
+#include <string>
+#include <winreg.h>
 
-#pragma comment(lib, "iphlpapi.lib")
+#include "sha.h"
+#include "filters.h"
+#include "base64.h"
+
 #pragma comment(lib, "wbemuuid.lib")
-//"SOFTWARE\\COGAPLEX\\LICENSEKEY"
-//"License Key"
-//"SELECT * FROM Win32_baseboard"
-//"SELECT * FROM Win32_diskdrive" 
 
 std::string SerialNumWMI(const char*);
 std::string macWMI();
 std::string HardwareIDs(const char*, const char*);
-void writeRegistry(const char*, const char*, std::string value);
-std::string readRegistry(const char*, const char*);
+void writeRegistry(std::string, std::string, DWORD,std::string);
+std::string readRegistry(std::string, std::string, DWORD);
+std::string SHA256HashString(std::string);
 
-
-int main(int argc, char** argv)
+int main()
 {
 	std::cout << HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive") << std::endl;
-	writeRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive"));
-	std::cout << "this is the value read : " << readRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key") << std::endl;
+	//writeRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ, HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive"));
+	std::cout << SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive")) << std::endl;
+	writeRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ, SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive")));
+	std::cout << "this is the value read : " << readRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ) << std::endl;
 	system("pause");
 	return 0;
 }
@@ -330,39 +332,55 @@ std::string macWMI()
 	return IDs;
 }
 
-void writeRegistry(const char* path, const char* keyName, std::string value)
+void writeRegistry(std::string path, std::string key, DWORD type, std::string value)
 {
-	HKEY key;
-	RegOpenKey(HKEY_LOCAL_MACHINE, path, &key); //"SOFTWARE\\COGAPLEX\\LICENSEKEY"
-	RegSetValueEx(key, keyName, 0, REG_SZ, (LPBYTE)value.c_str(), strlen(value.c_str()) * sizeof(char)); //"License Key"
-	RegCloseKey(key);
+	LONG lReg;
+	HKEY hKey;
+	LPCTSTR pathName = (LPCTSTR)path.c_str();
+	LPCTSTR keyName = (LPCTSTR)key.c_str();
+	lReg = RegCreateKeyEx(HKEY_LOCAL_MACHINE, pathName, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL);
+	if (lReg != ERROR_SUCCESS)
+	{
+		std::cout << "Registry creation failed & Error No - " << GetLastError() << std::endl;
+	}
+	std::cout << "Registry Creation Success " << std::endl;
+
+	RegOpenKey(HKEY_LOCAL_MACHINE, pathName, &hKey); //"SOFTWARE\\COGAPLEX\\LICENSEKEY"
+	RegSetValueEx(hKey, keyName, 0, type, (LPBYTE)(value.c_str()), strlen(value.c_str()) * sizeof(char)); //"License Key"
+	RegCloseKey(hKey);
 }
 
-std::string readRegistry(const char* path, const char* keyName)
+std::string readRegistry(std::string path, std::string key, DWORD type)
 {
-	LONG IResult;
+	LONG lReg;
+	std::cout << "reading Registry!" << std::endl;
 	HKEY hKey;
-	DWORD dwType;
-	DWORD dwBytes = 250;
-	char buffer[250];
-
-	IResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, path, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
-	if (IResult != ERROR_SUCCESS)
+	const char* myValue = (const char*)malloc(255);
+	TCHAR value[255];
+	DWORD value_length = 255;
+	LPCTSTR pathName = (LPCTSTR)path.c_str();
+	LPCTSTR keyName = (LPCTSTR)key.c_str();
+	RegOpenKey(HKEY_LOCAL_MACHINE, pathName, &hKey);  //"SOFTWARE\\COGAPLEX\\LICENSEKEY"
+ 	lReg = RegQueryValueEx(hKey, keyName, NULL, &type, (LPBYTE)myValue, &value_length);
+	if (lReg != ERROR_SUCCESS)
 	{
-		MessageBox(NULL, "Register Open Error", "Error", MB_OK);
+		std::cout << "read error " << GetLastError() << std::endl;
 	}
-
-	IResult = RegQueryValueExA(hKey, keyName, 0, &dwType, (LPBYTE)buffer, &dwBytes);
-	if (IResult == ERROR_SUCCESS)
-	{
-		//std::cout << buffer << std::endl;
-		//MessageBox(NULL, buffer, "Registry", MB_OK);
-	}
-	else
-		MessageBox(NULL, "Register Read Error", "Error", MB_OK);
-
 	RegCloseKey(hKey);
-	std::string licenseKey(buffer);
-
+	std::string licenseKey(myValue);/* = TCHAR2Str(value);*/
+	std::cout << "done reading!" << std::endl;
 	return licenseKey;
+
+}
+
+std::string SHA256HashString(std::string aString) {
+    std::string digest;
+    CryptoPP::SHA256 hash;
+
+    CryptoPP::StringSource foo(aString, true,
+        new CryptoPP::HashFilter(hash,
+            new CryptoPP::Base64Encoder(
+                new CryptoPP::StringSink(digest))));
+
+    return digest;
 }
