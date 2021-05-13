@@ -1,5 +1,6 @@
 //#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <comdef.h>
 #include <WbemIdl.h>
@@ -21,16 +22,43 @@ std::string HardwareIDs(const char*, const char*);
 void writeRegistry(std::string, std::string, DWORD,std::string);
 std::string readRegistry(std::string, std::string, DWORD);
 std::string SHA256HashString(std::string);
+void writeToFile(std::string);
+std::string readFromFile(std::string);
+void LicenseKeyGenerator(const char*, const char*, std::string, std::string);
+void LicenseValidator(std::string, std::string);
 
 int main()
 {
-	std::cout << HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive") << std::endl;
-	//writeRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ, HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive"));
-	std::cout << SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive")) << std::endl;
-	writeRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ, SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive")));
-	std::cout << "this is the value read : " << readRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ) << std::endl;
+	//std::cout << HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive") << std::endl;
+	//std::cout << SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive")) << std::endl;
+	//writeRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ, SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive")));
+	//std::cout << "this is the value read : " << readRegistry("SOFTWARE\\COGAPLEX\\LICENSEKEY", "License Key", REG_SZ) << std::endl;
+	//writeToFile("D:\\Github\\c_cpp_csharp\\LicenseKey\\text2.txt");
+	//readFromFile("D:\\Github\\c_cpp_csharp\\LicenseKey\\text2.txt");
+	//LicenseValidator("SOFTWARE\\COGAPLEX\\LICENSEKEY", "D:\\Github\\c_cpp_csharp\\LicenseKey\\text2.txt");
+	LicenseKeyGenerator("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive", "SOFTWARE\\COGAPLEX\\LICENSEKEY", "D:\\Github\\c_cpp_csharp\\LicenseKey\\text2.txt");
+	LicenseValidator("SOFTWARE\\COGAPLEX\\LICENSEKEY", "D:\\Github\\c_cpp_csharp\\LicenseKey\\text2.txt");
 	system("pause");
 	return 0;
+}
+
+void LicenseKeyGenerator(const char* mbQuery, const char* diskQuery, std::string regiPath, std::string filePath)
+{
+	writeRegistry(regiPath, "License Key", REG_SZ, SHA256HashString(HardwareIDs(mbQuery, diskQuery)));
+	writeToFile(filePath);
+}
+
+void LicenseValidator(std::string regiPath, std::string filePath)
+{
+	std::string regi, file;
+	regi = readRegistry(regiPath, "License Key", REG_SZ);
+	file = readFromFile(filePath);
+
+	if (regi == file)
+	{
+		std::cout << "PASS" << std::endl;
+	};
+
 }
 
 std::string HardwareIDs(const char* mbQuery, const char* diskQuery)
@@ -338,39 +366,54 @@ void writeRegistry(std::string path, std::string key, DWORD type, std::string va
 	HKEY hKey;
 	LPCTSTR pathName = (LPCTSTR)path.c_str();
 	LPCTSTR keyName = (LPCTSTR)key.c_str();
-	lReg = RegCreateKeyEx(HKEY_LOCAL_MACHINE, pathName, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL);
+	DWORD disposition = 0;
+	lReg = RegCreateKeyEx(HKEY_LOCAL_MACHINE, pathName, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disposition);
 	if (lReg != ERROR_SUCCESS)
 	{
 		std::cout << "Registry creation failed & Error No - " << GetLastError() << std::endl;
+		return;
+	}
+	if (disposition == REG_CREATED_NEW_KEY) // RegCreateKeyEx opens the key if the key 
+	{
+		RegOpenKey(HKEY_LOCAL_MACHINE, pathName, &hKey); //"SOFTWARE\\COGAPLEX\\LICENSEKEY"
+		RegSetValueEx(hKey, keyName, 0, type, (LPBYTE)(value.c_str()), strlen(value.c_str()) * sizeof(char)); //"License Key"
+	}
+	else 
+	{
+		RegSetValueEx(hKey, keyName, 0, type, (LPBYTE)(value.c_str()), strlen(value.c_str()) * sizeof(char)); //"License Key"
 	}
 	std::cout << "Registry Creation Success " << std::endl;
 
-	RegOpenKey(HKEY_LOCAL_MACHINE, pathName, &hKey); //"SOFTWARE\\COGAPLEX\\LICENSEKEY"
-	RegSetValueEx(hKey, keyName, 0, type, (LPBYTE)(value.c_str()), strlen(value.c_str()) * sizeof(char)); //"License Key"
 	RegCloseKey(hKey);
 }
 
 std::string readRegistry(std::string path, std::string key, DWORD type)
 {
 	LONG lReg;
-	std::cout << "reading Registry!" << std::endl;
 	HKEY hKey;
 	const char* myValue = (const char*)malloc(255);
 	TCHAR value[255];
 	DWORD value_length = 255;
-	LPCTSTR pathName = (LPCTSTR)path.c_str();
-	LPCTSTR keyName = (LPCTSTR)key.c_str();
-	RegOpenKey(HKEY_LOCAL_MACHINE, pathName, &hKey);  //"SOFTWARE\\COGAPLEX\\LICENSEKEY"
- 	lReg = RegQueryValueEx(hKey, keyName, NULL, &type, (LPBYTE)myValue, &value_length);
-	if (lReg != ERROR_SUCCESS)
+	LPCTSTR pathName, keyName;
+	pathName = (LPCTSTR)path.c_str();
+	keyName = (LPCTSTR)key.c_str();
+	
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, pathName, 0, KEY_READ | KEY_WOW64_64KEY, &hKey) == ERROR_SUCCESS)
 	{
-		std::cout << "read error " << GetLastError() << std::endl;
+		lReg = RegQueryValueEx(hKey, keyName, NULL, &type, (LPBYTE)myValue, &value_length);
+		if (lReg != ERROR_SUCCESS)
+		{
+			std::cout << "read error " << GetLastError() << std::endl;
+			return "";
+		}
+		std::string licenseKey(myValue);
+		licenseKey.erase(std::find_if(licenseKey.rbegin(), licenseKey.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), licenseKey.end());
+		std::cout << "done Reading!" << std::endl;
+		RegCloseKey(hKey);
+		return licenseKey;
 	}
-	RegCloseKey(hKey);
-	std::string licenseKey(myValue);/* = TCHAR2Str(value);*/
-	std::cout << "done reading!" << std::endl;
-	return licenseKey;
-
+	std::cout << "Cannot open Registry" << std::endl;
+	return "NULL";
 }
 
 std::string SHA256HashString(std::string aString) {
@@ -383,4 +426,33 @@ std::string SHA256HashString(std::string aString) {
                 new CryptoPP::StringSink(digest))));
 
     return digest;
+}
+
+void writeToFile(std::string path)
+{
+	std::ofstream writeFile;
+
+	writeFile.open(path);
+
+	std::string liKey = SHA256HashString(HardwareIDs("SELECT * FROM Win32_baseboard", "SELECT * FROM Win32_diskdrive"));
+	writeFile.write(liKey.c_str(), liKey.size());
+
+	writeFile.close();	
+}
+
+std::string readFromFile(std::string path)
+{
+	std::ifstream rfile(path);
+	std::string licenseKey;
+	if (true == rfile.is_open())
+	{
+		rfile >> licenseKey;
+		std::cout << "read keys : " << licenseKey << std::endl;
+	}
+	else
+	{
+		std::cout << "no files " << std::endl;
+	}
+	rfile.close();
+	return licenseKey;
 }
