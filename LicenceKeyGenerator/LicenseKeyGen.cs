@@ -36,7 +36,7 @@ namespace LicenceKeyGenerator
                 tbDiskdrive.Text += item;
             }
             RegeditHelper.Register("License Key", tbLicense.Text);
-            //Console.WriteLine(HardwareID.ssbb);
-        }
+			Console.WriteLine(HardwareID.ssbb);
+		}
     }
 }

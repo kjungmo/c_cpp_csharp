@@ -8,8 +8,8 @@ namespace LicenceKeyGenerator
     class HardwareID
     {
         public static string MbSerial { get; set; }
-        //public static StringBuilder ssbb = new StringBuilder();
-        public static List<string> MACAddress = new List<string>();
+		public static StringBuilder ssbb = new StringBuilder();
+		public static List<string> MACAddress = new List<string>();
         public static List<string> Diskdrives = new List<string>();
 
 
@@ -52,8 +52,8 @@ namespace LicenceKeyGenerator
 
             
             bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
-            //ssbb = sb;
-            hasedBytes = System.Security.Cryptography.SHA256.Create().ComputeHash(bytes);
+			ssbb = sb;
+			hasedBytes = System.Security.Cryptography.SHA512.Create().ComputeHash(bytes);
             return Convert.ToBase64String(hasedBytes);
         }
     }
