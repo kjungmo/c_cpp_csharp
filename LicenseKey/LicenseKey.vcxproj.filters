@@ -15,13 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Encrypter.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Registry.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="HardwareSN.cpp">
+    <ClCompile Include="LicenseKey.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
