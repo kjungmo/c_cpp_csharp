@@ -11,8 +11,7 @@ namespace FileSystemTester
 	class Program
 	{
 		static void Main(string[] args)
-		{ 
-
+		{
 			// args : rootPath, startZipDate, startDelDate
 			string rootPath = @"e:\ZipTest\";
 			List<string> tempList = new List<string>();
@@ -25,7 +24,7 @@ namespace FileSystemTester
 				Console.WriteLine("SourcePath None");
 				return;
 			}
-			Console.WriteLine("hellooo");
+
 			Console.WriteLine("SourcePath Exists");
 			if (!File.Exists(zipFilePath))
 			{
@@ -63,6 +62,19 @@ namespace FileSystemTester
 				#endregion
 			} // *****************************************************************************************
 			Console.ReadKey();
+		}
+
+		public static DateTime StringToDateTimeParser(string date)
+		{
+			DateTime dtDate;
+			string[] pattern = { "yyyyMMdd", "yyyy-MM-dd" };
+
+			if (!DateTime.TryParseExact(date, pattern, System.Globalization.CultureInfo.InvariantCulture,
+						   System.Globalization.DateTimeStyles.None, out dtDate))
+			{
+				return DateTime.Today;
+			}
+			return dtDate;
 		}
 
 		// gets every files
