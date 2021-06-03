@@ -24,7 +24,7 @@ namespace FileSystemTester
 				Console.WriteLine("SourcePath None");
 				return;
 			}
-
+			Console.WriteLine("hellooo");
 			Console.WriteLine("SourcePath Exists");
 			if (!File.Exists(zipFilePath))
 			{
