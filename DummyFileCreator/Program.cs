@@ -11,10 +11,10 @@ namespace DummyFileCreator
 	{
 		static void Main(string[] args)
 		{
-			int dates = -100;
-			string logPath = @"D:\ZipTest\LOG";
-			string ngPath = @"D:\ZipTest\NG";
-			string okPath = @"D:\ZipTest\OK";
+			int dates = -365;
+			string logPath = @"E:\ZipTest\LOG";
+			string ngPath = @"E:\ZipTest\NG";
+			string okPath = @"E:\ZipTest\OK";
 			if (Directory.Exists(logPath))
 			{
 				for (int i = 0; i > dates; i--)
