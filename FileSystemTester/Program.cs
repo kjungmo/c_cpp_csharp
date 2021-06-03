@@ -108,19 +108,6 @@ namespace FileSystemTester
 			Console.ReadKey();
 		}
 
-		public static DateTime StringToDateTimeParser(string date)
-		{
-			DateTime dtDate;
-			string[] pattern = { "yyyyMMdd", "yyyy-MM-dd" };
-
-			if (!DateTime.TryParseExact(date, pattern, System.Globalization.CultureInfo.InvariantCulture,
-						   System.Globalization.DateTimeStyles.None, out dtDate))
-			{
-				return DateTime.Today;
-			}
-			return dtDate;
-		}
-
 		// gets every files
 		public static List<string> GetFiles(string rootPath, List<string> fileLists)
 		{
