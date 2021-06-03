@@ -11,7 +11,8 @@ namespace FileSystemTester
 	class Program
 	{
 		static void Main(string[] args)
-		{
+		{ 
+
 			// args : rootPath, startZipDate, startDelDate
 			string rootPath = @"e:\ZipTest\";
 			List<string> tempList = new List<string>();
