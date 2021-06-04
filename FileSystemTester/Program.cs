@@ -135,7 +135,7 @@ namespace FileSystemTester
 					// Files that needs to be zipped
 					else
 					{
-						temp = GetFiles(item.FullName, temp);
+						temp = GetFiles(item.FullName, ref temp);
 						Console.WriteLine("to be zipped \n");
 						foreach (var file in temp)
 						{
