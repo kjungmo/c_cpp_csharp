@@ -33,7 +33,7 @@ namespace DummyFileCreator
 				{
 					string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
 					string folderpath = Path.Combine(ngPath, datetime);
-					if (Directory.Exists(folderpath) == false)
+					if (!Directory.Exists(folderpath))
 					{
 						Directory.CreateDirectory(folderpath);
 					}
@@ -47,7 +47,7 @@ namespace DummyFileCreator
 				{
 					string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
 					string folderpath = Path.Combine(okPath, datetime);
-					if (Directory.Exists(folderpath) == false)
+					if (!Directory.Exists(folderpath))
 					{
 						Directory.CreateDirectory(folderpath);
 					}
