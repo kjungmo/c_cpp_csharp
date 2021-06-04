@@ -17,7 +17,7 @@ namespace FileSystemTester
 			List<string> tempList = new List<string>();
 			string zipFilePath = Path.Combine(rootPath, "LOG.zip");
 			DateTime startZip = new DateTime(2021, 6, 1);
-			DateTime startDel = new DateTime(2021, 5, 30);
+			DateTime startDel = new DateTime(2021, 5, 27);
 
 			if (!Directory.Exists(rootPath))
 			{
@@ -72,7 +72,7 @@ namespace FileSystemTester
 					GetFiles(dir.FullName, ref fileLists);
 				}
 
-				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
+				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".Png"))
 				{
 					GetFiles(file.FullName, ref fileLists);
 				}
@@ -80,7 +80,7 @@ namespace FileSystemTester
 			else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
 			{
 				var fileInfo = new FileInfo(rootPath);
-				if (fileInfo.Extension == ".log" || fileInfo.Extension == ".jpg")
+				if (fileInfo.Extension == ".log" || fileInfo.Extension == ".Png")
 					fileLists.Add(fileInfo.FullName);
 			}
 			return fileLists;
@@ -139,11 +139,11 @@ namespace FileSystemTester
 						Console.WriteLine("to be zipped \n");
 						foreach (var file in temp)
 						{
-							Console.WriteLine(file);
+							//Console.WriteLine(file);
 							archive.CreateEntryFromFile(file, file.Substring(rootPath.Length), CompressionLevel.Optimal);
-							File.Delete(file);
 						}
 						temp.Clear();
+						Directory.Delete(item.FullName, recursive: true);
 					}
 				}
 			}
