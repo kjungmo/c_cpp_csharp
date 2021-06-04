@@ -51,7 +51,7 @@ namespace DummyFileCreator
 				}
 				for (int j = 0; j < 15; j++)
 				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + ".png"), "Captured Window", 1920, 1060);
+					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 1920, 1060);
 				}
 			}
 			Console.WriteLine("NG fertig");
@@ -76,7 +76,7 @@ namespace DummyFileCreator
 				}
 				for (int j = 0; j < 15; j++)
 				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + ".png"), "Captured Window", 1920, 1060);
+					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 1920, 1060);
 				}
 			}
 			Console.WriteLine("OK fertig");

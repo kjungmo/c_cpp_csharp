@@ -73,7 +73,7 @@ namespace FileSystemTester
 					GetFiles(dir.FullName, ref fileLists);
 				}
 
-				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ImageFormat.Png.ToString()))
+				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == "."+ImageFormat.Png.ToString()))
 				{
 					GetFiles(file.FullName, ref fileLists);
 				}
@@ -81,7 +81,7 @@ namespace FileSystemTester
 			else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
 			{
 				var fileInfo = new FileInfo(rootPath);
-				if (fileInfo.Extension == ".log" || fileInfo.Extension == ImageFormat.Png.ToString())
+				if (fileInfo.Extension == ".log" || fileInfo.Extension == "." + ImageFormat.Png.ToString())
 					fileLists.Add(fileInfo.FullName);
 			}
 			return fileLists;
