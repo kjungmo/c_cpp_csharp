@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
+using System.Drawing.Imaging;
 
 namespace FileSystemTester
 {
@@ -13,11 +14,11 @@ namespace FileSystemTester
 		static void Main(string[] args)
 		{
 			// args : rootPath, startZipDate, startDelDate
-			string rootPath = @"e:\ZipTest\";
+			string rootPath = @"e:\Dummy\";
 			List<string> tempList = new List<string>();
 			string zipFilePath = Path.Combine(rootPath, "LOG.zip");
-			DateTime startZip = new DateTime(2021, 6, 1);
-			DateTime startDel = new DateTime(2021, 5, 27);
+			DateTime startZip = new DateTime(2021, 6, 3);
+			DateTime startDel = new DateTime(2021, 5, 31);
 
 			if (!Directory.Exists(rootPath))
 			{
@@ -72,7 +73,7 @@ namespace FileSystemTester
 					GetFiles(dir.FullName, ref fileLists);
 				}
 
-				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".Png"))
+				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ImageFormat.Png.ToString()))
 				{
 					GetFiles(file.FullName, ref fileLists);
 				}
@@ -80,7 +81,7 @@ namespace FileSystemTester
 			else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
 			{
 				var fileInfo = new FileInfo(rootPath);
-				if (fileInfo.Extension == ".log" || fileInfo.Extension == ".Png")
+				if (fileInfo.Extension == ".log" || fileInfo.Extension == ImageFormat.Png.ToString())
 					fileLists.Add(fileInfo.FullName);
 			}
 			return fileLists;

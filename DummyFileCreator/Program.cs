@@ -14,7 +14,7 @@ namespace DummyFileCreator
 	{
 		static void Main(string[] args)
 		{
-			int dates = -100;
+			int dates = -5;
 			string logPath = @"E:\Dummy\LOG";
 			string ngPath = @"E:\Dummy\NG";
 			string okPath = @"E:\Dummy\OK";
@@ -51,7 +51,7 @@ namespace DummyFileCreator
 				}
 				for (int j = 0; j < 15; j++)
 				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + ".jpg"), "Captured Window", 1920, 1060);
+					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + ".png"), "Captured Window", 1920, 1060);
 				}
 			}
 			Console.WriteLine("NG fertig");
@@ -76,7 +76,7 @@ namespace DummyFileCreator
 				}
 				for (int j = 0; j < 15; j++)
 				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + ".jpg"), "Captured Window", 1920, 1060);
+					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + ".png"), "Captured Window", 1920, 1060);
 				}
 			}
 			Console.WriteLine("OK fertig");
