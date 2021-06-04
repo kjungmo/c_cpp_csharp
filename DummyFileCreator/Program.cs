@@ -14,7 +14,7 @@ namespace DummyFileCreator
 	{
 		static void Main(string[] args)
 		{
-			int dates = -5;
+			int dates = -150;
 			string logPath = @"E:\Dummy\LOG";
 			string ngPath = @"E:\Dummy\NG";
 			string okPath = @"E:\Dummy\OK";

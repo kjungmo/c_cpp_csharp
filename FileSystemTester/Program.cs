@@ -13,12 +13,17 @@ namespace FileSystemTester
 	{
 		static void Main(string[] args)
 		{
-			// args : rootPath, startZipDate, startDelDate
+			// [RELEASE] :: args in period, 
+
+			// args : rootPath, startZipPeriod(INTEGER), startDelPeriod(INTEGER)
 			string rootPath = @"e:\Dummy\";
 			List<string> tempList = new List<string>();
 			string zipFilePath = Path.Combine(rootPath, "LOG.zip");
-			DateTime startZip = new DateTime(2021, 6, 3);
-			DateTime startDel = new DateTime(2021, 5, 31);
+
+			DateTime startZip = new DateTime(2021, 4, 30);
+			DateTime startDel = new DateTime(2021, 1, 31);
+			//DateTime startZipDate = DateTime.Today.AddDays(-args1);
+			//DateTime startDelDate = startZipDate.AddDays(-args2);
 
 			if (!Directory.Exists(rootPath))
 			{
@@ -39,10 +44,18 @@ namespace FileSystemTester
 				#region CHECKS THE ZIP FILE, WHICH HAS ALREADY BEEN MADE EARLIER, DELETES AND UPDATES FILES
 				UpdateZip(startDel, archive);
 				#endregion
-
+			}
+			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update)) // delete 
+			{
 				#region FILES ARE ZIPPED, AND WHICH SHOULDVE BEEN ZIPPED BUT NOT ARE DELETED
 				ManageLOG(rootPath, startZip, startDel, archive);
+			}
+			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update)) // delete
+			{
 				ManageOKNG(rootPath, "OK", startZip, startDel, tempList, archive);
+			}
+			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update)) // delete
+			{ 
 				ManageOKNG(rootPath, "NG", startZip, startDel, tempList, archive);
 				#endregion
 			}
@@ -101,16 +114,18 @@ namespace FileSystemTester
 					if (DateTime.Compare(del.Date, StringToDateTimeParser(file.Name.Substring(0, 10))) >= 0)
 					//if (DateTime.Compare(new DateTime(2021, 5, 29), file.CreationTime.Date) >= 0)
 					{
-						//Console.WriteLine("\nThis is the Files to be deleted");
-						//Console.WriteLine(file.FullName);
+						Console.WriteLine("\nThis is the Files to be deleted");
+						Console.WriteLine(file.FullName);
+
 						File.Delete(file.FullName);
 					}
 
 					// Files that needs to be zipped
 					else
 					{
-						//Console.WriteLine("to be zipped \n");
-						//Console.WriteLine(file.FullName);
+						Console.WriteLine("to be zipped \n");
+						Console.WriteLine(file.FullName);
+
 						archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(rootPath.Length), CompressionLevel.Optimal);
 						File.Delete(file.FullName);
 					}
@@ -130,6 +145,8 @@ namespace FileSystemTester
 					//if (DateTime.Compare(new DateTime(2021, 5, 29), item.CreationTime.Date) >= 0)
 					{
 						Console.WriteLine("\nThe Files to be deleted");
+						Console.WriteLine(item.FullName);
+
 						Directory.Delete(item.FullName, recursive: true); // From FILE ZONE, these files are to be deleted
 					}
 
@@ -140,7 +157,8 @@ namespace FileSystemTester
 						Console.WriteLine("to be zipped \n");
 						foreach (var file in temp)
 						{
-							//Console.WriteLine(file);
+							Console.WriteLine(file);
+
 							archive.CreateEntryFromFile(file, file.Substring(rootPath.Length), CompressionLevel.Optimal);
 						}
 						temp.Clear();
