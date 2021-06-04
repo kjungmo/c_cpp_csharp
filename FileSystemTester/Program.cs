@@ -61,7 +61,7 @@ namespace FileSystemTester
 			return dtDate;
 		}
 
-		public static List<string> GetFiles(string rootPath, List<string> fileLists)
+		public static List<string> GetFiles(string rootPath, ref List<string> fileLists)
 		{
 			var attr = File.GetAttributes(rootPath);
 			if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -69,12 +69,12 @@ namespace FileSystemTester
 				var dirInfo = new DirectoryInfo(rootPath);
 				foreach (var dir in dirInfo.GetDirectories())
 				{
-					GetFiles(dir.FullName, fileLists);
+					GetFiles(dir.FullName, ref fileLists);
 				}
 
 				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == ".jpg"))
 				{
-					GetFiles(file.FullName, fileLists);
+					GetFiles(file.FullName, ref fileLists);
 				}
 			}
 			else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
