@@ -14,10 +14,10 @@ namespace DummyFileCreator
 	{
 		static void Main(string[] args)
 		{
-			int dates = -365;
-			string logPath = @"E:\ZipTest\LOG";
-			string ngPath = @"E:\ZipTest\NG";
-			string okPath = @"E:\ZipTest\OK";
+			int dates = -100;
+			string logPath = @"E:\Dummy\LOG";
+			string ngPath = @"E:\Dummy\NG";
+			string okPath = @"E:\Dummy\OK";
 			if (!Directory.Exists(logPath))
 			{
 				Directory.CreateDirectory(logPath);
@@ -63,7 +63,7 @@ namespace DummyFileCreator
 			for (int i = 0; i > dates; i--)
 			{
 				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
-				string folderpath = Path.Combine(ngPath, datetime);
+				string folderpath = Path.Combine(okPath, datetime);
 				string carPath = "CN7";
 				carPath = Path.Combine(folderpath, carPath);
 				if (!Directory.Exists(folderpath))
