@@ -20,6 +20,10 @@
 #include "cryptopp850/filters.h"
 #include "cryptopp850/base64.h"
 
+#include "cryptopp850/modes.h"
+#include "cryptopp850/aes.h"
+#include "cryptopp850/hex.h"
+
 #ifdef _DEBUG
 #pragma comment(lib, "D:/Github/c_cpp_csharp/LicenseKey/cryptlibD.lib")
 const char* GenerateLicenseKey(bool initCOM);
@@ -39,28 +43,29 @@ static char ChBuff[1024];
 static char DefChar = ' ';
 static char LkBuf[1024];
 
-bool GetWMI(std::string&, std::string&, std::string&, std::string, bool initCOM = true);
+bool GetWMI(std::string&, std::string&, std::string&, std::string&, bool initCOM = true);
 bool GetWMIUserAccount(std::string&, bool initCOM = true);
-bool GetWMIMacGUID(/*std::string&, */std::string&, bool initCOM = true);
+bool GetWMIMacGUID(std::string&, bool initCOM = true);
 std::string QueryWMI(IWbemServices*, IWbemLocator*, const char*, const wchar_t*);
-std::string CreateLicenseKey(std::string, bool);
-std::string CreateMacGuidKey(bool);
+std::string CreateLicenseKey(std::string, std::string, std::string, bool);
+std::string CreateMacGuidKey(std::string, bool);
 std::string SHA256HashString(std::string);
 bool WriteToFile(std::string, std::string);
 std::string ReadFromFile(std::string);
-std::string CreateIntrusionPath(std::string, bool initCOM = true);
-std::string CreateKeyPath(std::string, bool initCOM = true);
+std::string CreateIntrusionPath(std::string, std::string, bool initCOM = true);
+std::string CreateKeyPath(std::string, std::string, bool initCOM = true);
 std::string CreateKeyPathAnother(std::string, bool initCOM = true);
-std::string CreateMacGuidPath(std::string, bool initCOM = true);
+std::string CreateMacGuidPath(std::string, std::string, bool initCOM = true);
 std::string GetGPUSerial(std::string);
 bool SplitString(std::string&, std::string&);
 bool RemoveSymbols(std::string&);
 bool ConvertGUID(std::string&);
 
 
+
 int main()
 {
-	time_t startG, endG, startV, endV;
+	/*time_t startG, endG, startV, endV;
 	double resultG, resultV;
 	startG = clock();
 	if (GenerateLicenseKey(true))
@@ -77,25 +82,135 @@ int main()
 
 	std::cout << "Validation Complete." << std::endl;
 
-	std::cout << "PATH file1:  " << CreateKeyPath(FILE_NAME) << std::endl;
-	std::cout << "PATH file2:  " << CreateKeyPathAnother(FILE_NAME2) << std::endl;
-	std::cout << "PATH val:  " << CreateIntrusionPath(INTRUSION_NAME) << std::endl;
-
 	resultG = (double)(endG - startG);
 	resultV = (double)(endV - startV);
 	std::cout << "result Gen : " << resultG << std::endl << "result Val : " << resultV << std::endl;
 
 	system("pause");
+	return 0;*/
+
+	time_t startAES, endAES, startHASH, endHASH, startCREATEKEY, endCREATEKEY, startENCRYPT, endENCRYPT, startDECRYPT, endDECRYPT; //****************************************************************************************************************************************************************************************
+	double resultAES, resultHASH, resultCREATEKEY, resultENCRYPT, resultDECRYPT; //****************************************************************************************************************************************************************************************
+
+	startAES = clock(); //****************************************************************************************************************************************************************************************
+
+	CryptoPP::SHA256 hash;  //****************************************************************************************************************************************************************************************
+	CryptoPP::byte digest[CryptoPP::SHA256::DIGESTSIZE];
+
+
+	std::string mb, uuid, guid, mac; 
+	GetWMI(mb, uuid, guid, mac, true);
+	std::string message = mb;
+	std::cout << "motherboard : " << mb << std::endl;
+
+	startHASH = clock(); //****************************************************************************************************************************************************************************************
+	hash.CalculateDigest(digest, (CryptoPP::byte*)message.c_str(), message.length());
+
+	CryptoPP::HexEncoder encoder;
+	std::string sKey;
+	encoder.Attach(new CryptoPP::StringSink(sKey));
+	encoder.Put(digest, sizeof(digest));
+	encoder.MessageEnd();
+	endHASH = clock(); //****************************************************************************************************************************************************************************************
+
+	startCREATEKEY = clock(); //****************************************************************************************************************************************************************************************
+	CryptoPP::byte key[CryptoPP::AES::MAX_KEYLENGTH]; //16 Bytes MAXKEYLENGTH 32 BYTES(SHA 256)
+	CryptoPP::byte  iv[CryptoPP::AES::BLOCKSIZE];
+	memcpy(key, sKey.c_str(), CryptoPP::AES::MAX_KEYLENGTH);;
+	memset(iv, 0x00, CryptoPP::AES::BLOCKSIZE);
+	endCREATEKEY = clock(); //****************************************************************************************************************************************************************************************
+
+	//
+	// String and Sink setup
+	//
+	std::string plaintext = guid;
+	std::string ciphertext;
+	std::string decryptedtext;
+
+	//
+	// Dump Plain Text
+	//
+	std::cout << "Plain Text (" << plaintext.size() << " bytes)" << std::endl;
+	std::cout << plaintext;
+	std::cout << std::endl << std::endl;
+
+	//
+	// Create Cipher Text
+	//
+	startENCRYPT = clock(); //****************************************************************************************************************************************************************************************
+	CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::MAX_KEYLENGTH);
+	CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, iv);
+
+	CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(ciphertext));
+	RemoveSymbols(plaintext);
+	stfEncryptor.Put(reinterpret_cast<const unsigned char*>(plaintext.c_str()), plaintext.length());
+	stfEncryptor.MessageEnd();
+	endENCRYPT = clock(); //****************************************************************************************************************************************************************************************
+	//
+	// Dump Cipher Text
+	//
+	std::cout << "Cipher Text (" << ciphertext.size() << " bytes)" << std::endl;
+
+	for (int i = 0; i < ciphertext.size(); i++) {
+
+		std::cout << "0x" << std::hex << (0xFF & static_cast<CryptoPP::byte>(ciphertext[i])) << " ";
+	}
+	std::cout << "\nCipherText : " << ciphertext << std::endl;
+
+	WriteToFile("D:\\ZipTest\\CipherText.txt", ciphertext);
+	std::string textciphered = ReadFromFile("D:\\ZipTest\\CipherText.txt");
+	std::cout << "textciphered : " << textciphered << std::endl;
+
+	std::cout << std::endl << std::endl;
+
+	//
+	// Decrypt
+	//
+	startDECRYPT = clock(); 
+	CryptoPP::AES::Decryption aesDecryption(key, CryptoPP::AES::MAX_KEYLENGTH);
+	CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, iv);
+
+	CryptoPP::StreamTransformationFilter stfDecryptor(cbcDecryption, new CryptoPP::StringSink(decryptedtext));
+	stfDecryptor.Put(reinterpret_cast<const unsigned char*>(textciphered.c_str()), textciphered.size());
+	stfDecryptor.MessageEnd();
+	endDECRYPT = clock(); //****************************************************************************************************************************************************************************************
+
+	ConvertGUID(decryptedtext);
+	//
+	// Dump Decrypted Text
+	//
+	std::cout << "Decrypted Text: " << std::endl;
+	std::cout << decryptedtext;
+	std::cout << std::endl << std::endl;//****************************************************************************************************************************************************************************************
+
+
+	resultAES = (double)(endAES - startAES);
+	resultHASH = (double)(endHASH - startHASH);
+	resultCREATEKEY = (double)(endCREATEKEY - startCREATEKEY);
+	resultENCRYPT = (double)(endENCRYPT - startENCRYPT);
+	resultDECRYPT = (double)(endDECRYPT - startDECRYPT);
+	std::cout << "resultAES : " << resultAES << "\nresultHASH : " << resultHASH << "\nresultCREATEKEY : " << resultCREATEKEY << "\nresultENCRYPT : " << resultENCRYPT << "\nresultDECRYPT : " << resultDECRYPT << std::endl;
+
 	return 0;
+
+
 }
 
 const char* GenerateLicenseKey(bool initCOM)
 {
+	time_t startGETUSERACCOUNT, endGETUSERACCOUNT, startGETWMI, endGETWMI, startCREATELK, endCREATELK, startMACGUIDKEY, endMACGUIDKEY;
+	double resultGETUSERACCOUNT, resultGETWMI, resultCREATELK, resultMACGUIDKEY;
+
+
 //#ifdef GENERATOR_BUILD
-	std::string intrusion = CreateIntrusionPath(INTRUSION_NAME, initCOM);
-	std::string lkeyfile = CreateKeyPath(FILE_NAME, initCOM);
+	std::string userAsBrain;
+	startGETUSERACCOUNT = clock();
+	GetWMIUserAccount(userAsBrain, true);
+	endGETUSERACCOUNT = clock();
+	std::string intrusion = CreateIntrusionPath(INTRUSION_NAME, userAsBrain, initCOM);
+	std::string lkeyfile = CreateKeyPath(FILE_NAME, userAsBrain, initCOM);
 	std::string lkeyfileAnother = CreateKeyPathAnother(FILE_NAME2, initCOM);
-	std::string macguidFile = CreateMacGuidPath(MAC_GUID_NAME, initCOM);
+	std::string macguidFile = CreateMacGuidPath(MAC_GUID_NAME, userAsBrain, initCOM);
 
 	if (PathFileExists(intrusion.c_str()))
 	{
@@ -115,22 +230,33 @@ const char* GenerateLicenseKey(bool initCOM)
 		remove(macguidFile.c_str());
 	}
 
-	std::string licenseKey;
-	std::string macGuidKey = CreateMacGuidKey(initCOM);
+	std::string mBoard, uuid, guid, mac;
+	startGETWMI = clock();
 
-	//std::cout << "GenerateLicenseKey macGuidKey : " << macGuidKey << std::endl; //*************************
+	GetWMI(mBoard, uuid, guid, mac, initCOM);
+	//std::cout << "mboard : " << mBoard << "\nuuid : " << uuid << "\nguid : " << guid << "\nmac : " << mac << std::endl;  //****************************
+	endGETWMI = clock();
+	startMACGUIDKEY = clock();
 
-	if (ConvertGUID(macGuidKey))
-	{
-		licenseKey = CreateLicenseKey(macGuidKey, initCOM);
-		//std::cout << "GenerateLicenseKey Licensekey : " << licenseKey << "\nConvertedGuid : " << macGuidKey << std::endl; //************************
+	std::string macGuidKey = CreateMacGuidKey(guid, initCOM);
+	endMACGUIDKEY = clock();
 
-	}
+	startCREATELK = clock();
 
+	std::string licenseKey = CreateLicenseKey(mBoard, uuid, mac, initCOM);
+	endCREATELK = clock();
+	std::cout << "macGuidKey : " << macGuidKey  << "\nlicenseKey : " << licenseKey << std::endl;
 	if (licenseKey.empty() || !WriteToFile(lkeyfile, licenseKey) || !WriteToFile(lkeyfileAnother, licenseKey) || !WriteToFile(macguidFile, macGuidKey))
 	{
 		licenseKey = "";
 	}
+	
+	resultGETUSERACCOUNT = (double)(endGETUSERACCOUNT - startGETUSERACCOUNT);
+	resultGETWMI = (double)(endGETWMI - startGETWMI);
+	resultMACGUIDKEY = (double)(endMACGUIDKEY - startMACGUIDKEY);
+	resultCREATELK = (double)(endCREATELK - startCREATELK);
+
+	std::cout << "resultGETUSERACCOUNT : " << resultGETUSERACCOUNT << "\nresultGETWMI : " << resultGETWMI << "\nresultMACGUIDKEY : " << resultMACGUIDKEY << "\nresultCREATELK : " << resultCREATELK << std::endl;
 	strcpy_s(LkBuf, licenseKey.length() + 1, licenseKey.c_str());
 //#endif
 	return LkBuf;
@@ -138,24 +264,40 @@ const char* GenerateLicenseKey(bool initCOM)
 
 bool ValidateLicenseKey(bool initCOM)
 {
-	std::string intrusion = CreateIntrusionPath(INTRUSION_NAME, initCOM);
-	std::string lkeyfile = CreateKeyPath(FILE_NAME, initCOM);
+	time_t startCONVERT, endCONVERT, startGETWMIWITHGUID, endGETWMIWITHGUID;
+	double resultCONVERT, resultGETWMIWITHGUID;
+
+
+	std::string userAsBrain;
+	GetWMIUserAccount(userAsBrain, initCOM);
+	std::string intrusion = CreateIntrusionPath(INTRUSION_NAME, userAsBrain, initCOM);
+	std::string lkeyfile = CreateKeyPath(FILE_NAME, userAsBrain, initCOM);
 	std::string lkeyfileAnother = CreateKeyPathAnother(FILE_NAME2, initCOM);
-	std::string macguidFile = CreateMacGuidPath(MAC_GUID_NAME, initCOM);  //******************************
+	std::string macguidFile = CreateMacGuidPath(MAC_GUID_NAME, userAsBrain, initCOM);  
 
 	std::string file = ReadFromFile(lkeyfile);
 	std::string fileAnother = ReadFromFile(lkeyfileAnother);
-	std::string filemacguid = ReadFromFile(macguidFile); //*****************************
+	std::string filemacguid = ReadFromFile(macguidFile); 
 
-	std::string sha;
-	std::string macGuidKey = CreateMacGuidKey(initCOM); //**************************************
-	if (ConvertGUID(macGuidKey))
+	std::string mBoard, uuid, mac;
+
+	startCONVERT = clock();
+	if (ConvertGUID(filemacguid))
 	{
-		sha = CreateLicenseKey(macGuidKey, initCOM);
+		endCONVERT = clock();
+		resultCONVERT = (double)(endCONVERT - startCONVERT);
+		startGETWMIWITHGUID = clock();
+		GetWMI(mBoard, uuid, filemacguid, mac, initCOM);
+		endGETWMIWITHGUID = clock();
+		resultGETWMIWITHGUID = (double)(endGETWMIWITHGUID - startGETWMIWITHGUID);
+		std::cout << "resultCONVERT : " << resultCONVERT << "\nresultGETWMIWITHGUID : " << resultGETWMIWITHGUID << std::endl;
+		//std::cout << "mboard : " << mBoard << "\nuuid : " << uuid << "\nfilemacguid : " << filemacguid << "\nmac : " << mac << std::endl; //**********************************
 	}
-	if (!file.empty() && !fileAnother.empty() && !filemacguid.empty() && !sha.empty()) //**************************************
+	std::string sha = CreateLicenseKey(mBoard, uuid, mac, initCOM);
+
+	if (!file.empty() && !fileAnother.empty() && !filemacguid.empty() && !sha.empty())
 	{
-		if (!PathFileExists(intrusion.c_str()) && file == sha && fileAnother == sha && filemacguid == macGuidKey) //**************************************
+		if (!PathFileExists(intrusion.c_str()) && file == sha && fileAnother == sha)
 		{
 			return true;
 		}
@@ -169,16 +311,15 @@ bool ValidateLicenseKey(bool initCOM)
 	LicenseDetector.close();
 	remove(lkeyfile.c_str());
 	remove(lkeyfileAnother.c_str());
-	remove(macguidFile.c_str()); //**************************************
+	remove(macguidFile.c_str()); 
+
 
 	return false;
 }
 
-std::string CreateLicenseKey(std::string guid, bool initCOM)
+std::string CreateLicenseKey(std::string mBoard, std::string uuid, std::string mac, bool initCOM)
 {
-	std::string mBoard, uuid, mac;
-
-	if (GetWMI(mBoard, uuid, mac, guid, initCOM))
+	if (!(mBoard.empty() && uuid.empty() && mac.empty()))
 	{
 		std::string toBeEncrypted;
 		std::string mBoard2, uuid2, mac2;
@@ -194,20 +335,19 @@ std::string CreateLicenseKey(std::string guid, bool initCOM)
 	return "";
 }
 
-std::string CreateMacGuidKey(bool initCOM)
+std::string CreateMacGuidKey(std::string guid, bool initCOM)
 {
-	std::string guid;
-	if (GetWMIMacGUID(guid, initCOM))
+	if (guid.length() != 0)
 	{
 		RemoveSymbols(guid);
-		/*std::string toBeEncrypted = SHA256HashString(guid)*/;
-		//std::cout << "CreateMacGuidKey GUID : " << guid << std::endl; //********************************************
 		return guid;
 	}
+	/*std::string toBeEncrypted = SHA256HashString(guid)*/;
+	//std::cout << "CreateMacGuidKey GUID : " << guid << std::endl; //********************************************
 	return "";
 }
 
-bool GetWMI(std::string& mb, std::string& uuid, std::string& mac, std::string guid, bool initCOM)
+bool GetWMI(std::string& mb, std::string& uuid, std::string& guid, std::string& mac, bool initCOM)
 {
 	HRESULT hres;
 	if (initCOM)
@@ -289,17 +429,39 @@ bool GetWMI(std::string& mb, std::string& uuid, std::string& mac, std::string gu
 		CoUninitialize();
 		return false;
 	}
-
-	std::string guidToMac = "SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter = TRUE AND GUID = '" + guid + "'";
+	time_t startMB, endMB, startUUID, endUUID, startGUID, endGUID, startMAC, endMAC;  //********************************************
+	double resultMB, resultUUID, resultGUID, resultMAC; //********************************************
+	startMB = clock(); //********************************************
 	mb = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_BaseBoard", L"SerialNumber");
+	endMB = clock(); //********************************************
+	startUUID = clock(); //********************************************
 	uuid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_ComputerSystemProduct", L"UUID");
-	mac = QueryWMI(pSvc, pLoc, guidToMac.c_str(), L"MACAddress");
+	endUUID = clock(); //********************************************
+	startGUID = clock(); //********************************************
+	if (guid.length() == 0)
+	{
+		guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = '이더넷'", L"GUID");
+		if (guid.length() == 0)
+		{
+			guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = '이더넷 2'", L"GUID");
+		}
+	}
+	endGUID = clock(); //********************************************
+	startMAC = clock(); //********************************************
+	mac = QueryWMI(pSvc, pLoc, ("SELECT * FROM Win32_NetworkAdapter WHERE GUID = '" + guid + "'").c_str(), L"MACAddress");
+	endMAC = clock(); //********************************************
 
 	pSvc->Release();
 	pLoc->Release();
 	CoUninitialize();
 
-	return !(mb.empty() || uuid.empty() || mac.empty());
+	resultMB = (double)(endMB - startMB); //********************************************
+	resultUUID = (double)(endUUID - startUUID); //********************************************
+	resultGUID = (double)(endGUID - startGUID); //********************************************
+	resultMAC = (double)(endMAC - startMAC); //********************************************
+	std::cout << "resultMB : " << resultMB << "\nresultUUID : " << resultUUID << "\nresultGUID : " << resultGUID << "\nresultMAC :" << resultMAC << std::endl; //********************************************
+
+	return !(mb.empty() || uuid.empty() || guid.empty() || mac.empty());
 }
 
 bool GetWMIUserAccount(std::string& user, bool initCOM)
@@ -392,7 +554,7 @@ bool GetWMIUserAccount(std::string& user, bool initCOM)
 	return !(user.empty());
 }
 
-bool GetWMIMacGUID(/*std::string& mac, */std::string& guid, bool initCOM)
+bool GetWMIMacGUID(std::string& guid, bool initCOM)
 {
 	HRESULT hres;
 	if (initCOM)
@@ -475,22 +637,16 @@ bool GetWMIMacGUID(/*std::string& mac, */std::string& guid, bool initCOM)
 		return false;
 	}
 
-	//std::string getMacWithGUID;
-	guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter = TRUE AND (NetConnectionID = 'Ethernet' OR NetConnectionID = '이더넷')", L"GUID");
-	//getMacWithGUID = "SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter = TRUE AND GUID = '" + guid + "'";
-	//mac = QueryWMI(pSvc, pLoc, getMacWithGUID.c_str(), L"MACAddress");
-
-	//if (mac.length() == 0)
-	//{
-	//	guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter = TRUE AND (NetConnectionID = 'Ethernet 2' OR NetConnectionID = '이더넷 2')", L"GUID");
-	//	getMacWithGUID = "SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter = TRUE AND GUID = '" + guid + "'";
-	//	mac = QueryWMI(pSvc, pLoc, getMacWithGUID.c_str(), L"MACAddress");
-	//}
+	guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = '이더넷'", L"GUID");
+	if (guid.length() == 0)
+	{
+		guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = '이더넷 2'", L"GUID");
+	}
 
 	pSvc->Release();
 	pLoc->Release();
 	CoUninitialize();
-	return !(/*mac.empty() ||*/ guid.empty());
+	return !(guid.empty());
 }
 
 std::string QueryWMI(IWbemServices* pSvc, IWbemLocator* pLoc, const char* query, const wchar_t* desc)
@@ -582,18 +738,14 @@ std::string ReadFromFile(std::string filepath)
 	return licenseKey;
 }
 
-std::string CreateIntrusionPath(std::string filename, bool initCOM)
+std::string CreateIntrusionPath(std::string filename, std::string brain, bool initCOM)
 {
-	std::string brain;
-	GetWMIUserAccount(brain, initCOM);
 	std::string brainPath = "C:\\Users\\" + brain + "\\AppData\\LocalLow\\" + filename;
 	return brainPath;
 }
 
-std::string CreateKeyPath(std::string filename, bool initCOM)
+std::string CreateKeyPath(std::string filename, std::string brain, bool initCOM)
 {
-	std::string brain;
-	GetWMIUserAccount(brain, initCOM);
 	std::string brainPath = "C:\\Users\\" + brain + "\\AppData\\Local\\" + filename;
 	return brainPath;
 }
@@ -604,25 +756,11 @@ std::string CreateKeyPathAnother(std::string filename, bool initCOM)
 	return brainPath;
 }
 
-std::string CreateMacGuidPath(std::string filename, bool initCOM)
+std::string CreateMacGuidPath(std::string filename, std::string brain, bool initCOM)
 {
-	std::string brain;
-	GetWMIUserAccount(brain, initCOM);
 	std::string brainPath = "C:\\Users\\" + brain + "\\AppData\\Local\\Packages\\" + filename;
 	return brainPath;
 }
-
-//std::string GetGPUSerial(std::string id)
-//{
-//	std::string strNew;
-//	size_t split = id.find_last_of("\\");
-//	strNew = id.substr(split + 1);
-//	split = strNew.find("&");
-//	strNew = strNew.substr(split + 1);
-//	split = strNew.find_first_of("&");
-//	strNew = strNew.substr(0, split);
-//	return strNew;
-//}
 
 bool SplitString(std::string& firstHalf, std::string& secondHalf)
 {
@@ -645,14 +783,13 @@ bool RemoveSymbols(std::string& letters)
 				return symbols.find(c) != std::string::npos;
 			}),
 			letters.end());
-		//std::cout << letters << std::endl; //*******************
+		//std::cout << letters << std::endl;
 	}
 	return !(letters.empty());
 }
 
 bool ConvertGUID(std::string& guidRead)
 {
-
 	guidRead = "{" +
 		guidRead.substr(0, 8) + "-" +
 		guidRead.substr(8, 4) + "-" +
