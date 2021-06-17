@@ -45,7 +45,9 @@ namespace FileSystemTester
             {
                 UpdateLogsInExistingZip(startDel, archive);
                 UpdateCapturedImageInExistingZip(startDel, archive);
+
                 HandleLogs(rootPath, startZip, startDel, archive);
+
                 HandleCapturedImages(rootPath, "OK", startZip, startDel, temp, archive);
                 HandleCapturedImages(rootPath, "NG", startZip, startDel, temp, archive);
             }
