@@ -1,192 +1,250 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
-using System.Drawing.Imaging;
+using System.Linq;
 
 namespace FileSystemTester
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			// [RELEASE] :: args in period, 
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            // [RELEASE] : "args" are RootPath, ZipDate, DelDate INTEGER as if Timespan, 
 
-			// args : rootPath, startZipPeriod(INTEGER), startDelPeriod(INTEGER)
-			string rootPath = @"e:\Dummy\";
-			List<string> tempList = new List<string>();
-			string zipFilePath = Path.Combine(rootPath, "LOG.zip");
+            // args : rootPath, startZipPeriod(INTEGER), startDelPeriod(INTEGER)
+            string rootPath = @"e:\Dummy\";
+            List<string> temp = new List<string>();
+            string zipFilePath = Path.Combine(rootPath, "LOG.zip");
 
-			DateTime startZip = new DateTime(2021, 4, 30);
-			DateTime startDel = new DateTime(2021, 1, 31);
-			//DateTime startZipDate = DateTime.Today.AddDays(-args1);
-			//DateTime startDelDate = startZipDate.AddDays(-args2);
+            DateTime startZip = new DateTime(2021, 5, 1);
+            DateTime startDel = new DateTime(2021, 5, 11);
 
-			if (!Directory.Exists(rootPath))
-			{
-				Console.WriteLine("SourcePath None");
-				return;
-			}
+            //DateTime startZip = DateTime.Today.AddDays(-10);
+            //DateTime startZip = DateTime.Today.AddDays(-args1);
 
-			Console.WriteLine("SourcePath Exists");
-			if (!File.Exists(zipFilePath))
-			{
-				Console.WriteLine("No .zip File");
-				var myfile = File.Create(zipFilePath);
-				myfile.Close();
-			}
+            //DateTime startDel = startZip.AddDays(-10);
+            //DateTime startDel = startZip.AddDays(-args2);
 
-			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
-			{
-				#region CHECKS THE ZIP FILE, WHICH HAS ALREADY BEEN MADE EARLIER, DELETES AND UPDATES FILES
-				UpdateZip(startDel, archive);
-				#endregion
-			}
-			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update)) // delete 
-			{
-				#region FILES ARE ZIPPED, AND WHICH SHOULDVE BEEN ZIPPED BUT NOT ARE DELETED
-				ManageLOG(rootPath, startZip, startDel, archive);
-			}
-			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update)) // delete
-			{
-				ManageOKNG(rootPath, "OK", startZip, startDel, tempList, archive);
-			}
-			using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update)) // delete
-			{ 
-				ManageOKNG(rootPath, "NG", startZip, startDel, tempList, archive);
-				#endregion
-			}
-			Console.ReadKey();
-		}
+            if (!Directory.Exists(rootPath))
+            {
+                Console.WriteLine("SourcePath None");
+                return;
+            }
 
-		public static DateTime StringToDateTimeParser(string date)
-		{
-			DateTime dtDate;
-			string[] pattern = { "yyyyMMdd", "yyyy-MM-dd" };
+            Console.WriteLine("SourcePath Exists");
+            if (!File.Exists(zipFilePath))
+            {
+                Console.WriteLine("No .zip File");
+                var myfile = File.Create(zipFilePath);
+                myfile.Close();
+            }
 
-			if (!DateTime.TryParseExact(date, pattern, System.Globalization.CultureInfo.InvariantCulture,
-						   System.Globalization.DateTimeStyles.None, out dtDate))
-			{
-				return DateTime.Today;
-			}
-			return dtDate;
-		}
-
-		public static List<string> GetFiles(string rootPath, ref List<string> fileLists)
-		{
-			var attr = File.GetAttributes(rootPath);
-			if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-			{
-				var dirInfo = new DirectoryInfo(rootPath);
-				foreach (var dir in dirInfo.GetDirectories())
-				{
-					GetFiles(dir.FullName, ref fileLists);
-				}
-
-				foreach (var file in dirInfo.GetFiles().Where(f => f.Extension == ".log" || f.Extension == "."+ImageFormat.Png.ToString()))
-				{
-					GetFiles(file.FullName, ref fileLists);
-				}
-			}
-			else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
-			{
-				var fileInfo = new FileInfo(rootPath);
-				if (fileInfo.Extension == ".log" || fileInfo.Extension == "." + ImageFormat.Png.ToString())
-					fileLists.Add(fileInfo.FullName);
-			}
-			return fileLists;
-		}
+            using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
+            {
+                UpdateLogsInExistingZip(startDel, archive);
+                UpdateCapturedImageInExistingZip(startDel, archive);
+                HandleLogs(rootPath, startZip, startDel, archive);
+                HandleCapturedImages(rootPath, "OK", startZip, startDel, temp, archive);
+                HandleCapturedImages(rootPath, "NG", startZip, startDel, temp, archive);
+            }
 
 
-		public static void ManageLOG(string rootPath, DateTime zip, DateTime del, ZipArchive archive)
-		{
-			foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG")).GetFileSystemInfos())
-			{
+            //Scheduler.AddTaskSchedule(@"D:\Github\c_cpp_csharp\FileSystemTester\bin\Release\FileSystemTester.exe", "", ExeInterval.Weekly);
+            Console.WriteLine("Management Success.");
+            Console.ReadKey();
+        }
 
-				if (DateTime.Compare(zip.Date, StringToDateTimeParser(file.Name.Substring(0, 10))) >= 0)
-				//if (DateTime.Compare(new DateTime(2021, 6, 1), file.CreationTime.Date) >= 0)
-				{
+        public static void UpdateLogsInExistingZip(DateTime del, ZipArchive archive)
+        {
+            foreach (var file in archive.Entries
+                .Where(x => x.FullName.Contains("LOG"))
+                .Where(x => isDueDate(del, ParseFilenameToDateTime(x.Name)))
+                .ToList())
+            {
+                archive.GetEntry(file.FullName).Delete();
+            }
+        }
 
-					// Files that needs to be deleted
-					if (DateTime.Compare(del.Date, StringToDateTimeParser(file.Name.Substring(0, 10))) >= 0)
-					//if (DateTime.Compare(new DateTime(2021, 5, 29), file.CreationTime.Date) >= 0)
-					{
-						Console.WriteLine("\nThis is the Files to be deleted");
-						Console.WriteLine(file.FullName);
+        public static void UpdateCapturedImageInExistingZip(DateTime del, ZipArchive archive)
+        {
+            foreach (var file in archive.Entries
+                .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
+                .Where(x => isDueDate(del, ParseArchiveFoldernameToDateTime(x.FullName)))
+                .ToList())
+            {
+                archive.GetEntry(file.FullName).Delete();
+            }
+        }
 
-						File.Delete(file.FullName);
-					}
+        public static void HandleLogs(string rootPath, DateTime zip, DateTime del, ZipArchive archive)
+        {
+            foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG"))
+                .GetFileSystemInfos()
+                .Where(f => isDueDate(zip, ParseFilenameToDateTime(f.Name))) // ***************
+            //.Where(f => CompareDates(zip, f.CreationTime)).ToList())
+                .ToList())  
+            {
+                if (DeleteFileAfterDelDate(del, file))
+                {
+                    continue;
+                }
+                CompressFileIntoZipFile(rootPath, file, archive);
+            }
+        }
 
-					// Files that needs to be zipped
-					else
-					{
-						Console.WriteLine("to be zipped \n");
-						Console.WriteLine(file.FullName);
+        public static void HandleCapturedImages(string rootPath, string folder, DateTime zip, DateTime del,
+            List<string> temp, ZipArchive archive)
+        {
+            foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
+                .GetFileSystemInfos()
+                .Where(f => isDueDate(zip, ParseFoldernameToDateTime(f.Name))) // ***************
+            //.Where(f => CompareDates(zip, f.CreationTime)).ToList()) //
+                .ToList()) 
+            {
+                if (DeleteDirectoryAfterDelDate(del, dir))
+                {
+                    continue;
+                }
+                CompressDirectoryIntoZipFile(rootPath, dir, temp, archive);
+            }
+        }
 
-						archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(rootPath.Length), CompressionLevel.Optimal);
-						File.Delete(file.FullName);
-					}
-				}
-			}
-		}
+        public static DateTime ParseFilenameToDateTime(string fileName)
+        {
+            DateTime dtDate;
+            string pattern ="yyyy-MM-dd";
+            if (!DateTime.TryParseExact(fileName.Substring(0, pattern.Length), pattern, 
+                System.Globalization.CultureInfo.InvariantCulture, 
+                System.Globalization.DateTimeStyles.None, out dtDate))
+            {
+                return DateTime.Today;
+            }
+            return dtDate;
+        }
 
-		public static void ManageOKNG(string rootPath, string folder, DateTime zip, DateTime del, List<string> temp, ZipArchive archive)
-		{
-			foreach (var item in new DirectoryInfo(Path.Combine(rootPath, folder)).GetFileSystemInfos())
-			{
-				if (DateTime.Compare(zip, StringToDateTimeParser(item.FullName.Substring((item.FullName.Length - 8), 8))) >= 0)
-				//if (DateTime.Compare(new DateTime(2021, 6, 1), item.CreationTime.Date) >= 0)
-				{
-					// Files that needs to be deleted
-					if (DateTime.Compare(del, StringToDateTimeParser(item.FullName.Substring((item.FullName.Length - 8), 8))) >= 0)
-					//if (DateTime.Compare(new DateTime(2021, 5, 29), item.CreationTime.Date) >= 0)
-					{
-						Console.WriteLine("\nThe Files to be deleted");
-						Console.WriteLine(item.FullName);
+        public static DateTime ParseFoldernameToDateTime(string folderName)
+        {
+            DateTime dtDate;
+            string pattern = "yyyyMMdd";
+            if (!DateTime.TryParseExact(folderName, pattern, 
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out dtDate))
+            {
+                return DateTime.Today;
+            }
+            return dtDate;
+        }
 
-						Directory.Delete(item.FullName, recursive: true); // From FILE ZONE, these files are to be deleted
-					}
+        public static DateTime ParseArchiveFoldernameToDateTime(string folderName)
+        {
+            DateTime dtDate;
+            string pattern = "yyyyMMdd";
+            if (!DateTime.TryParseExact(folderName.Substring(3, pattern.Length), pattern,
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out dtDate))
+            {
+                return DateTime.Today;
+            }
+            return dtDate;
+        }
 
-					// Files that needs to be zipped
-					else
-					{
-						temp = GetFiles(item.FullName, ref temp);
-						Console.WriteLine("to be zipped \n");
-						foreach (var file in temp)
-						{
-							Console.WriteLine(file);
+        public static List<string> GetFiles(string rootPath, ref List<string> fileLists)
+        {
+            var attr = File.GetAttributes(rootPath);
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            {
+                var dirInfo = new DirectoryInfo(rootPath);
+                foreach (var dir in dirInfo.GetDirectories())
+                {
+                    GetFiles(dir.FullName, ref fileLists);
+                }
 
-							archive.CreateEntryFromFile(file, file.Substring(rootPath.Length), CompressionLevel.Optimal);
-						}
-						temp.Clear();
-						Directory.Delete(item.FullName, recursive: true);
-					}
-				}
-			}
-		}
+                foreach (var file in dirInfo.GetFiles()
+                    .Where(f => f.Extension == ".log" || f.Extension == "." + ImageFormat.Png.ToString().ToLower())
+                    .Where(f => f.FullName.Contains(DateTime.Today.Date.ToString())))
+                {
+                    GetFiles(file.FullName, ref fileLists);
+                }
+            }
+            else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
+            {
+                var fileInfo = new FileInfo(rootPath);
+                if (fileInfo.Extension == ".log" || fileInfo.Extension == "." + ImageFormat.Png.ToString().ToLower())
+                    fileLists.Add(fileInfo.FullName);
+            }
+            return fileLists;
+        }
 
-		public static void UpdateZip(DateTime startDEL, ZipArchive archive)
-		{
-			foreach (var file in archive.Entries.Where(x => x.FullName.Contains("LOG")).ToList())
-			{
+        public static bool isDueDate(DateTime setDate, DateTime fileDate)
+        {
+            if (DateTime.Compare(setDate.Date, fileDate.Date) >= 0)
+            {
+                return true;
+            }
+            return false;
+        }
 
-				if (DateTime.Compare(startDEL.Date, StringToDateTimeParser(file.FullName.Substring(4, 10))) >= 0)
-				//if (DateTime.Compare(startDel, file.LastWriteTime.Date) >= 0)
-				{
-					archive.GetEntry(file.FullName).Delete();
-				}
-			}
-			foreach (var file in archive.Entries.Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG")).ToList())
-			{
-				if (DateTime.Compare(startDEL.Date, StringToDateTimeParser(file.FullName.Substring(3, 8))) >= 0)
-				//if (DateTime.Compare(new DateTime(2021, 5, 29), file.LastWriteTime.Date) >= 0)
-				{
-					archive.GetEntry(file.FullName).Delete();
-				}
-			}
-		}
-	}
+        public static bool DeleteFileAfterDelDate(DateTime deletionDate, FileSystemInfo file)
+        {
+            if (isDueDate(deletionDate, ParseFilenameToDateTime(file.Name)))  // ***************
+            //if (CompareDates(deletionDate, file.CreationTime))
+            {
+                File.Delete(file.FullName);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool DeleteDirectoryAfterDelDate(DateTime deletionDate, FileSystemInfo directory)
+        {
+            if (isDueDate(deletionDate, ParseFoldernameToDateTime(directory.Name)))  // ***************
+            //if (CompareDates(deletionDate, directory.CreationTime))
+            {
+                Directory.Delete(directory.FullName, true);
+                return true;
+            }
+            return false;
+        }
+        public static void CompressFileIntoZipFile(string sourcePath, FileSystemInfo file, ZipArchive archive)
+        {
+            archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(sourcePath.Length), CompressionLevel.Optimal);
+            File.Delete(file.FullName);
+        }
+
+        public static void CompressDirectoryIntoZipFile(string sourcePath, FileSystemInfo folderName, 
+            List<string> compressable, ZipArchive archive)
+        {
+            compressable = GetFiles(folderName.FullName, ref compressable);
+            foreach (var file in compressable)
+            {
+                archive.CreateEntryFromFile(file, file.Substring(sourcePath.Length), CompressionLevel.Optimal);
+            }
+            compressable.Clear();
+            Directory.Delete(folderName.FullName, true);
+
+        }
+
+
+        //public static bool ZipDirectoryAfterZipDate(string rootPath, DateTime compressionDate, FileSystemInfo folder, List<string> compressable, ZipArchive archive)
+        //{
+        //	if (CompareDates(compressionDate, folder.CreationTime))
+        //	{
+        //		CompressDirectoryIntoZipFile(rootPath, folder, compressable, archive);
+        //		return true;
+        //	}
+        //	return false;
+        //}
+
+        //public static bool ZipFileAfterZipDate(string rootPath, DateTime compressionDate, FileSystemInfo file, ZipArchive archive)
+        //{
+        //	if (CompareDates(compressionDate, file.CreationTime))
+        //	{
+        //		CompressFileIntoZipFile(rootPath, file, archive);
+        //		return true;
+        //	}
+        //	return false;
+        //}
+    }
 }
