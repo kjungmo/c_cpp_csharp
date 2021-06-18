@@ -7,7 +7,7 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.IO.Compression;
 
-namespace FileSystemTester
+namespace LogManagementSystem
 {
     public class ZipHelper
     {
@@ -85,10 +85,10 @@ namespace FileSystemTester
             return false;
         }
 
-        public static bool DeleteFileAfterDelDate(DateTime deletionDate, FileSystemInfo file)
+        public static bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
         {
-            if (isDueDate(deletionDate, ParseFilenameToDateTime(file.Name)))  // ***************
-            //if (isDueDate(deletionDate, file.CreationTime))
+            if (isDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))  // ***************
+            //if (isDueDate(deleteDate, file.CreationTime))
             {
                 File.Delete(file.FullName);
                 return true;
@@ -96,10 +96,10 @@ namespace FileSystemTester
             return false;
         }
 
-        public static bool DeleteFolderAfterDelDate(DateTime deletionDate, FileSystemInfo directory)
+        public static bool DeleteFolderAfterDelDate(DateTime deleteDate, FileSystemInfo directory)
         {
-            if (isDueDate(deletionDate, ParseFoldernameToDateTime(directory.Name)))  // ***************
-            //if (isDueDate(deletionDate, directory.CreationTime))
+            if (isDueDate(deleteDate, ParseFoldernameToDateTime(directory.Name)))  // ***************
+            //if (isDueDate(deleteDate, directory.CreationTime))
             {
                 Directory.Delete(directory.FullName, true);
                 return true;
@@ -126,22 +126,22 @@ namespace FileSystemTester
 
         }
 
-        public static void UpdateLogsInExistingZip(ZipArchive archive, DateTime deletionDate)
+        public static void UpdateLogsInExistingZip(ZipArchive archive, DateTime deleteDate)
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("LOG"))
-                .Where(x => isDueDate(deletionDate, ParseFilenameToDateTime(x.Name)))
+                .Where(x => isDueDate(deleteDate, ParseFilenameToDateTime(x.Name)))
                 .ToList())
             {
                 archive.GetEntry(file.FullName).Delete();
             }
         }
 
-        public static void UpdateCapturedImageInExistingZip(ZipArchive archive, DateTime deletionDate)
+        public static void UpdateCapturedImageInExistingZip(ZipArchive archive, DateTime deleteDate)
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
-                .Where(x => isDueDate(deletionDate, ParseArchiveFoldernameToDateTime(x.FullName)))
+                .Where(x => isDueDate(deleteDate, ParseArchiveFoldernameToDateTime(x.FullName)))
                 .ToList())
             {
                 archive.GetEntry(file.FullName).Delete();

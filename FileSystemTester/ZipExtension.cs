@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
 
-namespace FileSystemTester
+namespace LogManagementSystem
 {
     public static class ZipExtension
     {
-        public static void FilterExpiredFilesInZip(this ZipArchive archive, DateTime deletionDate)
+        public static void FilterExpiredFilesInZip(this ZipArchive archive, DateTime deleteDate)
         {
-            ZipHelper.UpdateLogsInExistingZip(archive, deletionDate);
-            ZipHelper.UpdateCapturedImageInExistingZip(archive, deletionDate);
+            ZipHelper.UpdateLogsInExistingZip(archive, deleteDate);
+            ZipHelper.UpdateCapturedImageInExistingZip(archive, deleteDate);
         }
         
-        public static void HandleLogs(this ZipArchive archive, string rootPath, DateTime zipDate, DateTime deletionDate)
+        public static void HandleLogs(this ZipArchive archive, string rootPath, DateTime zipDate, DateTime deleteDate)
         {
             foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG"))
                 .GetFileSystemInfos()
@@ -24,7 +24,7 @@ namespace FileSystemTester
             //.Where(f => ZipHelper.isDueDate(zip, f.CreationTime)).ToList())
                 .ToList())
             {
-                if (ZipHelper.DeleteFileAfterDelDate(deletionDate, file))
+                if (ZipHelper.DeleteFileAfterDelDate(deleteDate, file))
                 {
                     continue;
                 }
@@ -32,7 +32,7 @@ namespace FileSystemTester
             }
         }
 
-        public static void HandleCapturedImages(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deletionDate,
+        public static void HandleCapturedImages(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deleteDate,
             List<string> temp)
         {
             foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
@@ -41,7 +41,7 @@ namespace FileSystemTester
             //.Where(f => ZipHelper.isDueDate(zip, f.CreationTime)).ToList()) //
                 .ToList())
             {
-                if (ZipHelper.DeleteFolderAfterDelDate(deletionDate, dir))
+                if (ZipHelper.DeleteFolderAfterDelDate(deleteDate, dir))
                 {
                     continue;
                 }

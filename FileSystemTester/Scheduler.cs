@@ -1,7 +1,8 @@
 ﻿using Microsoft.Win32.TaskScheduler;
 using System;
 
-namespace FileSystemTester
+namespace LogManagementSystem
+
 {
     public static class Scheduler
     {
@@ -52,11 +53,11 @@ namespace FileSystemTester
             TaskService.Instance.RootFolder.RegisterTaskDefinition("CogAplex Log Management System", taskDefinition);
         }
 
-        public static string CreateSchedulerArguments(string zipDate, string deletionDate)
+        public static string CreateSchedulerArguments(string zipDate, string deleteDate)
         {
             string arguments = zipDate;
             arguments += " ";
-            arguments += deletionDate;
+            arguments += deleteDate;
             return arguments;
         }
 
