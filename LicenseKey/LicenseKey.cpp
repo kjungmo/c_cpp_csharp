@@ -351,10 +351,10 @@ bool GetWMI(std::string& uuid, std::string& guid, std::string& mac, bool initCOM
     startGUID = clock(); //********************************************
     if (guid.length() == 0)
     {
-        guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = 'ÀÌ´õ³Ý'", L"GUID");
+        guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = 'ï¿½Ì´ï¿½ï¿½ï¿½'", L"GUID");
         if (guid.length() == 0)
         {
-            guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = 'ÀÌ´õ³Ý 2'", L"GUID");
+            guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = 'ï¿½Ì´ï¿½ï¿½ï¿½ 2'", L"GUID");
         }
     }
     endGUID = clock(); //********************************************
