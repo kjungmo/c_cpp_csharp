@@ -9,7 +9,7 @@ namespace ZipTester
 {
 	public static class Scheduler
 	{
-        private static void AddTaskSchedule(string timeInterval, string stopFlag = "true")
+        private static void AddTaskSchedule(string executionPath, string arguments, string timeInterval, string stopFlag = "true")
         {
             // Create a new task definition for the local machine and assign properties
             TaskDefinition taskDefinition = TaskService.Instance.NewTask();
@@ -69,8 +69,8 @@ namespace ZipTester
 
             // action settings 
             ExecAction CogAplex = new ExecAction();
-            CogAplex.Path = "zip"; // where exe is located ( full address ) 
-            CogAplex.Arguments = "d";  // arguments
+            CogAplex.Path = executionPath;//"zip"; // where exe is located ( full address ) 
+            CogAplex.Arguments = arguments;  // arguments
             CogAplex.WorkingDirectory = ""; // directory of exe OR dir of files that exe uses 
 
             taskDefinition.Actions.Add(CogAplex);
