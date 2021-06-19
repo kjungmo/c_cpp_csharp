@@ -47,6 +47,8 @@ namespace ZipTester
             //ZipTester.exe unzip ‪D:\ZipTest\2021-04_zipp.zip
             switch (userInput[0].ToLower())
             {
+
+                //ZipTester.exe zip e:\ZipTest e:\ZipTest\log e:\ZipTest\img 7
                 case "zip":
                     Console.WriteLine("Zip Mode Selected!");
                     //List<string> fileLists = GetFileList(userInput[1], userInput[4]);
@@ -54,9 +56,9 @@ namespace ZipTester
                     //Compressor.CompressFiles(Compressor.CreateZipFileDirectory(userInput[1], userInput[4]), userInput[2], userInput[3], userInput[4], CompressionLevel.Optimal);
                     //DeleteLogFiles(userInput[1], userInput[3]);
                     //Compressor.DeleteZipfile(userInput[1], userInput[4]);
-                    Compressor.FileCompressor(userInput[1], userInput[4]);
+                    //Compressor.(userInput[1], userInput[4]);
 					break;
-
+                    
                 case "unzip":
                     //Application.Run(form);
                     Console.WriteLine("Unzip Mode Selected!");
