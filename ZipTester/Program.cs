@@ -56,7 +56,7 @@ namespace ZipTester
                     //Compressor.CompressFiles(Compressor.CreateZipFileDirectory(userInput[1], userInput[4]), userInput[2], userInput[3], userInput[4], CompressionLevel.Optimal);
                     //DeleteLogFiles(userInput[1], userInput[3]);
                     //Compressor.DeleteZipfile(userInput[1], userInput[4]);
-                    Compressor.(userInput[1], userInput[4]);
+                    //Compressor.(userInput[1], userInput[4]);
 					break;
                     
                 case "unzip":

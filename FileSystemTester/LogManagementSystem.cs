@@ -22,7 +22,7 @@ namespace LogManagementSystem
             // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-            #region Development mode ( to be deleted ) 
+            #region [[ Development mode ]] ( to be deleted ) 
             //string rootPath = @"e:\Dummy\";
             //List<string> temp = new List<string>();
             //string zipFilePath = Path.Combine(rootPath, "LOG.zip");
@@ -31,14 +31,14 @@ namespace LogManagementSystem
             //DateTime deleteDate = new DateTime(2021, 5, 11);
             #endregion
 
-            #region Release mode
+            #region [[ Release mode ]]
             string[] cmdArgs = Environment.GetCommandLineArgs();
             List<string> userInput = cmdArgs.Where(arg => arg != cmdArgs[0]).ToList();
 
             string rootPath = userInput[0];
             string zip = userInput[1];
             string del = userInput[2];
-            string interval = userInput[4];
+            string interval = userInput[3];
 
             List<string> temp = new List<string>();
             DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zip));
@@ -68,8 +68,7 @@ namespace LogManagementSystem
                     archive.HandleCapturedImages(rootPath, "NG", zipDate, deleteDate, temp);
                 }
 
-                // Register to Windows TaskScheduler 
-                #region Registering Task
+                #region [[ Registering Task ]]
                 Scheduler.AddTaskSchedule(interval, Scheduler.CreateSchedulerArguments(zip, del));
                 if (true)
                 {
