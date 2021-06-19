@@ -32,7 +32,7 @@ namespace LogManagementSystem
             }
         }
 
-        public static void HandleCapturedImages(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deleteDate,
+        public static void HandleCapturedImagesByFolder(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deleteDate,
             List<string> temp)
         {
             foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
