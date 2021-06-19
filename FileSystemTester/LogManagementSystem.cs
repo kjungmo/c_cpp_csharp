@@ -64,8 +64,8 @@ namespace LogManagementSystem
                 {
                     archive.FilterExpiredFilesInZip(deleteDate);
                     archive.HandleLogs(rootPath, zipDate, deleteDate);
-                    archive.HandleCapturedImages(rootPath, "OK", zipDate, deleteDate, temp);
-                    archive.HandleCapturedImages(rootPath, "NG", zipDate, deleteDate, temp);
+                    archive.HandleCapturedImagesByFolder(rootPath, "OK", zipDate, deleteDate, temp);
+                    archive.HandleCapturedImagesByFolder(rootPath, "NG", zipDate, deleteDate, temp);
                 }
 
                 #region [[ Registering Task ]]
@@ -78,7 +78,7 @@ namespace LogManagementSystem
                 Console.WriteLine("Management Success.");
             }
 
-            Console.WriteLine("SourcePath None");
+            Console.WriteLine("No such Root Path");
             Console.ReadKey();
         }
     }
