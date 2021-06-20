@@ -69,10 +69,10 @@ namespace LogManagementSystem
                 }
 
                 #region [[ Registering Task ]]
-                Scheduler.AddTaskSchedule(interval, Scheduler.CreateSchedulerArguments(zip, del));
+                Scheduler.AddTaskSchedule(Scheduler.CreateSchedulerArguments(zip, del), Scheduler.SelectTrigger(interval));
                 if (true)
                 {
-                    Scheduler.AddTaskSchedule(interval, Scheduler.CreateSchedulerArguments(zip, del), false);
+                    Scheduler.AddTaskSchedule(Scheduler.CreateSchedulerArguments(zip, del), Scheduler.SelectTrigger(interval), false);
                 }
                 #endregion
                 Console.WriteLine("Management Success.");
