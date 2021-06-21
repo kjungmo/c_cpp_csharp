@@ -1,7 +1,7 @@
-#define FILE_NAME "Profile.txt"
-#define FILE_NAME2 "Info.txt"
-#define INTRUSION_NAME "wtfjm.dat"
-#define MAC_GUID_NAME "id_gu.dat"
+#define KEY1_FILE "Profile.txt"
+#define KEY2_FILE "Info.txt"
+#define INTRUSION_FILE "wtfjm.dat"
+#define MAC_GUID_FILE "rnlel.dat"
 
 #include "comdef.h"
 #include "WbemIdl.h"
@@ -11,12 +11,12 @@
 #include "Shlwapi.h"
 #include "shlobj_core.h"
 
-#include "cryptopp850/sha.h"
-#include "cryptopp850/filters.h"
-#include "cryptopp850/base64.h"
-#include "cryptopp850/modes.h"
-#include "cryptopp850/aes.h"
-#include "cryptopp850/hex.h"
+#include "cryptopp/sha.h"
+#include "cryptopp/filters.h"
+#include "cryptopp/base64.h"
+#include "cryptopp/modes.h"
+#include "cryptopp/aes.h"
+#include "cryptopp/hex.h"
 
 #include <iostream>
 #include <fstream>
@@ -25,11 +25,11 @@
 #include <algorithm>
 
 #ifdef _DEBUG
-#pragma comment(lib, "D:/Github/c_cpp_csharp/LicenseKey/cryptlibD.lib")
+#pragma comment(lib, "F:/Github/c_cpp_csharp/LicenseKey/cryptlibD.lib")
 const char* GenerateLicenseKey(bool initCOM);
 bool ValidateLicenseKey(bool initCOM);
 #else
-#pragma comment(lib, "D:/Github/c_cpp_csharp/LicenseKey/cryptlibR.lib")
+#pragma comment(lib, "F:/Github/c_cpp_csharp/LicenseKey/cryptlibR.lib")
 #define LICENSE_DLL_EXPORT
 #include "License.h"
 const char* GenerateLicenseKey(bool initCOM);
@@ -54,8 +54,8 @@ std::string SHA256HashString(std::string);
 bool WriteToFile(std::string, std::string);
 std::string ReadFromFile(std::string);
 std::string CreateIntrusionPath(std::string, std::string);
-std::string CreateKeyPath(std::string, std::string);
-std::string CreateKeyPathAnother(std::string);
+std::string CreateKey1Path(std::string, std::string);
+std::string CreateKey2Path(std::string);
 std::string CreateMacGuidPath(std::string, std::string);
 std::string GetGPUSerial(std::string);
 bool SplitString(std::string&, std::string&);
@@ -95,11 +95,11 @@ int main()
 const char* GenerateLicenseKey(bool initCOM)
 {
     LkBuf[0] = '\0';
-//#ifdef GENERATOR_BUILD
+#ifdef GENERATOR_BUILD
 
     time_t startGen, endGen, startGETWMI, endGETWMI, startCREATELK, endCREATELK, startMACGUIDKEY, endMACGUIDKEY;  //**********************************
     double resultGen, resultGETWMI, resultCREATELK, resultMACGUIDKEY;  //****************************
-    startGen = clock();
+    startGen = clock(); // *********************
 
     std::string userName;
     std::string mBoard;
@@ -113,24 +113,24 @@ const char* GenerateLicenseKey(bool initCOM)
         return LkBuf;
     }
 
-    std::string intrusion = CreateIntrusionPath(INTRUSION_NAME, userName);
-    std::string lkeyfile = CreateKeyPath(FILE_NAME, userName);
-    std::string lkeyfileAnother = CreateKeyPathAnother(FILE_NAME2);
-    std::string macguidFile = CreateMacGuidPath(MAC_GUID_NAME, userName);
+    std::string intrusion = CreateIntrusionPath(INTRUSION_FILE, userName);
+    std::string lkey1File = CreateKey1Path(KEY1_FILE, userName);
+    std::string lkey2File = CreateKey2Path(KEY2_FILE);
+    std::string macguidFile = CreateMacGuidPath(MAC_GUID_FILE, userName);
 
     if (PathFileExists(intrusion.c_str()))
     {
         remove(intrusion.c_str());
     }
 
-    if (PathFileExists(lkeyfile.c_str()))
+    if (PathFileExists(lkey1File.c_str()))
     {
-        remove(lkeyfile.c_str());
+        remove(lkey1File.c_str());
     }
 
-    if (PathFileExists(lkeyfileAnother.c_str()))
+    if (PathFileExists(lkey2File.c_str()))
     {
-        remove(lkeyfileAnother.c_str());
+        remove(lkey2File.c_str());
     }
 
     if (PathFileExists(macguidFile.c_str()))
@@ -159,7 +159,7 @@ const char* GenerateLicenseKey(bool initCOM)
     startCREATELK = clock();  //****************************
     endCREATELK = clock();  //****************************
 
-    if (!WriteToFile(lkeyfile, licenseKey) || !WriteToFile(lkeyfileAnother, licenseKey) || !WriteToFile(macguidFile, macGuidKey))
+    if (!WriteToFile(lkey1File, licenseKey) || !WriteToFile(lkey2File, licenseKey) || !WriteToFile(macguidFile, macGuidKey))
     {
         return LkBuf;
     }
@@ -170,65 +170,61 @@ const char* GenerateLicenseKey(bool initCOM)
 
 
     strcpy_s(LkBuf, licenseKey.length() + 1, licenseKey.c_str());
-    endGen = clock();
-    resultGen = (double)(endGen - startGen);
+    endGen = clock(); // *********************
+    resultGen = (double)(endGen - startGen); // *********************
     std::cout << "resultGen : " << resultGen << "\nresultGETWMI : " << resultGETWMI << "\nresultMACGUIDKEY : " << resultMACGUIDKEY << "\nresultCREATELK : " << resultCREATELK << std::endl;  //****************************
-//#endif
+#endif
     return LkBuf;
 }
 
 bool ValidateLicenseKey(bool initCOM)
 {
-    time_t start = clock();
+    time_t start = clock();  // *********************
 
     std::string userName;
-    std::string mBoard;
-    std::string uuid;
-    std::string mac;
-
-    if (!GetWMIUserAccount(userName, initCOM) || !GetWMIMboard(mBoard, initCOM))
+    if (!GetWMIUserAccount(userName, initCOM))
     {
         return false;
     }
 
-    std::string intrusion = CreateIntrusionPath(INTRUSION_NAME, userName);
-    std::string lkeyfile = CreateKeyPath(FILE_NAME, userName);
-    std::string lkeyfileAnother = CreateKeyPathAnother(FILE_NAME2);
-    std::string macguidFile = CreateMacGuidPath(MAC_GUID_NAME, userName);
+    std::string intrusion = CreateIntrusionPath(INTRUSION_FILE, userName);
+    std::string lkey1File = CreateKey1Path(KEY1_FILE, userName);
+    std::string lkey2File = CreateKey2Path(KEY2_FILE);
+    std::string macguidFile = CreateMacGuidPath(MAC_GUID_FILE, userName);
 
-    std::string lKey1 = ReadFromFile(lkeyfile);
-    std::string lKey2 = ReadFromFile(lkeyfileAnother);
+    std::string lKey1 = ReadFromFile(lkey1File);
+    std::string lKey2 = ReadFromFile(lkey2File);
     std::string macguidCipher = ReadFromFile(macguidFile);
-    std::string guid = DecryptGUID(mBoard, macguidCipher);
 
-    if (guid.length() == 0 || !GetWMI(uuid, guid, mac, initCOM))
+    std::string mBoard;
+    if (GetWMIMboard(mBoard, initCOM))
     {
-        return false;
-    }
+        std::string guid = DecryptGUID(mBoard, macguidCipher);
+        std::string uuid;
+        std::string mac;
 
-    std::string licenseKey = CreateLicenseKey(mBoard, uuid, mac);
-    if (!lKey1.empty() && !lKey2.empty() && !licenseKey.empty())
-    {
-        if (!PathFileExists(intrusion.c_str()) && lKey1 == licenseKey && lKey2 == licenseKey)
+        if (guid.length() != 0 && GetWMI(uuid, guid, mac, initCOM))
         {
-            time_t end = clock();
-            std::cout << "val: " << (double)(end - start) << std::endl;
-            return true;
+            std::string licenseKey = CreateLicenseKey(mBoard, uuid, mac);
+            if (!lKey1.empty() && !lKey2.empty() && !licenseKey.empty())
+            {
+                if (!PathFileExists(intrusion.c_str()) && lKey1 == licenseKey && lKey2 == licenseKey)
+                {
+                    time_t end = clock(); // *********************
+                    std::cout << "val: " << (double)(end - start) << std::endl; // *********************
+                    return true;
+                }
+            }
         }
     }
 
-    std::string detector = "More at cogaplex@cogaplex.com.";
-    std::ofstream LicenseDetector;
-    LicenseDetector.open(intrusion);
-    SetFileAttributes(intrusion.c_str(), FILE_ATTRIBUTE_HIDDEN);
-    LicenseDetector.write(detector.c_str(), detector.size());
-    LicenseDetector.close();
-    remove(lkeyfile.c_str());
-    remove(lkeyfileAnother.c_str());
+    WriteToFile(intrusion, "More at cogaplex@cogaplex.com.");
+    remove(lkey1File.c_str());
+    remove(lkey2File.c_str());
     remove(macguidFile.c_str());
 
-    time_t end = clock();
-    std::cout << "val(fail): " << (double)(end - start) << std::endl;
+    time_t end = clock(); // *********************
+    std::cout << "val(fail): " << (double)(end - start) << std::endl; // *********************
     return false;
 }
 
@@ -236,6 +232,9 @@ std::string CreateLicenseKey(std::string mBoard, std::string uuid, std::string m
 {
     if (RemoveSymbols(mBoard) && RemoveSymbols(uuid) && RemoveSymbols(mac))
     {
+        std::cout << "mBoard(removed) : " << mBoard << "\n"; // *********************
+        std::cout << "uuid(removed) : " << uuid << "\n"; // *********************
+        std::cout << "mac(removed) : " << mac << "\n"; // *********************
         std::string mBoard2, uuid2, mac2;
         if (SplitString(mBoard, mBoard2) && SplitString(uuid, uuid2) && SplitString(mac, mac2))
         {
@@ -250,12 +249,12 @@ bool CreateMacGuidKey(std::string mb, std::string guid, std::string& cipher)
 {
     if (mb.length() != 0 && guid.length() != 0)
     {
-        std::cout << "guid " << guid << "\n";
+        std::cout << "guid " << guid << "\n";  // *********************
         RemoveSymbols(guid);
-        std::cout << "removed guid " << guid << "\n";
+        std::cout << "removed guid " << guid << "\n"; // *********************
         cipher = EncryptGUID(mb, guid);
-        std::cout << "cipher " << cipher << "\n";
-        std::cout << "cipher end\n";
+        std::cout << "cipher " << cipher << "\n"; // *********************
+        std::cout << "cipher end\n"; // *********************
         return !(cipher.empty());
     }
     return false;
@@ -351,10 +350,10 @@ bool GetWMI(std::string& uuid, std::string& guid, std::string& mac, bool initCOM
     startGUID = clock(); //********************************************
     if (guid.length() == 0)
     {
-        guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = '�̴���'", L"GUID");
+        guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = '이더넷'", L"GUID");
         if (guid.length() == 0)
         {
-            guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = '�̴��� 2'", L"GUID");
+            guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = '이더넷 2'", L"GUID");
         }
     }
     endGUID = clock(); //********************************************
@@ -619,18 +618,17 @@ std::string SHA256HashString(std::string value)
     return digest;
 }
 
-bool WriteToFile(std::string filepath, std::string liKey)
+bool WriteToFile(std::string filepath, std::string content)
 {
-    std::ofstream writeFile;
+    std::ofstream writeFile(filepath);
 
-    writeFile.open(filepath);
     SetFileAttributes(filepath.c_str(), FILE_ATTRIBUTE_HIDDEN);
-    if (liKey.empty())
+    if (content.empty())
     {
         writeFile.close();
         return false;
     }
-    writeFile.write(liKey.c_str(), liKey.size());
+    writeFile << content;
     writeFile.close();
     return true;
 }
@@ -638,17 +636,7 @@ bool WriteToFile(std::string filepath, std::string liKey)
 std::string ReadFromFile(std::string filepath)
 {
     std::ifstream rfile(filepath);
-    /*
-    std::string readStr;
-    if (rfile.is_open())
-    {
-        rfile >> readStr;
-    }
-    */
-
     std::string readStr((std::istreambuf_iterator<char>(rfile)), (std::istreambuf_iterator<char>()));
-
-
     rfile.close();
     return readStr;
 }
@@ -662,7 +650,7 @@ std::string CreateIntrusionPath(std::string filename, std::string userName)
     return path;
 }
 
-std::string CreateKeyPath(std::string filename, std::string userName)
+std::string CreateKey1Path(std::string filename, std::string userName)
 {
     std::string path = "C:\\Users\\";
     path += userName;
@@ -671,7 +659,7 @@ std::string CreateKeyPath(std::string filename, std::string userName)
     return path;
 }
 
-std::string CreateKeyPathAnother(std::string filename)
+std::string CreateKey2Path(std::string filename)
 {
     std::string path = "C:\\Users\\Public\\Documents\\";
     path += filename;
@@ -702,12 +690,10 @@ bool RemoveSymbols(std::string& letters)
 {
     if (!letters.empty())
     {
-        std::string symbols = "!@#$%^&*:;()_-=+{}[].,/\\";
-        letters.erase(std::remove_if(letters.begin(), letters.end(),
-            [&symbols](const char& c) {
-                return symbols.find(c) != std::string::npos;
-            }),
-            letters.end());
+        letters.erase(
+            std::remove_if(letters.begin(), letters.end(), [](char c) { return std::isspace(c) || std::ispunct(c); }),
+            letters.end()
+        );
     }
     return !(letters.empty());
 }
