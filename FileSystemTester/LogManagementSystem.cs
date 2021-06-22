@@ -77,11 +77,11 @@ namespace LogManagementSystem
                 }
 
                 #region [[ Registering Task ]]
-                Scheduler logManager = new Scheduler(zip, del, interval);
-                logManager.AddTaskSchedule(logManager.SelectTrigger());
+                Scheduler taskScheduler = new Scheduler(zip, del, interval);
+                taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
                 if (userInput.Count() > 4)
                 {
-                    logManager.AddTaskSchedule(logManager.SelectTrigger(false));
+                    taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(false));
                 }
                 #endregion
                 Console.WriteLine("Management Success.");
