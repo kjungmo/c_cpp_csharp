@@ -24,7 +24,7 @@ namespace LogManagementSystem
             return dtDate;
         }
 
-        public static DateTime ParseFoldernameToDateTime(string folderName)
+        public static DateTime ParseFoldernameToDateTime(string folderName) //**************************
         {
             DateTime dtDate;
             string pattern = "yyyyMMdd";
