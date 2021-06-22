@@ -4,8 +4,19 @@ using System;
 namespace LogManagementSystem
 
 {
-    public static class Scheduler
+    public class Scheduler
     {
+        public string ZipDate { get; private set; }
+        public string DeleteDate { get; private set; }
+        public string ExecutionInterval { get; private set; }
+
+        public Scheduler(string zipDate, string delDate, string exeInterval)
+        {
+            ZipDate = ZipDate;
+            DeleteDate = delDate;
+            ExecutionInterval = exeInterval;
+        }
+
         public enum ExeInterval
         {
             DAILY,
@@ -13,38 +24,38 @@ namespace LogManagementSystem
             MONTHLY,
         }
 
-        public static void AddTaskSchedule(string arguments, Trigger startTrigger, bool stopFlag = true)
+        public void AddTaskSchedule(Trigger startTrigger)
         {
             TaskDefinition taskDefinition = TaskService.Instance.NewTask();
             taskDefinition.RegistrationInfo.Author = "cogaplex@cogaplex.com";
             taskDefinition.RegistrationInfo.Description = "Management of daily .log and captured image files.";
             taskDefinition.Triggers.Add(startTrigger);
-            taskDefinition.Actions.Add(CreateExeAction(arguments));
+            taskDefinition.Actions.Add(CreateExeAction());
             // Register the task in the root folder of the local machine
             TaskService.Instance.RootFolder.RegisterTaskDefinition("CogAplex Log Management System", taskDefinition);
         }
 
-        public static string CreateSchedulerArguments(string zipDate, string deleteDate)
+        public string CreateSchedulerArguments()
         {
-            string arguments = zipDate;
+            string arguments = ZipDate;
             arguments += " ";
-            arguments += deleteDate;
+            arguments += DeleteDate;
             return arguments;
         }
 
-        public static ExecAction CreateExeAction(string arguments)
+        public ExecAction CreateExeAction()
         {
             ExecAction CogAplex = new ExecAction();
             CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            CogAplex.Arguments = arguments;
+            CogAplex.Arguments = CreateSchedulerArguments();
             return CogAplex;
         }
 
         //TODO-switch method
-        public static Trigger SelectTrigger(string interval, bool stopFlag = true)
+        public Trigger SelectTrigger(bool stopFlag = true)
         {
             ExeInterval triggerInterval;
-            if (!Enum.TryParse<ExeInterval>(interval.ToUpper(), out triggerInterval))
+            if (!Enum.TryParse<ExeInterval>(ExecutionInterval.ToUpper(), out triggerInterval))
             {
                 return null;
             }
@@ -67,7 +78,7 @@ namespace LogManagementSystem
 
         }
 
-        public static DailyTrigger CreateDailyTrigger(bool stopFlag = true)
+        public DailyTrigger CreateDailyTrigger(bool stopFlag = true)
         {
             // [DAILY] - StartBoundary(DateTime), DaysInterval(int), stopFlag(bool)
             DailyTrigger dailyTrigger = new DailyTrigger();
@@ -80,7 +91,7 @@ namespace LogManagementSystem
             return dailyTrigger;
         }
 
-        public static WeeklyTrigger CreateWeeklyTrigger(bool stopFlag = true)
+        public WeeklyTrigger CreateWeeklyTrigger(bool stopFlag = true)
         {
             // [WEEKLY] - StartBoundray(DateTime), DaysOfWeek(DaysOfTheWeek), WeeksInterval(int), stopFlag(bool)
             WeeklyTrigger weeklyTrigger = new WeeklyTrigger();
@@ -94,7 +105,7 @@ namespace LogManagementSystem
             return weeklyTrigger;
         }
 
-        public static MonthlyTrigger CreateMonthlyTrigger(bool stopFlag = true)
+        public MonthlyTrigger CreateMonthlyTrigger(bool stopFlag = true)
         {
             // [MONTHLY] - StartBoundary(DateTime), DaysOfWeek(DaysOfTheWeek), MonthsOfYear(MonthsOfTheYear), stopFlag(bool)
             // Type : Day
@@ -112,7 +123,7 @@ namespace LogManagementSystem
             return monthlyTrigger;
         }
 
-        public static MonthlyDOWTrigger CreateMonthlyTrigger2(bool stopFlag = true)
+        public MonthlyDOWTrigger CreateMonthlyTrigger2(bool stopFlag = true)
         {
             // [MONTHLY] - StartBoundary(DateTime), DaysOfWeek(DaysOfTheWeek), MonthsOfYear(MonthsOfTheYear), stopFlag(bool)
             //// Type : Weekday
@@ -132,7 +143,7 @@ namespace LogManagementSystem
         }
 
 
-        public static void DeleteTaskSchedule(string deleteFlag)
+        public void DeleteTaskSchedule(string deleteFlag)
         {
             if (deleteFlag.ToLower() == "true")
             {
