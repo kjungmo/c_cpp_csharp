@@ -32,6 +32,7 @@ namespace LogManagementSystem
             #endregion
 
             #region [[ Release mode ]]
+            #region Variables
             string[] cmdArgs = Environment.GetCommandLineArgs();
             List<string> userInput = cmdArgs.Where(arg => arg != cmdArgs[0]).ToList();
 
@@ -44,20 +45,27 @@ namespace LogManagementSystem
             DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zip));
             DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(del));
             string zipFilePath = Path.Combine(rootPath, "LOG.zip");
-
+            #endregion
             //DateTime startZip = DateTime.Today.AddDays(-10);
             //DateTime startZip = DateTime.Today.AddDays(-args1);
 
             //DateTime startDel = startZip.AddDays(-10);
             //DateTime startDel = startZip.AddDays(-args2);
-            #endregion  
+            #endregion
+
             if (Directory.Exists(rootPath))
             {
                 if (!File.Exists(zipFilePath))
                 {
-                    Console.WriteLine("No .zip File");
-                    var myfile = File.Create(zipFilePath);
-                    myfile.Close();
+                    try
+                    {
+                        var myfile = File.Create(zipFilePath);
+                        myfile.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"{e.Message} \nUnable to create zipfile");
+                    }
                 }
 
                 using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
@@ -69,10 +77,11 @@ namespace LogManagementSystem
                 }
 
                 #region [[ Registering Task ]]
-                Scheduler.AddTaskSchedule(Scheduler.CreateSchedulerArguments(zip, del), Scheduler.SelectTrigger(interval));
-                if (true)
+                Scheduler logManager = new Scheduler(zip, del, interval);
+                logManager.AddTaskSchedule(logManager.SelectTrigger());
+                if (userInput.Count() > 4)
                 {
-                    Scheduler.AddTaskSchedule(Scheduler.CreateSchedulerArguments(zip, del), Scheduler.SelectTrigger(interval), false);
+                    logManager.AddTaskSchedule(logManager.SelectTrigger(false));
                 }
                 #endregion
                 Console.WriteLine("Management Success.");
