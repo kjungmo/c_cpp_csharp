@@ -6,14 +6,16 @@ namespace LogManagementSystem
 {
     public class Scheduler
     {
-        public string ZipDate { get; private set; }
-        public string DeleteDate { get; private set; }
+        public string RootPath { get; private set; }
+        public string ZipDaysAfterLogged { get; private set; }
+        public string DeleteDaysAfterZip { get; private set; }
         public string ExecutionInterval { get; private set; }
 
-        public Scheduler(string zipDate, string delDate, string exeInterval)
+        public Scheduler(string rootPath, string zipDaysAfterLogged, string deleteDaysAfterZip, string exeInterval)
         {
-            ZipDate = ZipDate;
-            DeleteDate = delDate;
+            RootPath = rootPath;
+            ZipDaysAfterLogged = zipDaysAfterLogged;
+            DeleteDaysAfterZip = deleteDaysAfterZip;
             ExecutionInterval = exeInterval;
         }
 
@@ -37,9 +39,11 @@ namespace LogManagementSystem
 
         public string CreateSchedulerArguments()
         {
-            string arguments = ZipDate;
+            string arguments = RootPath;
             arguments += " ";
-            arguments += DeleteDate;
+            arguments += ZipDaysAfterLogged;
+            arguments += " ";
+            arguments += DeleteDaysAfterZip;
             return arguments;
         }
 
