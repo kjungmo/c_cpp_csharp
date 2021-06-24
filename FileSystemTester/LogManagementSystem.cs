@@ -11,15 +11,15 @@ namespace LogManagementSystem
         static void Main(string[] args)
         {
 
-            // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-            // |                                                                                      |
-            // |                                                                                      |
-            // |       [RELEASE] : "args" are RootPath, ZipDate(int), DelDate(int),                   |
-            // |                                  interval, [deleteSchedule]                          |
-            // |                                                                                      |
-            // |                                                                                      |
-            // |                                                                                      |
-            // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+            // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+            // |                                                                                                                       |
+            // |                                                                                                                       |
+            // |      [SCHEDULER MODE] : "args" are Mode, RootPath, ZipDaysAfterLogged(int), DeleteDaysAfterZip(int), interval         |
+            // |                                                                                                                       |
+            // |   [DEFAULT MODE(zip)] : "args" are RootPath, ZipDaysAfterLogged(int), DelDaysAfterZip(int)                            |
+            // |                                                                                                                       |
+            // |                                                                                                                       |
+            // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
             #region [[ Development mode ]] ( to be deleted ) 
@@ -36,15 +36,15 @@ namespace LogManagementSystem
             string[] cmdArgs = Environment.GetCommandLineArgs();
             List<string> userInput = cmdArgs.Where(arg => arg != cmdArgs[0]).ToList();
 
-            string rootPath = userInput[0];
-            string zip = userInput[1];
-            string del = userInput[2];
-            string interval = userInput[3];
+            //string rootPath = userInput[1];
+            //string zip = userInput[2];
+            //string del = userInput[3];
+            //string interval = userInput[4];
 
-            List<string> temp = new List<string>();
-            DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zip));
-            DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(del));
-            string zipFilePath = Path.Combine(rootPath, "LOG.zip");
+            //List<string> temp = new List<string>();
+            //DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zip));
+            //DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(del));
+            //string zipFilePath = Path.Combine(rootPath, "LOG.zip");
             #endregion
             //DateTime startZip = DateTime.Today.AddDays(-10);
             //DateTime startZip = DateTime.Today.AddDays(-args1);
@@ -53,40 +53,60 @@ namespace LogManagementSystem
             //DateTime startDel = startZip.AddDays(-args2);
             #endregion
 
-            if (Directory.Exists(rootPath))
+            string rootPath, zipDaysAfterLogged, deleteDaysAfterZip;
+            List<string> temp = new List<string>();
+
+            if(userInput[0].ToLower() =="scheduler")
             {
-                if (!File.Exists(zipFilePath))
-                {
-                    try
-                    {
-                        var myfile = File.Create(zipFilePath);
-                        myfile.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine($"{e.Message} \nUnable to create zipfile");
-                    }
-                }
+                Console.WriteLine("TaskScheduler Registration Mode Selected!");
+                rootPath = userInput[1];
+                zipDaysAfterLogged = userInput[2];
+                deleteDaysAfterZip = userInput[3];
+                string interval = userInput[4];
 
-                using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
-                {
-                    archive.FilterExpiredFilesInZip(deleteDate);
-                    archive.HandleLogs(rootPath, zipDate, deleteDate);
-                    archive.HandleCapturedImagesByFolder(rootPath, "OK", zipDate, deleteDate, temp);
-                    archive.HandleCapturedImagesByFolder(rootPath, "NG", zipDate, deleteDate, temp);
-                }
-
-                #region [[ Registering Task ]]
-                Scheduler taskScheduler = new Scheduler(zip, del, interval);
+                Scheduler taskScheduler = new Scheduler(rootPath ,zipDaysAfterLogged, deleteDaysAfterZip, interval);
                 taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
-                if (userInput.Count() > 4)
+                if (userInput.Count() > 5 && userInput[5].ToLower() == "-stop")
                 {
                     taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(false));
                 }
-                #endregion
-                Console.WriteLine("Management Success.");
             }
 
+            else
+            {
+                rootPath = userInput[0];
+                zipDaysAfterLogged = userInput[1];
+                deleteDaysAfterZip = userInput[2];
+
+                DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zipDaysAfterLogged));
+                DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(deleteDaysAfterZip));
+                string zipFilePath = Path.Combine(rootPath, "LOG.zip");
+
+                if (Directory.Exists(rootPath))
+                {
+                    if (!File.Exists(zipFilePath))
+                    {
+                        try
+                        {
+                            var myfile = File.Create(zipFilePath);
+                            myfile.Close();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"{e.Message} \nUnable to create zipfile");
+                        }
+                    }
+
+                    using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
+                    {
+                        archive.FilterExpiredFilesInZip(deleteDate);
+                        archive.HandleLogs(rootPath, zipDate, deleteDate);
+                        archive.HandleCapturedImagesByFolder(rootPath, "OK", zipDate, deleteDate, temp);
+                        archive.HandleCapturedImagesByFolder(rootPath, "NG", zipDate, deleteDate, temp);
+                    }
+                    Console.WriteLine("Management Success.");
+                }
+            }
             Console.WriteLine("No such Root Path");
             Console.ReadKey();
         }
