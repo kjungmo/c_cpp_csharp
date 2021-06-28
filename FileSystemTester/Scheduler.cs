@@ -19,7 +19,7 @@ namespace LogManagementSystem
             ExecutionInterval = exeInterval;
         }
 
-        public enum ExeInterval
+        private enum ExeInterval
         {
             DAILY,
             WEEKLY,
@@ -38,14 +38,14 @@ namespace LogManagementSystem
         }
 
 
-        public ExecAction CreateExeAction()
+        private ExecAction CreateExeAction()
         {
             ExecAction CogAplex = new ExecAction();
             CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
             CogAplex.Arguments = CreateSchedulerArguments();
             return CogAplex;
         }
-        public string CreateSchedulerArguments()
+        private string CreateSchedulerArguments()
         {
             string arguments = "zip";
             arguments += " ";
@@ -84,7 +84,7 @@ namespace LogManagementSystem
 
         }
 
-        public DailyTrigger CreateDailyTrigger(bool stopFlag = true)
+        private DailyTrigger CreateDailyTrigger(bool stopFlag = true)
         {
             // [DAILY] - StartBoundary(DateTime), DaysInterval(int), stopFlag(bool)
             DailyTrigger dailyTrigger = new DailyTrigger();
@@ -97,7 +97,7 @@ namespace LogManagementSystem
             return dailyTrigger;
         }
 
-        public WeeklyTrigger CreateWeeklyTrigger(bool stopFlag = true)
+        private WeeklyTrigger CreateWeeklyTrigger(bool stopFlag = true)
         {
             // [WEEKLY] - StartBoundray(DateTime), DaysOfWeek(DaysOfTheWeek), WeeksInterval(int), stopFlag(bool)
             WeeklyTrigger weeklyTrigger = new WeeklyTrigger();
@@ -111,7 +111,7 @@ namespace LogManagementSystem
             return weeklyTrigger;
         }
 
-        public MonthlyTrigger CreateMonthlyTrigger(bool stopFlag = true)
+        private MonthlyTrigger CreateMonthlyTrigger(bool stopFlag = true)
         {
             // [MONTHLY] - StartBoundary(DateTime), DaysOfWeek(DaysOfTheWeek), MonthsOfYear(MonthsOfTheYear), stopFlag(bool)
             // Type : Day
@@ -129,7 +129,7 @@ namespace LogManagementSystem
             return monthlyTrigger;
         }
 
-        public MonthlyDOWTrigger CreateMonthlyTrigger2(bool stopFlag = true)
+        private MonthlyDOWTrigger CreateMonthlyTrigger2(bool stopFlag = true)
         {
             // [MONTHLY] - StartBoundary(DateTime), DaysOfWeek(DaysOfTheWeek), MonthsOfYear(MonthsOfTheYear), stopFlag(bool)
             //// Type : Weekday

@@ -42,6 +42,28 @@ namespace LogManagementSystem
             return false;
         }
 
+        public static bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
+        {
+            if (isDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))  // ***************
+            //if (isDueDate(deleteDate, file.CreationTime))
+            {
+                File.Delete(file.FullName);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool DeleteFolderAfterDelDate(DateTime deleteDate, FileSystemInfo directory)
+        {
+            if (isDueDate(deleteDate, ParseFoldernameToDateTime(directory.Name)))  // ***************
+            //if (isDueDate(deleteDate, directory.CreationTime))
+            {
+                Directory.Delete(directory.FullName, true);
+                return true;
+            }
+            return false;
+        }
+
         public static DateTime ParseFilenameToDateTime(string fileName)
         {
             DateTime dtDate;
@@ -91,10 +113,9 @@ namespace LogManagementSystem
             }
             compressable.Clear();
             Directory.Delete(folderName.FullName, true);
-            //DeleteDirectory(folderName.FullName, true);
         }
 
-        public static List<string> GetFiles(string rootPath, ref List<string> fileLists)
+        private static List<string> GetFiles(string rootPath, ref List<string> fileLists)
         {
             var attr = File.GetAttributes(rootPath);
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -120,44 +141,10 @@ namespace LogManagementSystem
             return fileLists;
         }
 
-        public static bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
-        {
-            if (isDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))  // ***************
-            //if (isDueDate(deleteDate, file.CreationTime))
-            {
-                File.Delete(file.FullName);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool DeleteFolderAfterDelDate(DateTime deleteDate, FileSystemInfo directory)
-        {
-            if (isDueDate(deleteDate, ParseFoldernameToDateTime(directory.Name)))  // ***************
-            //if (isDueDate(deleteDate, directory.CreationTime))
-            {
-                Directory.Delete(directory.FullName, true);
-                return true;
-            }
-            return false;
-        }
-
         public static void CompressFileIntoZipFile(string sourcePath, FileSystemInfo file, ZipArchive archive)
         {
             archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(sourcePath.Length), CompressionLevel.Optimal);
             File.Delete(file.FullName);
-        }
-
-        public static void DeleteDirectory(string directoryName, bool checkDirectoryExistance)
-        {
-            if (Directory.Exists(directoryName))
-            {
-                Directory.Delete(directoryName, true);
-            }
-            else if (checkDirectoryExistance)
-            {
-                throw new SystemException("No such Directory to Delete.");
-            }
         }
     }
 }
