@@ -42,19 +42,8 @@ namespace LogManagementSystem
         {
             ExecAction CogAplex = new ExecAction();
             CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            CogAplex.Arguments = CreateSchedulerArguments();
+            CogAplex.Arguments = $"zip {RootPath} {ZipDaysAfterLogged} {DeleteDaysAfterZip}";
             return CogAplex;
-        }
-        private string CreateSchedulerArguments()
-        {
-            string arguments = "zip";
-            arguments += " ";
-            arguments += RootPath;
-            arguments += " ";
-            arguments += ZipDaysAfterLogged;
-            arguments += " ";
-            arguments += DeleteDaysAfterZip;
-            return arguments;
         }
 
         //TODO-switch method
@@ -66,7 +55,7 @@ namespace LogManagementSystem
                 return null;
             }
 
-            switch (triggerInterval)
+            switch (triggerInterval) // enum말고 string 으로 switch할 것.
             {
                 case ExeInterval.DAILY:
                     return CreateDailyTrigger(stopFlag);
@@ -122,7 +111,7 @@ namespace LogManagementSystem
             monthlyTrigger.DaysOfMonth = new int[] { 1 };
             monthlyTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
             monthlyTrigger.RunOnLastDayOfMonth = false; // V2 only
-            if (!stopFlag)
+            if (!stopFlag) // 그냥 delete하는 걸로 
             {
                 monthlyTrigger.Enabled = false;
             }

@@ -44,8 +44,7 @@ namespace LogManagementSystem
 
         public static bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
         {
-            if (isDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))  // ***************
-            //if (isDueDate(deleteDate, file.CreationTime))
+            if (isDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))
             {
                 File.Delete(file.FullName);
                 return true;
@@ -55,8 +54,7 @@ namespace LogManagementSystem
 
         public static bool DeleteFolderAfterDelDate(DateTime deleteDate, FileSystemInfo directory)
         {
-            if (isDueDate(deleteDate, ParseFoldernameToDateTime(directory.Name)))  // ***************
-            //if (isDueDate(deleteDate, directory.CreationTime))
+            if (isDueDate(deleteDate, ParseFoldernameToDateTime(directory.Name)))
             {
                 Directory.Delete(directory.FullName, true);
                 return true;
@@ -64,10 +62,9 @@ namespace LogManagementSystem
             return false;
         }
 
-        public static DateTime ParseFilenameToDateTime(string fileName)
+        public static DateTime ParseFilenameToDateTime(string fileName, string pattern = "yyyy-MM-dd")
         {
             DateTime dtDate;
-            string pattern = "yyyy-MM-dd";
             if (!DateTime.TryParseExact(fileName.Substring(0, pattern.Length), pattern,
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.None, out dtDate))
@@ -77,10 +74,9 @@ namespace LogManagementSystem
             return dtDate;
         }
 
-        public static DateTime ParseFoldernameToDateTime(string folderName) //**************************
+        public static DateTime ParseFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
         {
             DateTime dtDate;
-            string pattern = "yyyyMMdd";
             if (!DateTime.TryParseExact(folderName, pattern,
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.None, out dtDate))
@@ -90,17 +86,9 @@ namespace LogManagementSystem
             return dtDate;
         }
 
-        public static DateTime ParseArchiveFoldernameToDateTime(string folderName)
+        public static DateTime ParseArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
         {
-            DateTime dtDate;
-            string pattern = "yyyyMMdd";
-            if (!DateTime.TryParseExact(folderName.Substring(3, pattern.Length), pattern,
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None, out dtDate))
-            {
-                return DateTime.Today;
-            }
-            return dtDate;
+            return ParseFoldernameToDateTime(folderName.Substring(3, pattern.Length));
         }
 
         public static void CompressFolderIntoZipFile(string sourcePath, FileSystemInfo folderName,

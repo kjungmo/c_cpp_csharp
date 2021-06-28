@@ -14,9 +14,9 @@ namespace LogManagementSystem
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
             // |                                                                                                                       |
             // |                                                                                                                       |
-            // |      [SCHEDULER MODE] : "args" are Mode, RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int), interval         |
+            // |      [SCHEDULER MODE] : "args" are Mode, RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int), interval        |
             // |                                                                                                                       |
-            // |   [DEFAULT MODE(zip)] : "args" are RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int)                            |
+            // |   [DEFAULT MODE(zip)] : "args" are RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int)                        |
             // |                                                                                                                       |
             // |                                                                                                                       |
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -54,11 +54,10 @@ namespace LogManagementSystem
             #endregion
 
             List<string> temp = new List<string>();
-            string rootPath, numOfDaysUntilZip, numOfDaysUntilDelete;
             
-            rootPath = userInput[1];
-            numOfDaysUntilZip = userInput[2];
-            numOfDaysUntilDelete = userInput[3];
+            string rootPath = userInput[1];
+            string numOfDaysUntilZip = userInput[2];
+            string numOfDaysUntilDelete = userInput[3];
 
             if (userInput[0].ToLower() =="scheduler" && userInput.Count() == 5)
             {
@@ -66,10 +65,10 @@ namespace LogManagementSystem
 
                 Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval);
                 taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
-                if (userInput.Count() > 5 && userInput[5].ToLower() == "-stop")
-                {
-                    taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(false));
-                }
+                //if (userInput.Count() > 5 && userInput[5].ToLower() == "-stop")
+                //{
+                //    taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(false));
+                //}
             }
 
             else if (userInput[0].ToLower() == "zip" && userInput.Count() == 4)
@@ -104,12 +103,16 @@ namespace LogManagementSystem
                 }
             }
 
-            else
+            else if (userInput[0].ToLower() == "/help")
             {
-                Console.WriteLine("Select Correct Mode");
-                Console.WriteLine("To Register .exe file to Windows Task Scheduler : [scheduler] ");
-                Console.WriteLine("To sort files and manage them : [zip]");
+                Console.WriteLine();
+
             }
+            //{
+            //    Console.WriteLine("Select Correct Mode");
+            //    Console.WriteLine("To Register .exe file to Windows Task Scheduler : [scheduler] ");
+            //    Console.WriteLine("To sort files and manage them : [zip]");
+            //}
             
             Console.WriteLine("No such Root Path");
             Console.ReadKey();
