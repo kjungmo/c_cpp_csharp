@@ -11,6 +11,37 @@ namespace LogManagementSystem
 {
     public class ZipHelper
     {
+        public static void UpdateLogsInExistingZip(ZipArchive archive, DateTime deleteDate)
+        {
+            foreach (var file in archive.Entries
+                .Where(x => x.FullName.Contains("LOG"))
+                .Where(x => isDueDate(deleteDate, ParseFilenameToDateTime(x.Name)))
+                .ToList())
+            {
+                archive.GetEntry(file.FullName).Delete();
+            }
+        }
+
+        public static void UpdateCapturedImageInExistingZip(ZipArchive archive, DateTime deleteDate)
+        {
+            foreach (var file in archive.Entries
+                .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
+                .Where(x => isDueDate(deleteDate, ParseArchiveFoldernameToDateTime(x.FullName)))
+                .ToList())
+            {
+                archive.GetEntry(file.FullName).Delete();
+            }
+        }
+
+        public static bool isDueDate(DateTime setDate, DateTime fileDate)
+        {
+            if (DateTime.Compare(setDate.Date, fileDate.Date) >= 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static DateTime ParseFilenameToDateTime(string fileName)
         {
             DateTime dtDate;
@@ -50,6 +81,19 @@ namespace LogManagementSystem
             return dtDate;
         }
 
+        public static void CompressFolderIntoZipFile(string sourcePath, FileSystemInfo folderName,
+            List<string> compressable, ZipArchive archive)
+        {
+            compressable = GetFiles(folderName.FullName, ref compressable);
+            foreach (var file in compressable)
+            {
+                archive.CreateEntryFromFile(file, file.Substring(sourcePath.Length), CompressionLevel.Optimal);
+            }
+            compressable.Clear();
+            Directory.Delete(folderName.FullName, true);
+            //DeleteDirectory(folderName.FullName, true);
+        }
+
         public static List<string> GetFiles(string rootPath, ref List<string> fileLists)
         {
             var attr = File.GetAttributes(rootPath);
@@ -76,15 +120,6 @@ namespace LogManagementSystem
             return fileLists;
         }
 
-        public static bool isDueDate(DateTime setDate, DateTime fileDate)
-        {
-            if (DateTime.Compare(setDate.Date, fileDate.Date) >= 0)
-            {
-                return true;
-            }
-            return false;
-        }
-
         public static bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
         {
             if (isDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))  // ***************
@@ -106,46 +141,11 @@ namespace LogManagementSystem
             }
             return false;
         }
+
         public static void CompressFileIntoZipFile(string sourcePath, FileSystemInfo file, ZipArchive archive)
         {
             archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(sourcePath.Length), CompressionLevel.Optimal);
             File.Delete(file.FullName);
-        }
-
-        public static void CompressFolderIntoZipFile(string sourcePath, FileSystemInfo folderName,
-            List<string> compressable, ZipArchive archive)
-        {
-            compressable = GetFiles(folderName.FullName, ref compressable);
-            foreach (var file in compressable)
-            {
-                archive.CreateEntryFromFile(file, file.Substring(sourcePath.Length), CompressionLevel.Optimal);
-            }
-            compressable.Clear();
-            Directory.Delete(folderName.FullName, true);
-            //DeleteDirectory(folderName.FullName, true);
-
-        }
-
-        public static void UpdateLogsInExistingZip(ZipArchive archive, DateTime deleteDate)
-        {
-            foreach (var file in archive.Entries
-                .Where(x => x.FullName.Contains("LOG"))
-                .Where(x => isDueDate(deleteDate, ParseFilenameToDateTime(x.Name)))
-                .ToList())
-            {
-                archive.GetEntry(file.FullName).Delete();
-            }
-        }
-
-        public static void UpdateCapturedImageInExistingZip(ZipArchive archive, DateTime deleteDate)
-        {
-            foreach (var file in archive.Entries
-                .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
-                .Where(x => isDueDate(deleteDate, ParseArchiveFoldernameToDateTime(x.FullName)))
-                .ToList())
-            {
-                archive.GetEntry(file.FullName).Delete();
-            }
         }
 
         public static void DeleteDirectory(string directoryName, bool checkDirectoryExistance)

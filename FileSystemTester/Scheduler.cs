@@ -37,6 +37,14 @@ namespace LogManagementSystem
             TaskService.Instance.RootFolder.RegisterTaskDefinition("CogAplex Log Management System", taskDefinition);
         }
 
+
+        public ExecAction CreateExeAction()
+        {
+            ExecAction CogAplex = new ExecAction();
+            CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            CogAplex.Arguments = CreateSchedulerArguments();
+            return CogAplex;
+        }
         public string CreateSchedulerArguments()
         {
             string arguments = "zip";
@@ -47,14 +55,6 @@ namespace LogManagementSystem
             arguments += " ";
             arguments += DeleteDaysAfterZip;
             return arguments;
-        }
-
-        public ExecAction CreateExeAction()
-        {
-            ExecAction CogAplex = new ExecAction();
-            CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            CogAplex.Arguments = CreateSchedulerArguments();
-            return CogAplex;
         }
 
         //TODO-switch method
@@ -147,7 +147,6 @@ namespace LogManagementSystem
 
             return monthlyTrigger;
         }
-
 
         public void DeleteTaskSchedule(string deleteFlag)
         {
