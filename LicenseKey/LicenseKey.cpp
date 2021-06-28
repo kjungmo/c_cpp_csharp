@@ -7,7 +7,7 @@
 #include "WbemIdl.h"
 #include "Windows.h"
 #include "assert.h"
-#include "iphlpapi.h""
+#include "iphlpapi.h"
 #include "Shlwapi.h"
 #include "shlobj_core.h"
 
@@ -25,11 +25,11 @@
 #include <algorithm>
 
 #ifdef _DEBUG
-#pragma comment(lib, "F:/Github/c_cpp_csharp/LicenseKey/cryptlibD.lib")
+#pragma comment(lib, "D:/Github/c_cpp_csharp/LicenseKey/cryptlibD.lib")
 const char* GenerateLicenseKey(bool initCOM);
 bool ValidateLicenseKey(bool initCOM);
 #else
-#pragma comment(lib, "F:/Github/c_cpp_csharp/LicenseKey/cryptlibR.lib")
+#pragma comment(lib, "D:/Github/c_cpp_csharp/LicenseKey/cryptlibR.lib")
 #define LICENSE_DLL_EXPORT
 #include "License.h"
 const char* GenerateLicenseKey(bool initCOM);
@@ -95,7 +95,7 @@ int main()
 const char* GenerateLicenseKey(bool initCOM)
 {
     LkBuf[0] = '\0';
-#ifdef GENERATOR_BUILD
+//#ifdef GENERATOR_BUILD
 
     time_t startGen, endGen, startGETWMI, endGETWMI, startCREATELK, endCREATELK, startMACGUIDKEY, endMACGUIDKEY;  //**********************************
     double resultGen, resultGETWMI, resultCREATELK, resultMACGUIDKEY;  //****************************
@@ -173,7 +173,7 @@ const char* GenerateLicenseKey(bool initCOM)
     endGen = clock(); // *********************
     resultGen = (double)(endGen - startGen); // *********************
     std::cout << "resultGen : " << resultGen << "\nresultGETWMI : " << resultGETWMI << "\nresultMACGUIDKEY : " << resultMACGUIDKEY << "\nresultCREATELK : " << resultCREATELK << std::endl;  //****************************
-#endif
+//#endif
     return LkBuf;
 }
 
@@ -350,10 +350,10 @@ bool GetWMI(std::string& uuid, std::string& guid, std::string& mac, bool initCOM
     startGUID = clock(); //********************************************
     if (guid.length() == 0)
     {
-        guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = 'ì´ë”ë„·'", L"GUID");
+        guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet' OR NetConnectionID = 'ÀÌ´õ³Ý'", L"GUID");
         if (guid.length() == 0)
         {
-            guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = 'ì´ë”ë„· 2'", L"GUID");
+            guid = QueryWMI(pSvc, pLoc, "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Ethernet 2' OR NetConnectionID = 'ÀÌ´õ³Ý 2'", L"GUID");
         }
     }
     endGUID = clock(); //********************************************
