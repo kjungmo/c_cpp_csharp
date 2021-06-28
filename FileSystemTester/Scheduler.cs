@@ -39,7 +39,9 @@ namespace LogManagementSystem
 
         public string CreateSchedulerArguments()
         {
-            string arguments = RootPath;
+            string arguments = "zip";
+            arguments += " ";
+            arguments += RootPath;
             arguments += " ";
             arguments += ZipDaysAfterLogged;
             arguments += " ";
@@ -66,15 +68,15 @@ namespace LogManagementSystem
 
             switch (triggerInterval)
             {
-                case ExeInterval.DAILY: 
+                case ExeInterval.DAILY:
                     return CreateDailyTrigger(stopFlag);
 
                 case ExeInterval.WEEKLY:
                     return CreateWeeklyTrigger(stopFlag);
 
-                case ExeInterval.MONTHLY: 
+                case ExeInterval.MONTHLY:
                     return CreateMonthlyTrigger(stopFlag);
-                    //return CreateMonthlyTrigger2(stopFlag);
+                //return CreateMonthlyTrigger2(stopFlag);
 
                 default:
                     return CreateDailyTrigger(stopFlag);
@@ -149,9 +151,12 @@ namespace LogManagementSystem
 
         public void DeleteTaskSchedule(string deleteFlag)
         {
-            if (deleteFlag.ToLower() == "true")
+            using (TaskService service = new TaskService())
             {
-                TaskService.Instance.RootFolder.DeleteTask("CogAplex Log Management System");
+                foreach (var item in service.FindAllTasks(new System.Text.RegularExpressions.Regex("CogAplex")))
+                {
+                    service.RootFolder.DeleteTask(item.Name, false);
+                }
             }
         }
     }

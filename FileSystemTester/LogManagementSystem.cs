@@ -14,9 +14,9 @@ namespace LogManagementSystem
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
             // |                                                                                                                       |
             // |                                                                                                                       |
-            // |      [SCHEDULER MODE] : "args" are Mode, RootPath, ZipDaysAfterLogged(int), DeleteDaysAfterZip(int), interval         |
+            // |      [SCHEDULER MODE] : "args" are Mode, RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int), interval         |
             // |                                                                                                                       |
-            // |   [DEFAULT MODE(zip)] : "args" are RootPath, ZipDaysAfterLogged(int), DelDaysAfterZip(int)                            |
+            // |   [DEFAULT MODE(zip)] : "args" are RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int)                            |
             // |                                                                                                                       |
             // |                                                                                                                       |
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -53,18 +53,18 @@ namespace LogManagementSystem
             //DateTime startDel = startZip.AddDays(-args2);
             #endregion
 
-            string rootPath, zipDaysAfterLogged, deleteDaysAfterZip;
             List<string> temp = new List<string>();
+            string rootPath, numOfDaysUntilZip, numOfDaysUntilDelete;
+            
+            rootPath = userInput[1];
+            numOfDaysUntilZip = userInput[2];
+            numOfDaysUntilDelete = userInput[3];
 
-            if(userInput[0].ToLower() =="scheduler")
+            if (userInput[0].ToLower() =="scheduler" && userInput.Count() == 5)
             {
-                Console.WriteLine("TaskScheduler Registration Mode Selected!");
-                rootPath = userInput[1];
-                zipDaysAfterLogged = userInput[2];
-                deleteDaysAfterZip = userInput[3];
                 string interval = userInput[4];
 
-                Scheduler taskScheduler = new Scheduler(rootPath ,zipDaysAfterLogged, deleteDaysAfterZip, interval);
+                Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval);
                 taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
                 if (userInput.Count() > 5 && userInput[5].ToLower() == "-stop")
                 {
@@ -72,14 +72,10 @@ namespace LogManagementSystem
                 }
             }
 
-            else if (userInput[0].ToLower() == "zip")
+            else if (userInput[0].ToLower() == "zip" && userInput.Count() == 4)
             {
-                rootPath = userInput[0];
-                zipDaysAfterLogged = userInput[1];
-                deleteDaysAfterZip = userInput[2];
-
-                DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zipDaysAfterLogged));
-                DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(deleteDaysAfterZip));
+                DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(numOfDaysUntilZip));
+                DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(numOfDaysUntilDelete));
                 string zipFilePath = Path.Combine(rootPath, "LOG.zip");
 
                 if (Directory.Exists(rootPath))
