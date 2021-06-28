@@ -16,7 +16,7 @@ namespace LogManagementSystem
             ZipHelper.UpdateCapturedImageInExistingZip(archive, deleteDate);
         }
         
-        public static void HandleLogs(this ZipArchive archive, string rootPath, DateTime zipDate, DateTime deleteDate)
+        public static void SortLogs(this ZipArchive archive, string rootPath, DateTime zipDate, DateTime deleteDate)
         {
             foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG"))
                 .GetFileSystemInfos()
@@ -32,7 +32,7 @@ namespace LogManagementSystem
             }
         }
 
-        public static void HandleCapturedImagesByFolder(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deleteDate,
+        public static void SortCapturedImagesByFolder(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deleteDate,
             List<string> temp)
         {
             foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))

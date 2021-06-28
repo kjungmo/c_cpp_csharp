@@ -72,7 +72,7 @@ namespace LogManagementSystem
                 }
             }
 
-            else
+            else if (userInput[0].ToLower() == "zip")
             {
                 rootPath = userInput[0];
                 zipDaysAfterLogged = userInput[1];
@@ -100,13 +100,21 @@ namespace LogManagementSystem
                     using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
                     {
                         archive.FilterExpiredFilesInZip(deleteDate);
-                        archive.HandleLogs(rootPath, zipDate, deleteDate);
-                        archive.HandleCapturedImagesByFolder(rootPath, "OK", zipDate, deleteDate, temp);
-                        archive.HandleCapturedImagesByFolder(rootPath, "NG", zipDate, deleteDate, temp);
+                        archive.SortLogs(rootPath, zipDate, deleteDate);
+                        archive.SortCapturedImagesByFolder(rootPath, "OK", zipDate, deleteDate, temp);
+                        archive.SortCapturedImagesByFolder(rootPath, "NG", zipDate, deleteDate, temp);
                     }
                     Console.WriteLine("Management Success.");
                 }
             }
+
+            else
+            {
+                Console.WriteLine("Select Correct Mode");
+                Console.WriteLine("To Register .exe file to Windows Task Scheduler : [scheduler] ");
+                Console.WriteLine("To sort files and manage them : [zip]");
+            }
+            
             Console.WriteLine("No such Root Path");
             Console.ReadKey();
         }
