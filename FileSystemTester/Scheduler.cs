@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32.TaskScheduler;
 using System;
+using System.Collections.Generic;
 
 namespace LogManagementSystem
 
@@ -10,6 +11,11 @@ namespace LogManagementSystem
         public string ZipDaysAfterLogged { get; private set; }
         public string DeleteDaysAfterZip { get; private set; }
         public string ExecutionInterval { get; private set; }
+        public static DateTime OneDayFromToday
+        {
+            get { return DateTime.Today.AddDays(1); }
+        }
+        private readonly DateTime dateOfToday = DateTime.Today.AddDays(1);
 
         public Scheduler(string rootPath, string zipDaysAfterLogged, string deleteDaysAfterZip, string exeInterval)
         {
@@ -47,7 +53,12 @@ namespace LogManagementSystem
         }
 
         //TODO-switch method
-        public Trigger SelectTrigger(bool stopFlag = true)
+        public Trigger SelectTrigger(int daysInterval = 1, 
+            DaysOfTheWeek dayofWeek = DaysOfTheWeek.Monday, int weeksInterval = 1,
+            int day = 1, MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths,
+            DaysOfTheWeek daysOfTheWeek = DaysOfTheWeek.Monday,
+            WhichWeek whichweek = WhichWeek.AllWeeks
+            )
         {
             ExeInterval triggerInterval;
             if (!Enum.TryParse<ExeInterval>(ExecutionInterval.ToUpper(), out triggerInterval))
@@ -58,49 +69,39 @@ namespace LogManagementSystem
             switch (triggerInterval) // enum말고 string 으로 switch할 것.
             {
                 case ExeInterval.DAILY:
-                    return CreateDailyTrigger(stopFlag);
+                    return CreateDailyTrigger(daysInterval);
 
                 case ExeInterval.WEEKLY:
-                    return CreateWeeklyTrigger(stopFlag);
+                    return CreateWeeklyTrigger(dayofWeek, weeksInterval);
 
                 case ExeInterval.MONTHLY:
-                    return CreateMonthlyTrigger(stopFlag);
-                //return CreateMonthlyTrigger2(stopFlag);
-
+                    return CreateMonthlyTrigger(day, monthsOfTheYear);
+                    //return CreateMonthlyTrigger2(daysOfTheWeek, monthsOfTheYear, whichweek);
                 default:
-                    return CreateDailyTrigger(stopFlag);
+                    return CreateDailyTrigger(daysInterval);
             }
-
         }
 
-        private DailyTrigger CreateDailyTrigger(bool stopFlag = true)
+        private DailyTrigger CreateDailyTrigger(int daysInterval = 1)
         {
             // [DAILY] - StartBoundary(DateTime), DaysInterval(int), stopFlag(bool)
             DailyTrigger dailyTrigger = new DailyTrigger();
             dailyTrigger.StartBoundary = DateTime.Today.AddDays(1);
             dailyTrigger.DaysInterval = 1;
-            if (!stopFlag)
-            {
-                dailyTrigger.Enabled = false;
-            }
             return dailyTrigger;
         }
 
-        private WeeklyTrigger CreateWeeklyTrigger(bool stopFlag = true)
+        private WeeklyTrigger CreateWeeklyTrigger(DaysOfTheWeek dayofWeek = DaysOfTheWeek.Monday, int weeksInterval = 1)
         {
             // [WEEKLY] - StartBoundray(DateTime), DaysOfWeek(DaysOfTheWeek), WeeksInterval(int), stopFlag(bool)
             WeeklyTrigger weeklyTrigger = new WeeklyTrigger();
             weeklyTrigger.StartBoundary = DateTime.Today.AddDays(1);
             weeklyTrigger.DaysOfWeek = DaysOfTheWeek.Monday;
             weeklyTrigger.WeeksInterval = 1;
-            if (!stopFlag)
-            {
-                weeklyTrigger.Enabled = false;
-            }
             return weeklyTrigger;
         }
 
-        private MonthlyTrigger CreateMonthlyTrigger(bool stopFlag = true)
+        private MonthlyTrigger CreateMonthlyTrigger(int day = 1, MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths)
         {
             // [MONTHLY] - StartBoundary(DateTime), DaysOfWeek(DaysOfTheWeek), MonthsOfYear(MonthsOfTheYear), stopFlag(bool)
             // Type : Day
@@ -108,32 +109,36 @@ namespace LogManagementSystem
 
             MonthlyTrigger monthlyTrigger = new MonthlyTrigger();
             monthlyTrigger.StartBoundary = DateTime.Today.AddDays(1);
-            monthlyTrigger.DaysOfMonth = new int[] { 1 };
-            monthlyTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
+            monthlyTrigger.DaysOfMonth = setDaysToMonthlyTrigger(day);
+            monthlyTrigger.MonthsOfYear = monthsOfTheYear;
             monthlyTrigger.RunOnLastDayOfMonth = false; // V2 only
-            if (!stopFlag) // 그냥 delete하는 걸로 
-            {
-                monthlyTrigger.Enabled = false;
-            }
             return monthlyTrigger;
         }
+        private int[] setDaysToMonthlyTrigger(int day = 1)
+        {
+            List<int> dayToSet = new List<int>();
+            if (day > 0 && day <= 31)
+            {
+                dayToSet.Add(day);
+            }
+            return dayToSet.ToArray();
+        }
 
-        private MonthlyDOWTrigger CreateMonthlyTrigger2(bool stopFlag = true)
+
+        private MonthlyDOWTrigger CreateMonthlyTrigger2(
+            DaysOfTheWeek daysOfTheWeek = DaysOfTheWeek.Monday, 
+            MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths,
+            WhichWeek whichweek = WhichWeek.AllWeeks)
         {
             // [MONTHLY] - StartBoundary(DateTime), DaysOfWeek(DaysOfTheWeek), MonthsOfYear(MonthsOfTheYear), stopFlag(bool)
             //// Type : Weekday
             ////OR starts tomorrow, triggers on the first week's monday of every month
 
             MonthlyDOWTrigger monthlyTrigger = new MonthlyDOWTrigger();
-            monthlyTrigger.StartBoundary = DateTime.Now.AddSeconds(2);
-            monthlyTrigger.DaysOfWeek = DaysOfTheWeek.Monday;
-            monthlyTrigger.MonthsOfYear = MonthsOfTheYear.AllMonths;
-            monthlyTrigger.WeeksOfMonth = WhichWeek.FirstWeek;
-            if (!stopFlag)
-            {
-                monthlyTrigger.Enabled = false;
-            }
-
+            monthlyTrigger.StartBoundary = DateTime.Today.AddDays(1);
+            monthlyTrigger.DaysOfWeek = daysOfTheWeek;
+            monthlyTrigger.MonthsOfYear = monthsOfTheYear;
+            monthlyTrigger.WeeksOfMonth = whichweek;
             return monthlyTrigger;
         }
 
