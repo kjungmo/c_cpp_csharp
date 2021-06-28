@@ -16,12 +16,12 @@ namespace LogManagementSystem
             ZipHelper.UpdateCapturedImageInExistingZip(archive, deleteDate);
         }
         
-        public static void SortLogs(this ZipArchive archive, string rootPath, DateTime zipDate, DateTime deleteDate)
+        public static void SortLogs(this ZipArchive archive, string rootPath, 
+            DateTime zipDate, DateTime deleteDate)
         {
             foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG"))
                 .GetFileSystemInfos()
-                .Where(f => ZipHelper.isDueDate(zipDate, ZipHelper.ParseFilenameToDateTime(f.Name))) // ***************
-            //.Where(f => ZipHelper.isDueDate(zip, f.CreationTime)).ToList())
+                .Where(f => ZipHelper.isDueDate(zipDate, ZipHelper.ParseFilenameToDateTime(f.Name)))
                 .ToList())
             {
                 if (ZipHelper.DeleteFileAfterDelDate(deleteDate, file))
@@ -32,22 +32,30 @@ namespace LogManagementSystem
             }
         }
 
-        public static void SortCapturedImagesByFolder(this ZipArchive archive, string rootPath, string folder, DateTime zipDate, DateTime deleteDate,
-            List<string> temp)
+        public static void SortCapturedImagesByFolder(this ZipArchive archive, string rootPath, 
+            DateTime zipDate, DateTime deleteDate, List<string> temp)
         {
-            foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
-                .GetFileSystemInfos()
-                .Where(f => ZipHelper.isDueDate(zipDate, ZipHelper.ParseFoldernameToDateTime(f.Name))) // ***************
-            //.Where(f => ZipHelper.isDueDate(zip, f.CreationTime)).ToList()) //
-                .ToList())
+            List<string> capturedLogFolders = new List<string> { "OK", "NG" };
+            foreach (var folder in capturedLogFolders)
             {
-                if (ZipHelper.DeleteFolderAfterDelDate(deleteDate, dir))
+                foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
+                .GetFileSystemInfos()
+                .Where(f => ZipHelper.isDueDate(zipDate, ZipHelper.ParseFoldernameToDateTime(f.Name)))
+                .ToList())
                 {
-                    continue;
+                    if (ZipHelper.DeleteFolderAfterDelDate(deleteDate, dir))
+                    {
+                        continue;
+                    }
+                    ZipHelper.CompressFolderIntoZipFile(rootPath, dir, temp, archive);
                 }
-                ZipHelper.CompressFolderIntoZipFile(rootPath, dir, temp, archive);
             }
         }
 
+        public static void SortCSVFiles(this ZipArchive archive, string rootPath, 
+            DateTime zipDate, DateTime deleteDate)
+        {
+            
+        }
     }
 }
