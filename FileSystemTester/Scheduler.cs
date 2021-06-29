@@ -40,6 +40,8 @@ namespace LogManagementSystem
             DeleteLog = deleteLog;
             DeleteImg = deleteImg;
             DeleteCsv = deleteCsv;
+            ExecutionInterval = "daily";
+            ExeRepititionInterval = 1;
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
         }
 
@@ -78,11 +80,17 @@ namespace LogManagementSystem
 
         private ExecAction CreateExeAction()
         {
-            ExecAction CogAplex = new ExecAction
+            ExecAction CogAplex = new ExecAction();
+            if (Mode == "zip")
             {
-                Path = System.Reflection.Assembly.GetExecutingAssembly().Location,
-                Arguments = $"{Mode} {RootPath} {ZipDaysAfterLogged} {DeleteDaysAfterZip}"
-            };
+                CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                CogAplex.Arguments = $"{Mode} {RootPath} {ZipDaysAfterLogged} {DeleteDaysAfterZip}";
+            }
+            else if (Mode == "manage")
+            {
+                CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                CogAplex.Arguments = $"{Mode} {RootPath} {DeleteLog} {DeleteImg} {DeleteCsv}";
+            }
             return CogAplex;
         }
 
