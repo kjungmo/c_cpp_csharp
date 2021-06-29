@@ -210,7 +210,7 @@ namespace LogManagementSystem
             return dayToSet.ToArray();
         }
 
-        public void DeleteTaskSchedule()
+        public static void DeleteTaskSchedule()
         {
             using (TaskService service = new TaskService())
             {

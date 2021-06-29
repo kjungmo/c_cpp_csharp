@@ -126,8 +126,7 @@ namespace LogManagementSystem
 
             else if (userInput[0].ToLower() == "schdedule_delete")
             {
-                Scheduler deleteSchedule = new Scheduler();
-                deleteSchedule.DeleteTaskSchedule();
+                Scheduler.DeleteTaskSchedule();
             }
             Console.ReadKey();
         }
