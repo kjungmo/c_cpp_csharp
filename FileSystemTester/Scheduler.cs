@@ -20,6 +20,11 @@ namespace LogManagementSystem
             ExecutionInterval = exeInterval;
         }
 
+        public Scheduler()
+        {
+
+        }
+
         public void AddTaskSchedule(Trigger startTrigger)
         {
             TaskDefinition taskDefinition = TaskService.Instance.NewTask();
@@ -39,51 +44,51 @@ namespace LogManagementSystem
             return CogAplex;
         }
 
-        public DailyTrigger SelectTrigger(string interval, 
-            DateTime? startingBoundary = null)
-        {
-            if (interval.ToLower() == "daily")
-            {
-                return CreateDailyTrigger(startingBoundary);
-            }
-            return null;
-        }
+        //public DailyTrigger SelectTrigger(string interval, 
+        //    DateTime? startingBoundary = null)
+        //{
+        //    if (interval.ToLower() == "daily")
+        //    {
+        //        return CreateDailyTrigger(startingBoundary);
+        //    }
+        //    return null;
+        //}
 
-        public WeeklyTrigger SelectTrigger(string interval, 
-            DateTime? startingBoundary = null,
-            DaysOfTheWeek dayofWeek = DaysOfTheWeek.Monday)
-        {
-            if (interval.ToLower() == "weekly")
-            {
-                return CreateWeeklyTrigger(startingBoundary, dayofWeek);
-            }
-            return null;
-        }
+        //public WeeklyTrigger SelectTrigger(string interval, 
+        //    DateTime? startingBoundary = null,
+        //    DaysOfTheWeek dayofWeek = DaysOfTheWeek.Monday)
+        //{
+        //    if (interval.ToLower() == "weekly")
+        //    {
+        //        return CreateWeeklyTrigger(startingBoundary, dayofWeek);
+        //    }
+        //    return null;
+        //}
 
-        public MonthlyTrigger SelectTrigger(string interval, 
-            DateTime? startingBoundary = null, 
-            int day = 1, 
-            MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths)
-        {
-            if (interval.ToLower() == "monthly")
-            {
-                return CreateMonthlyTrigger(startingBoundary, day, monthsOfTheYear);
-            }
-            return null;
-        }
+        //public MonthlyTrigger SelectTrigger(string interval, 
+        //    DateTime? startingBoundary = null, 
+        //    int day = 1, 
+        //    MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths)
+        //{
+        //    if (interval.ToLower() == "monthly")
+        //    {
+        //        return CreateMonthlyTrigger(startingBoundary, day, monthsOfTheYear);
+        //    }
+        //    return null;
+        //}
 
-        public MonthlyDOWTrigger SelectTrigger(string interval, 
-            DateTime? startingBoundary = null, 
-            DaysOfTheWeek daysOfTheWeek = DaysOfTheWeek.Monday, 
-            MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths,
-            WhichWeek whichweek = WhichWeek.AllWeeks)
-        {
-            if (interval.ToLower() == "monthly2")
-            {
-                return CreateMonthlyTrigger2(startingBoundary, daysOfTheWeek, monthsOfTheYear, whichweek);
-            }
-            return null;
-        }
+        //public MonthlyDOWTrigger SelectTrigger(string interval, 
+        //    DateTime? startingBoundary = null, 
+        //    DaysOfTheWeek daysOfTheWeek = DaysOfTheWeek.Monday, 
+        //    MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths,
+        //    WhichWeek whichweek = WhichWeek.AllWeeks)
+        //{
+        //    if (interval.ToLower() == "monthly2")
+        //    {
+        //        return CreateMonthlyTrigger2(startingBoundary, daysOfTheWeek, monthsOfTheYear, whichweek);
+        //    }
+        //    return null;
+        //}
 
         public Trigger SelectTrigger(DateTime? startingBoundary = null, int daysInterval = 1,
             DaysOfTheWeek dayofWeek = DaysOfTheWeek.Monday, int weeksInterval = 1,
@@ -175,7 +180,7 @@ namespace LogManagementSystem
             return monthlyTrigger;
         }
 
-        public void DeleteTaskSchedule(string deleteFlag)
+        public void DeleteTaskSchedule()
         {
             using (TaskService service = new TaskService())
             {
