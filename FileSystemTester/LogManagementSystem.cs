@@ -64,7 +64,7 @@ namespace LogManagementSystem
                 string interval = userInput[4];
 
                 Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval);
-                taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
+                taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(interval));
                 //if (userInput.Count() > 5 && userInput[5].ToLower() == "-stop")
                 //{
                 //    taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(false));
@@ -96,8 +96,8 @@ namespace LogManagementSystem
                     {
                         archive.FilterExpiredFilesInZip(deleteDate);
                         archive.SortLogs(rootPath, zipDate, deleteDate);
-                        archive.SortCapturedImagesByFolder(rootPath, "OK", zipDate, deleteDate, temp);
-                        archive.SortCapturedImagesByFolder(rootPath, "NG", zipDate, deleteDate, temp);
+                        archive.SortCapturedImagesByFolder(rootPath, zipDate, deleteDate, temp);
+                        archive.SortCSVFiles(rootPath, zipDate, deleteDate);
                     }
                     Console.WriteLine("Management Success.");
                 }
