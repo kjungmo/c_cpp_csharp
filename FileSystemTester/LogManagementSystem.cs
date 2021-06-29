@@ -64,11 +64,7 @@ namespace LogManagementSystem
                 string interval = userInput[4];
 
                 Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval);
-                taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(interval));
-                //if (userInput.Count() > 5 && userInput[5].ToLower() == "-stop")
-                //{
-                //    taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger(false));
-                //}
+                taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
             }
 
             else if (userInput[0].ToLower() == "zip" && userInput.Count() == 4)
@@ -103,6 +99,11 @@ namespace LogManagementSystem
                 }
             }
 
+            else if (userInput[0].ToLower() == "schdedule_delete")
+            {
+                Scheduler deleteSchedule = new Scheduler();
+                deleteSchedule.DeleteTaskSchedule();
+            }
             else if (userInput[0].ToLower() == "/help")
             {
                 Console.WriteLine();
