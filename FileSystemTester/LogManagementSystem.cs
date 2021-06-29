@@ -10,7 +10,6 @@ namespace LogManagementSystem
     {
         static void Main(string[] args)
         {
-
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
             // |                                                                                                                       |
             // |                                                                                                                       |
@@ -54,25 +53,30 @@ namespace LogManagementSystem
             #endregion
 
             List<string> temp = new List<string>();
-            
-            string rootPath = userInput[1];
-            string numOfDaysUntilZip = userInput[2];
-            string numOfDaysUntilDelete = userInput[3];
+            string rootPath;
+            int numOfDaysUntilZip;
+            int numOfDaysUntilDelete;
 
-            if (userInput[0].ToLower() =="scheduler" && userInput.Count() == 5)
+            if (userInput[0].ToLower() =="schedulerZ" && userInput.Count() == 5)
             {
+                rootPath = userInput[1];
+                numOfDaysUntilZip = Convert.ToInt32(userInput[2]);
+                numOfDaysUntilDelete = Convert.ToInt32(userInput[3]);
                 string interval = userInput[4];
                 string weekday = "monday";
                 int month = 1;
                 int dayInMonth = 1;
-                Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
+                Scheduler taskScheduler = new Scheduler("zip", rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
                 taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
             }
-
+            
             else if (userInput[0].ToLower() == "zip" && userInput.Count() == 4)
             {
-                DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(numOfDaysUntilZip));
-                DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(numOfDaysUntilDelete));
+                rootPath = userInput[1];
+                numOfDaysUntilZip = Convert.ToInt32(userInput[2]);
+                numOfDaysUntilDelete = Convert.ToInt32(userInput[3]);
+                DateTime zipDate = DateTime.Today.AddDays(-numOfDaysUntilZip);
+                DateTime deleteDate = zipDate.AddDays(-numOfDaysUntilDelete);
                 string zipFilePath = Path.Combine(rootPath, "LOG.zip");
 
                 if (Directory.Exists(rootPath))
@@ -95,10 +99,29 @@ namespace LogManagementSystem
                         archive.FilterExpiredFilesInZip(deleteDate);
                         archive.SortLogs(rootPath, zipDate, deleteDate);
                         archive.SortCapturedImagesByFolder(rootPath, zipDate, deleteDate, temp);
-                        archive.SortCSVFiles(rootPath, zipDate, deleteDate);
+                        archive.SortCSVs(rootPath, zipDate, deleteDate, temp);
                     }
                     Console.WriteLine("Management Success.");
                 }
+            }
+
+            else if (userInput[0].ToLower() == "scheduler")
+            {
+                rootPath = userInput[1];
+                Scheduler taskScheduler = new Scheduler("manage", rootPath, userInput[2], userInput[3], userInput[4]); // Setting Manager -> Date input
+                taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
+            }
+
+            else if (userInput[0].ToLower() == "manage")
+            {
+                rootPath = userInput[1];
+                DateTime deleteLog = DateTime.Today.AddDays(-Convert.ToInt32(userInput[2]));
+                DateTime deleteImg = DateTime.Today.AddDays(-Convert.ToInt32(userInput[3]));
+                DateTime deleteCsv = DateTime.Today.AddDays(-Convert.ToInt32(userInput[4]));
+
+                ZipHelper.SortLogs(rootPath, deleteLog);
+                ZipHelper.SortCapturedImageByFolder(rootPath, deleteImg);
+                ZipHelper.SortCSVs(rootPath, deleteCsv);
             }
 
             else if (userInput[0].ToLower() == "schdedule_delete")
@@ -106,17 +129,6 @@ namespace LogManagementSystem
                 Scheduler deleteSchedule = new Scheduler();
                 deleteSchedule.DeleteTaskSchedule();
             }
-            else if (userInput[0].ToLower() == "/help")
-            {
-                Console.WriteLine();
-
-            }
-            //{
-            //    Console.WriteLine("Select Correct Mode");
-            //    Console.WriteLine("To Register .exe file to Windows Task Scheduler : [scheduler] ");
-            //    Console.WriteLine("To sort files and manage them : [zip]");
-            //}
-            
             Console.ReadKey();
         }
     }

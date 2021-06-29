@@ -26,7 +26,18 @@ namespace LogManagementSystem
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
-                .Where(x => isDueDate(deleteDate, ParseArchiveFoldernameToDateTime(x.FullName)))
+                .Where(x => isDueDate(deleteDate, ParseImgArchiveFoldernameToDateTime(x.FullName)))
+                .ToList())
+            {
+                archive.GetEntry(file.FullName).Delete();
+            }
+        }
+
+        public static void UpdateCsvInExistingZip(ZipArchive archive, DateTime deleteDate)
+        {
+            foreach (var file in archive.Entries
+                .Where(x => x.FullName.Contains("VALUES"))
+                .Where(x => isDueDate(deleteDate, ParseCsvArchiveFoldernameToDateTime(x.FullName)))
                 .ToList())
             {
                 archive.GetEntry(file.FullName).Delete();
@@ -86,9 +97,13 @@ namespace LogManagementSystem
             return dtDate;
         }
 
-        public static DateTime ParseArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
+        public static DateTime ParseImgArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
         {
             return ParseFoldernameToDateTime(folderName.Substring(3, pattern.Length));
+        }
+        public static DateTime ParseCsvArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
+        {
+            return ParseFoldernameToDateTime(folderName.Substring(7, pattern.Length));
         }
 
         public static void CompressFolderIntoZipFile(string sourcePath, FileSystemInfo folderName,
@@ -115,7 +130,9 @@ namespace LogManagementSystem
                 }
 
                 foreach (var file in dirInfo.GetFiles()
-                    .Where(f => f.Extension == ".log" || f.Extension == "." + ImageFormat.Png.ToString().ToLower()))
+                    .Where(f => f.Extension == ".log" 
+                    || f.Extension == "." + ImageFormat.Png.ToString().ToLower() 
+                    || f.Extension == ".csv"))
                 {
                     GetFiles(file.FullName, ref fileLists);
                 }
@@ -123,7 +140,9 @@ namespace LogManagementSystem
             else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
             {
                 var fileInfo = new FileInfo(rootPath);
-                if (fileInfo.Extension == ".log" || fileInfo.Extension == "." + ImageFormat.Png.ToString().ToLower())
+                if (fileInfo.Extension == ".log" 
+                    || fileInfo.Extension == "." + ImageFormat.Png.ToString().ToLower()
+                    || fileInfo.Extension == ".csv")
                     fileLists.Add(fileInfo.FullName);
             }
             return fileLists;
@@ -133,6 +152,52 @@ namespace LogManagementSystem
         {
             archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(sourcePath.Length), CompressionLevel.Optimal);
             File.Delete(file.FullName);
+        }
+
+        public static void SortLogs(string rootPath, DateTime deleteDate)
+        {
+            foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG"))
+                .GetFileSystemInfos()
+                .Where(f => isDueDate(deleteDate, ParseFilenameToDateTime(f.Name)))
+                .ToList())
+            {
+                if (DeleteFileAfterDelDate(deleteDate, file))
+                {
+                    continue;
+                }
+            }
+        }
+
+        public static void SortCapturedImageByFolder(string rootPath, DateTime deleteDate)
+        {
+            List<string> capturedLogFolders = new List<string> { "OK", "NG" };
+            foreach (var folder in capturedLogFolders)
+            {
+                foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
+                .GetFileSystemInfos()
+                .Where(f => isDueDate(deleteDate, ParseFoldernameToDateTime(f.Name)))
+                .ToList())
+                {
+                    if (DeleteFolderAfterDelDate(deleteDate, dir))
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        public static void SortCSVs(string rootPath, DateTime deleteDate)
+        {
+            foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, "VALUES"))
+            .GetFileSystemInfos()
+            .Where(f => isDueDate(deleteDate, ParseFoldernameToDateTime(f.Name)))
+            .ToList())
+            {
+                if (DeleteFolderAfterDelDate(deleteDate, dir))
+                {
+                    continue;
+                }
+            }
         }
     }
 }

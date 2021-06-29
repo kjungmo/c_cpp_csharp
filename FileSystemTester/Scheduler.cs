@@ -7,6 +7,7 @@ namespace LogManagementSystem
 {
     public class Scheduler
     {
+        public string Mode { get; private set; }
         public string RootPath { get; private set; }
         public string ZipDaysAfterLogged { get; private set; }
         public string DeleteDaysAfterZip { get; private set; }
@@ -16,6 +17,9 @@ namespace LogManagementSystem
         public DaysOfTheWeek SelectedWeekday { get; private set; }
         public MonthsOfTheYear SelectedMonth { get; private set; }
         public int[] SelectedDayInMonth { get; private set; }
+        public string DeleteLog { get; private set; }
+        public string DeleteImg { get; private set; }
+        public string DeleteCsv { get; private set; }
 
         public Scheduler()
         {
@@ -23,18 +27,37 @@ namespace LogManagementSystem
         }
 
         public Scheduler(
+            string mode,
+            string rootPath,
+            string deleteLog,
+            string deleteImg,
+            string deleteCsv,
+            DateTime? startExeFile = null
+            )
+        {
+            Mode = mode;
+            RootPath = rootPath;
+            DeleteLog = deleteLog;
+            DeleteImg = deleteImg;
+            DeleteCsv = deleteCsv;
+            StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
+        }
+
+        public Scheduler(
+            string mode,
             string rootPath, 
-            string zipDaysAfterLogged, 
-            string deleteDaysAfterZip, 
+            int zipDaysAfterLogged, 
+            int deleteDaysAfterZip, 
             string exeInterval,
             string weekday,
             int month,
             int dayInMonth,
             DateTime? startExeFile = null)
         {
+            Mode = mode;
             RootPath = rootPath;
-            ZipDaysAfterLogged = zipDaysAfterLogged;
-            DeleteDaysAfterZip = deleteDaysAfterZip;
+            ZipDaysAfterLogged = Convert.ToString(zipDaysAfterLogged);
+            DeleteDaysAfterZip = Convert.ToString(deleteDaysAfterZip);
             ExecutionInterval = exeInterval;
             SelectedWeekday = SelectWeekday(weekday);
             SelectedMonth = SelectMonth(month);
@@ -58,7 +81,7 @@ namespace LogManagementSystem
             ExecAction CogAplex = new ExecAction
             {
                 Path = System.Reflection.Assembly.GetExecutingAssembly().Location,
-                Arguments = $"zip {RootPath} {ZipDaysAfterLogged} {DeleteDaysAfterZip}"
+                Arguments = $"{Mode} {RootPath} {ZipDaysAfterLogged} {DeleteDaysAfterZip}"
             };
             return CogAplex;
         }

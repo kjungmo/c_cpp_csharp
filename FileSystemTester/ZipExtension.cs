@@ -14,6 +14,7 @@ namespace LogManagementSystem
         {
             ZipHelper.UpdateLogsInExistingZip(archive, deleteDate);
             ZipHelper.UpdateCapturedImageInExistingZip(archive, deleteDate);
+            ZipHelper.UpdateCsvInExistingZip(archive, deleteDate);
         }
         
         public static void SortLogs(this ZipArchive archive, string rootPath, 
@@ -52,10 +53,20 @@ namespace LogManagementSystem
             }
         }
 
-        public static void SortCSVFiles(this ZipArchive archive, string rootPath, 
-            DateTime zipDate, DateTime deleteDate)
+        public static void SortCSVs(this ZipArchive archive, string rootPath, 
+            DateTime zipDate, DateTime deleteDate, List<string> temp)
         {
-            
+            foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, "VALUES"))
+            .GetFileSystemInfos()
+            .Where(f => ZipHelper.isDueDate(zipDate, ZipHelper.ParseFoldernameToDateTime(f.Name)))
+            .ToList())
+            {
+                if (ZipHelper.DeleteFolderAfterDelDate(deleteDate, dir))
+                {
+                    continue;
+                }
+                ZipHelper.CompressFolderIntoZipFile(rootPath, dir, temp, archive);
+            }
         }
     }
 }
