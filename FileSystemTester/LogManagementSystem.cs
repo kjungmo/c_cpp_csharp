@@ -62,9 +62,11 @@ namespace LogManagementSystem
             if (userInput[0].ToLower() =="scheduler" && userInput.Count() == 5)
             {
                 string interval = userInput[4];
-
-                Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval);
-                taskScheduler.AddTaskSchedule(taskScheduler.SelectTrigger());
+                string weekday = "monday";
+                int month = 1;
+                int dayInMonth = 1;
+                Scheduler taskScheduler = new Scheduler(rootPath ,numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
+                taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
             }
 
             else if (userInput[0].ToLower() == "zip" && userInput.Count() == 4)
@@ -115,7 +117,6 @@ namespace LogManagementSystem
             //    Console.WriteLine("To sort files and manage them : [zip]");
             //}
             
-            Console.WriteLine("No such Root Path");
             Console.ReadKey();
         }
     }
