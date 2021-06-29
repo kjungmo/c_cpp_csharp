@@ -13,6 +13,9 @@ namespace LogManagementSystem
         public string ExecutionInterval { get; private set; }
         public DateTime StartExeFile { get; private set; }
         public int ExeRepititionInterval { get; private set; }
+        public DaysOfTheWeek SelectedWeekday { get; private set; }
+        public MonthsOfTheYear SelectedMonth { get; private set; }
+        public int[] SelectedDayInMonth { get; private set; }
 
         public Scheduler()
         {
@@ -23,13 +26,19 @@ namespace LogManagementSystem
             string rootPath, 
             string zipDaysAfterLogged, 
             string deleteDaysAfterZip, 
-            string exeInterval, 
+            string exeInterval,
+            string weekday,
+            int month,
+            int dayInMonth,
             DateTime? startExeFile = null)
         {
             RootPath = rootPath;
             ZipDaysAfterLogged = zipDaysAfterLogged;
             DeleteDaysAfterZip = deleteDaysAfterZip;
             ExecutionInterval = exeInterval;
+            SelectedWeekday = SelectWeekday(weekday);
+            SelectedMonth = SelectMonth(month);
+            SelectedDayInMonth = SelectDayInMonth(dayInMonth);
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
             ExeRepititionInterval = 1;
         }
@@ -54,41 +63,7 @@ namespace LogManagementSystem
             return CogAplex;
         }
 
-        public DailyTrigger SelectTrigger()
-        {
-            if (ExecutionInterval.ToLower() == "daily")
-            {
-                return CreateDailyTrigger();
-            }
-            return null;
-        }
-
-        public WeeklyTrigger SelectTrigger(
-            DaysOfTheWeek dayofWeek = DaysOfTheWeek.Monday)
-        {
-            if (ExecutionInterval.ToLower() == "weekly")
-            {
-                return CreateWeeklyTrigger(dayofWeek);
-            }
-            return null;
-        }
-
-        public MonthlyTrigger SelectTrigger(
-            int dayOfMonth = 1, 
-            MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths)
-        {
-            if (ExecutionInterval.ToLower() == "monthly")
-            {
-                return CreateMonthlyTrigger(dayOfMonth, monthsOfTheYear);
-            }
-            return null;
-        }
-
-        public Trigger CreateTrigger(
-            DaysOfTheWeek daysOfTheWeek = DaysOfTheWeek.Monday,
-            int dayOfMonth = 1, 
-            MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths
-            )
+        public Trigger CreateTrigger()
         {
             switch (ExecutionInterval.ToLower())
             {
@@ -96,10 +71,10 @@ namespace LogManagementSystem
                     return CreateDailyTrigger();
 
                 case "weekly":
-                    return CreateWeeklyTrigger(daysOfTheWeek);
+                    return CreateWeeklyTrigger();
 
                 case "monthly":
-                    return CreateMonthlyTrigger(dayOfMonth, monthsOfTheYear);
+                    return CreateMonthlyTrigger();
                 default:
                     return CreateDailyTrigger();
             }
@@ -115,37 +90,91 @@ namespace LogManagementSystem
             return dailyTrigger;
         }
 
-        private WeeklyTrigger CreateWeeklyTrigger(
-            DaysOfTheWeek daysOfTheWeek = DaysOfTheWeek.Monday)
+        private WeeklyTrigger CreateWeeklyTrigger()
         {
             WeeklyTrigger weeklyTrigger = new WeeklyTrigger
             {
                 StartBoundary = StartExeFile,
-                DaysOfWeek = daysOfTheWeek,
+                DaysOfWeek = SelectedWeekday,
                 WeeksInterval = (short)ExeRepititionInterval
             };
             return weeklyTrigger;
         }
 
-        private MonthlyTrigger CreateMonthlyTrigger(
-            int day = 1, 
-            MonthsOfTheYear monthsOfTheYear = MonthsOfTheYear.AllMonths)
+        public DaysOfTheWeek SelectWeekday(string weekday)
+        {
+            switch (weekday.ToLower())
+            {
+                case "tuesday":
+                    return DaysOfTheWeek.Tuesday;
+                case "wednesday":
+                    return DaysOfTheWeek.Wednesday;
+                case "thursday":
+                    return DaysOfTheWeek.Thursday;
+                case "friday":
+                    return DaysOfTheWeek.Friday;
+                case "saturday":
+                    return DaysOfTheWeek.Saturday;
+                case "sunday":
+                    return DaysOfTheWeek.Sunday;
+                case "Allday":
+                    return DaysOfTheWeek.AllDays;
+                default:
+                    return DaysOfTheWeek.Monday;
+            }
+        }
+
+        private MonthlyTrigger CreateMonthlyTrigger()
         {
             MonthlyTrigger monthlyTrigger = new MonthlyTrigger
             {
                 StartBoundary = StartExeFile,
-                DaysOfMonth = setDayOfMonth(day),
-                MonthsOfYear = monthsOfTheYear,
+                DaysOfMonth = SelectedDayInMonth,
+                MonthsOfYear = SelectedMonth,
                 RunOnLastDayOfMonth = false
             };
             return monthlyTrigger;
         }
-        private int[] setDayOfMonth(int day = 1)
+
+        public MonthsOfTheYear SelectMonth(int month)
+        {
+            switch (month)
+            {
+                case 1:
+                    return MonthsOfTheYear.January;
+                case 2:
+                    return MonthsOfTheYear.February;
+                case 3:
+                    return MonthsOfTheYear.March;
+                case 4:
+                    return MonthsOfTheYear.April;
+                case 5:
+                    return MonthsOfTheYear.May;
+                case 6:
+                    return MonthsOfTheYear.June;
+                case 7:
+                    return MonthsOfTheYear.July;
+                case 8:
+                    return MonthsOfTheYear.August;
+                case 9:
+                    return MonthsOfTheYear.September;
+                case 10:
+                    return MonthsOfTheYear.October;
+                case 11:
+                    return MonthsOfTheYear.November;
+                case 12:
+                    return MonthsOfTheYear.December;
+                default:
+                    return MonthsOfTheYear.AllMonths;
+            }
+        }
+
+        private int[] SelectDayInMonth(int dayInMonth = 1)
         {
             List<int> dayToSet = new List<int>();
-            if (day > 0 && day <= 31)
+            if (dayInMonth > 0 && dayInMonth <= 31)
             {
-                dayToSet.Add(day);
+                dayToSet.Add(dayInMonth);
             }
             return dayToSet.ToArray();
         }
@@ -159,16 +188,6 @@ namespace LogManagementSystem
                     service.RootFolder.DeleteTask(item.Name, false);
                 }
             }
-        }
-
-        public void WeekdaySelector(string weekday)
-        {
-
-        }
-
-        public void MonthSelector(string month)
-        {
-
         }
     }
 }
