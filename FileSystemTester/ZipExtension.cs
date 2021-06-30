@@ -10,7 +10,7 @@ namespace LogManagementSystem
 {
     public static class ZipExtension
     {
-        public static void FilterExpiredFilesInZip(this ZipArchive archive, DateTime deleteDate)
+        public static void FilterZipFileEntries(this ZipArchive archive, DateTime deleteDate)
         {
             ZipHelper.UpdateLogsInExistingZip(archive, deleteDate);
             ZipHelper.UpdateCapturedImageInExistingZip(archive, deleteDate);
@@ -33,11 +33,11 @@ namespace LogManagementSystem
             }
         }
 
-        public static void SortCapturedImagesByFolder(this ZipArchive archive, string rootPath, 
+        public static void SortImgs(this ZipArchive archive, string rootPath, 
             DateTime zipDate, DateTime deleteDate, List<string> temp)
         {
-            List<string> capturedLogFolders = new List<string> { "OK", "NG" };
-            foreach (var folder in capturedLogFolders)
+            List<string> imgFolders = new List<string> { "OK", "NG" };
+            foreach (var folder in imgFolders)
             {
                 foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, folder))
                 .GetFileSystemInfos()
