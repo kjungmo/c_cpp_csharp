@@ -20,6 +20,7 @@ namespace LogManagementSystem
         public string DeleteLog { get; private set; }
         public string DeleteImg { get; private set; }
         public string DeleteCsv { get; private set; }
+        public string ExeFilePath { get; private set; }
 
         public Scheduler()
         {
@@ -32,6 +33,7 @@ namespace LogManagementSystem
             string deleteLog,
             string deleteImg,
             string deleteCsv,
+            string exeFilePath = null,
             DateTime? startExeFile = null
             )
         {
@@ -40,6 +42,7 @@ namespace LogManagementSystem
             DeleteLog = deleteLog;
             DeleteImg = deleteImg;
             DeleteCsv = deleteCsv;
+            ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
             ExecutionInterval = "daily";
             ExeRepititionInterval = 1;
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
@@ -54,6 +57,7 @@ namespace LogManagementSystem
             string weekday,
             int month,
             int dayInMonth,
+            string exeFilePath = null,
             DateTime? startExeFile = null)
         {
             Mode = mode;
@@ -64,6 +68,7 @@ namespace LogManagementSystem
             SelectedWeekday = SelectWeekday(weekday);
             SelectedMonth = SelectMonth(month);
             SelectedDayInMonth = SelectDayInMonth(dayInMonth);
+            ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
             ExeRepititionInterval = 1;
         }
@@ -81,14 +86,13 @@ namespace LogManagementSystem
         private ExecAction CreateExeAction()
         {
             ExecAction CogAplex = new ExecAction();
+            CogAplex.Path = ExeFilePath;
             if (Mode == "zip")
             {
-                CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 CogAplex.Arguments = $"{Mode} {RootPath} {ZipDaysAfterLogged} {DeleteDaysAfterZip}";
             }
             else if (Mode == "manage")
             {
-                CogAplex.Path = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 CogAplex.Arguments = $"{Mode} {RootPath} {DeleteLog} {DeleteImg} {DeleteCsv}";
             }
             return CogAplex;
