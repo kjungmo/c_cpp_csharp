@@ -13,7 +13,7 @@ namespace ScheduleRegister
         public string DeleteDaysAfterZip { get; private set; }
         public string ExecutionInterval { get; private set; }
         public DateTime StartExeFile { get; private set; }
-        public int ExeRepititionInterval { get; private set; }
+        public short ExeRepititionInterval { get; private set; }
         public DaysOfTheWeek SelectedWeekday { get; private set; }
         public MonthsOfTheYear SelectedMonth { get; private set; }
         public int[] SelectedDayInMonth { get; private set; }
@@ -33,9 +33,10 @@ namespace ScheduleRegister
             string deleteLog,
             string deleteImg,
             string deleteCsv,
+            DateTime? startExeFile = null,
             string exeFilePath = null,
-            int exeRepititionInterval = 1,
-            DateTime? startExeFile = null
+            string exeInterval = "daily",
+            short exeRepititionInterval = 1
             )
         {
             Mode = mode;
@@ -43,10 +44,10 @@ namespace ScheduleRegister
             DeleteLog = deleteLog;
             DeleteImg = deleteImg;
             DeleteCsv = deleteCsv;
-            ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
-            ExeRepititionInterval = exeRepititionInterval;
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
-            ExecutionInterval = "daily";
+            ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
+            ExecutionInterval = exeInterval;
+            ExeRepititionInterval = exeRepititionInterval;
         }
 
         public Scheduler(
@@ -54,12 +55,14 @@ namespace ScheduleRegister
             string rootPath, 
             int zipDaysAfterLogged, 
             int deleteDaysAfterZip, 
-            string exeInterval,
-            string weekday,
-            int month,
-            int dayInMonth,
+            string exeInterval = "daily",
+            string weekday = "monday",
+            int month = 1,
+            int dayInMonth = 1,
+            DateTime? startExeFile = null,
             string exeFilePath = null,
-            DateTime? startExeFile = null)
+            short exeRepititionInterval = 1
+            )
         {
             Mode = mode;
             RootPath = rootPath;
@@ -69,17 +72,17 @@ namespace ScheduleRegister
             SelectedWeekday = SelectWeekday(weekday);
             SelectedMonth = SelectMonth(month);
             SelectedDayInMonth = SelectDayInMonth(dayInMonth);
-            ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
-            ExeRepititionInterval = 1;
+            ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
+            ExeRepititionInterval = exeRepititionInterval;
         }
 
-        public void AddTaskSchedule(Trigger startTrigger)
+        public void AddTaskSchedule()
         {
             TaskDefinition taskDefinition = TaskService.Instance.NewTask();
             taskDefinition.RegistrationInfo.Author = "cogaplex@cogaplex.com";
             taskDefinition.RegistrationInfo.Description = "Management of daily .log and captured image files.";
-            taskDefinition.Triggers.Add(startTrigger);
+            taskDefinition.Triggers.Add(CreateTrigger());
             taskDefinition.Actions.Add(CreateExeAction());
             TaskService.Instance.RootFolder.RegisterTaskDefinition("CogAplex Log Management System", taskDefinition);
         }
@@ -99,7 +102,7 @@ namespace ScheduleRegister
             return CogAplex;
         }
 
-        public Trigger CreateTrigger()
+        private Trigger CreateTrigger()
         {
             switch (ExecutionInterval.ToLower())
             {
