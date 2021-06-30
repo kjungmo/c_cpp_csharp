@@ -63,7 +63,7 @@ namespace LogManager
                     int month = 1;
                     int dayInMonth = 1;
                     ScheduleRegister.Scheduler taskScheduler = new ScheduleRegister.Scheduler("zip", rootPath, numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
-                    taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
+                    taskScheduler.AddTaskSchedule();
                     break;
 
                 case "zip":
@@ -105,7 +105,7 @@ namespace LogManager
                     string deleteImg = userInput[3];
                     string deleteCsv = userInput[4];
                     taskScheduler = new ScheduleRegister.Scheduler("manage", rootPath, deleteLog, deleteImg, deleteCsv); // Setting Manager -> Date input
-                    taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
+                    taskScheduler.AddTaskSchedule();
                     break;
 
                 case "manage":
@@ -121,7 +121,6 @@ namespace LogManager
                     break;
 
             }
-
             Console.ReadKey();
         }
     }
