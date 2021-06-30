@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
-namespace LogManagementSystem
+namespace LogManager
 {
     public static class ZipExtension
     {
@@ -16,8 +14,8 @@ namespace LogManagementSystem
             ZipHelper.UpdateCapturedImageInExistingZip(archive, deleteDate);
             ZipHelper.UpdateCsvInExistingZip(archive, deleteDate);
         }
-        
-        public static void SortLogs(this ZipArchive archive, string rootPath, 
+
+        public static void SortLogs(this ZipArchive archive, string rootPath,
             DateTime zipDate, DateTime deleteDate)
         {
             foreach (var file in new DirectoryInfo(Path.Combine(rootPath, "LOG"))
@@ -33,7 +31,7 @@ namespace LogManagementSystem
             }
         }
 
-        public static void SortImgs(this ZipArchive archive, string rootPath, 
+        public static void SortImgs(this ZipArchive archive, string rootPath,
             DateTime zipDate, DateTime deleteDate, List<string> temp)
         {
             List<string> imgFolders = new List<string> { "OK", "NG" };
@@ -53,7 +51,7 @@ namespace LogManagementSystem
             }
         }
 
-        public static void SortCSVs(this ZipArchive archive, string rootPath, 
+        public static void SortCSVs(this ZipArchive archive, string rootPath,
             DateTime zipDate, DateTime deleteDate, List<string> temp)
         {
             foreach (var dir in new DirectoryInfo(Path.Combine(rootPath, "VALUES"))

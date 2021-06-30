@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Drawing.Imaging;
+using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
-namespace LogManagementSystem
+namespace LogManager
 {
     public class ZipHelper
     {
@@ -130,8 +128,8 @@ namespace LogManagementSystem
                 }
 
                 foreach (var file in dirInfo.GetFiles()
-                    .Where(f => f.Extension == ".log" 
-                    || f.Extension == "." + ImageFormat.Png.ToString().ToLower() 
+                    .Where(f => f.Extension == ".log"
+                    || f.Extension == "." + ImageFormat.Png.ToString().ToLower()
                     || f.Extension == ".csv"))
                 {
                     GetFiles(file.FullName, ref fileLists);
@@ -140,7 +138,7 @@ namespace LogManagementSystem
             else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
             {
                 var fileInfo = new FileInfo(rootPath);
-                if (fileInfo.Extension == ".log" 
+                if (fileInfo.Extension == ".log"
                     || fileInfo.Extension == "." + ImageFormat.Png.ToString().ToLower()
                     || fileInfo.Extension == ".csv")
                     fileLists.Add(fileInfo.FullName);

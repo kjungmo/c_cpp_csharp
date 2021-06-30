@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-namespace LogManagementSystem
+namespace LogManager
 {
     public class LogManagementSystem
     {
@@ -62,7 +62,7 @@ namespace LogManagementSystem
                     string weekday = "monday";
                     int month = 1;
                     int dayInMonth = 1;
-                    Scheduler taskScheduler = new Scheduler("zip", rootPath, numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
+                    ScheduleRegister.Scheduler taskScheduler = new ScheduleRegister.Scheduler("zip", rootPath, numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
                     taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
                     break;
 
@@ -104,7 +104,7 @@ namespace LogManagementSystem
                     string deleteLog = userInput[2];
                     string deleteImg = userInput[3];
                     string deleteCsv = userInput[4];
-                    taskScheduler = new Scheduler("manage", rootPath, deleteLog, deleteImg, deleteCsv); // Setting Manager -> Date input
+                    taskScheduler = new ScheduleRegister.Scheduler("manage", rootPath, deleteLog, deleteImg, deleteCsv); // Setting Manager -> Date input
                     taskScheduler.AddTaskSchedule(taskScheduler.CreateTrigger());
                     break;
 
@@ -117,7 +117,7 @@ namespace LogManagementSystem
                     break;
 
                 case "schedule_delete":
-                    Scheduler.DeleteTaskSchedule();
+                    ScheduleRegister.Scheduler.DeleteTaskSchedule();
                     break;
 
             }
