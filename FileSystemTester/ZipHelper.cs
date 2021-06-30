@@ -168,7 +168,7 @@ namespace LogManagementSystem
             }
         }
 
-        public static void SortCapturedImageByFolder(string rootPath, DateTime deleteDate)
+        public static void SortImgs(string rootPath, DateTime deleteDate)
         {
             List<string> capturedLogFolders = new List<string> { "OK", "NG" };
             foreach (var folder in capturedLogFolders)
