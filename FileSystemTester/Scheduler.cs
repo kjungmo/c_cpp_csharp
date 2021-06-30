@@ -34,6 +34,7 @@ namespace ScheduleRegister
             string deleteImg,
             string deleteCsv,
             string exeFilePath = null,
+            int exeRepititionInterval = 1,
             DateTime? startExeFile = null
             )
         {
@@ -43,9 +44,9 @@ namespace ScheduleRegister
             DeleteImg = deleteImg;
             DeleteCsv = deleteCsv;
             ExeFilePath = exeFilePath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
-            ExecutionInterval = "daily";
-            ExeRepititionInterval = 1;
+            ExeRepititionInterval = exeRepititionInterval;
             StartExeFile = startExeFile ?? DateTime.Today.AddDays(1);
+            ExecutionInterval = "daily";
         }
 
         public Scheduler(
