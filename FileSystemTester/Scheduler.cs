@@ -224,5 +224,18 @@ namespace ScheduleRegister
                 }
             }
         }
+
+        public static bool CheckAlreadyRegistered()
+        {
+            using (TaskService service = new TaskService())
+            {
+                Task[] tasks = service.FindAllTasks(new System.Text.RegularExpressions.Regex("CogAplex"));
+                if (tasks.Length == 0)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
     }
 }
