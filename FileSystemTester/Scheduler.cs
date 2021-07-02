@@ -1,12 +1,12 @@
-﻿using Microsoft.Win32.TaskScheduler;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Win32.TaskScheduler;
 
 namespace ScheduleRegister
-
 {
     public class Scheduler
     {
+        public static string CogAplexLogManager { get { return "CogAplex Log Management System"; } }
         public string Mode { get; private set; }
         public string RootPath { get; private set; }
         public string ZipDaysAfterLogged { get; private set; }
@@ -24,7 +24,6 @@ namespace ScheduleRegister
 
         public Scheduler()
         {
-
         }
 
         public Scheduler(
@@ -52,9 +51,9 @@ namespace ScheduleRegister
 
         public Scheduler(
             string mode,
-            string rootPath, 
-            int zipDaysAfterLogged, 
-            int deleteDaysAfterZip, 
+            string rootPath,
+            int zipDaysAfterLogged,
+            int deleteDaysAfterZip,
             string exeInterval = "daily",
             string weekday = "monday",
             int month = 1,
@@ -81,10 +80,12 @@ namespace ScheduleRegister
         {
             TaskDefinition taskDefinition = TaskService.Instance.NewTask();
             taskDefinition.RegistrationInfo.Author = "cogaplex@cogaplex.com";
-            taskDefinition.RegistrationInfo.Description = "Management of daily .log and captured image files.";
             taskDefinition.Triggers.Add(CreateTrigger());
             taskDefinition.Actions.Add(CreateExeAction());
-            TaskService.Instance.RootFolder.RegisterTaskDefinition("CogAplex Log Management System", taskDefinition);
+            taskDefinition.RegistrationInfo.Description = CreateExeAction().Arguments;
+            taskDefinition.RegistrationInfo.Description += " ";
+            taskDefinition.RegistrationInfo.Description += StartExeFile.ToString("HH:mm");
+            TaskService.Instance.RootFolder.RegisterTaskDefinition(CogAplexLogManager, taskDefinition);
         }
 
         private ExecAction CreateExeAction()
@@ -222,9 +223,9 @@ namespace ScheduleRegister
         {
             using (TaskService service = new TaskService())
             {
-                foreach (var item in service.FindAllTasks(new System.Text.RegularExpressions.Regex("CogAplex")))
+                if (service.FindTask(CogAplexLogManager, false).IsActive)
                 {
-                    service.RootFolder.DeleteTask(item.Name, false);
+                    service.RootFolder.DeleteTask(CogAplexLogManager, false);
                 }
             }
         }
@@ -233,13 +234,27 @@ namespace ScheduleRegister
         {
             using (TaskService service = new TaskService())
             {
-                Task[] tasks = service.FindAllTasks(new System.Text.RegularExpressions.Regex("CogAplex"));
-                if (tasks.Length == 0)
+                Task task = service.FindTask(CogAplexLogManager, false);
+                if (task == null)
                 {
                     return false;
                 }
                 return true;
             }
+        }
+
+        public static string GetRegisteredValues()
+        {
+            string desc;
+            using (TaskService service = new TaskService())
+            {
+                desc = service.FindTask(CogAplexLogManager, false).Definition.RegistrationInfo.Description;
+                if (string.IsNullOrEmpty(desc))
+                {
+                    return "";
+                }
+            }
+            return desc;
         }
     }
 }
