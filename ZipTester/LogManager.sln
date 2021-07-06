@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogMgr", "LogMgr.csproj", "{BAA78E3C-4066-4339-8F35-3ADD18F0D767}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleRegister", "..\FileSystemTester\ScheduleRegister.csproj", "{8E52555B-6BD3-40D0-B07F-6E6318D9379D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogManager", "..\LogManager\LogManager.csproj", "{03B78433-E7BB-4120-B3DF-06EA17BFB8F9}"
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BAA78E3C-4066-4339-8F35-3ADD18F0D767}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BAA78E3C-4066-4339-8F35-3ADD18F0D767}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BAA78E3C-4066-4339-8F35-3ADD18F0D767}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BAA78E3C-4066-4339-8F35-3ADD18F0D767}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8E52555B-6BD3-40D0-B07F-6E6318D9379D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E52555B-6BD3-40D0-B07F-6E6318D9379D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E52555B-6BD3-40D0-B07F-6E6318D9379D}.Release|Any CPU.ActiveCfg = Release|Any CPU

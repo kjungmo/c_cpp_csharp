@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.Win32.TaskScheduler;
+using System;
 using System.Collections.Generic;
-using Microsoft.Win32.TaskScheduler;
 
 namespace ScheduleRegister
 {
     public class Scheduler
     {
-        public static string CogAplexLogManager { get { return "CogAplex Log Management System"; } }
+        public static string CogAplexLogManager = "CogAplex Log Management System";
         public string Mode { get; private set; }
         public string RootPath { get; private set; }
         public string ZipDaysAfterLogged { get; private set; }
@@ -21,10 +21,6 @@ namespace ScheduleRegister
         public string DeleteImg { get; private set; }
         public string DeleteCsv { get; private set; }
         public string ExeFilePath { get; private set; }
-
-        public Scheduler()
-        {
-        }
 
         public Scheduler(
             string mode,
@@ -219,42 +215,30 @@ namespace ScheduleRegister
             return dayToSet.ToArray();
         }
 
+        public static System.Threading.Tasks.Task RegisterScheduleAsync(Scheduler schedule)
+        {
+            return System.Threading.Tasks.Task.Run(() => schedule.AddTaskSchedule());
+        }
+
         public static void DeleteTaskSchedule()
         {
             using (TaskService service = new TaskService())
             {
-                if (service.FindTask(CogAplexLogManager, false).IsActive)
-                {
-                    service.RootFolder.DeleteTask(CogAplexLogManager, false);
-                }
+                service.RootFolder.DeleteTask(CogAplexLogManager, false);
             }
         }
 
-        public static bool CheckAlreadyRegistered()
+        public static System.Threading.Tasks.Task<string> CheckAlreadyRegisteredAsync()
         {
-            using (TaskService service = new TaskService())
+            return System.Threading.Tasks.Task.Run(() =>
             {
-                Task task = service.FindTask(CogAplexLogManager, false);
-                if (task == null)
+                using (TaskService service = new TaskService())
                 {
-                    return false;
+                    var scheduleTask = service.FindTask(CogAplexLogManager, false);
+                    return scheduleTask?.Definition.RegistrationInfo.Description ?? "";
                 }
-                return true;
-            }
+            });
         }
 
-        public static string GetRegisteredValues()
-        {
-            string desc;
-            using (TaskService service = new TaskService())
-            {
-                desc = service.FindTask(CogAplexLogManager, false).Definition.RegistrationInfo.Description;
-                if (string.IsNullOrEmpty(desc))
-                {
-                    return "";
-                }
-            }
-            return desc;
-        }
     }
 }
