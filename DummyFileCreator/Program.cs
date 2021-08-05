@@ -18,6 +18,7 @@ namespace DummyFileCreator
 			string logPath = @"E:\Dummy\LOG";
 			string ngPath = @"E:\Dummy\NG";
 			string okPath = @"E:\Dummy\OK";
+			string csvPath = @"E:\Dummy\VALUES";
 			if (!Directory.Exists(logPath))
 			{
 				Directory.CreateDirectory(logPath);
@@ -39,8 +40,7 @@ namespace DummyFileCreator
 			{
 				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
 				string folderpath = Path.Combine(ngPath, datetime);
-				string carPath = "CN7";
-				carPath = Path.Combine(folderpath, carPath);
+				string carPath = Path.Combine(folderpath, "CN7");
 				if (!Directory.Exists(folderpath))
 				{
 					Directory.CreateDirectory(folderpath);
@@ -51,7 +51,7 @@ namespace DummyFileCreator
 				}
 				for (int j = 0; j < 15; j++)
 				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 1920, 1060);
+					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 200, 200);
 				}
 			}
 			Console.WriteLine("NG fertig");
@@ -64,8 +64,7 @@ namespace DummyFileCreator
 			{
 				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
 				string folderpath = Path.Combine(okPath, datetime);
-				string carPath = "CN7";
-				carPath = Path.Combine(folderpath, carPath);
+				string carPath = Path.Combine(folderpath, "CN7");
 				if (!Directory.Exists(folderpath))
 				{
 					Directory.CreateDirectory(folderpath);
@@ -76,10 +75,36 @@ namespace DummyFileCreator
 				}
 				for (int j = 0; j < 15; j++)
 				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 1920, 1060);
+					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 200, 200);
 				}
 			}
 			Console.WriteLine("OK fertig");
+
+            if (!Directory.Exists(csvPath))
+            {
+				Directory.CreateDirectory(csvPath);
+            }
+            for (int i = 0; i > dates; i--)
+            {
+				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
+				string folderpath = Path.Combine(csvPath, datetime);
+				string carPath = Path.Combine(folderpath, "CN7");
+				if (!Directory.Exists(folderpath))
+				{
+					Directory.CreateDirectory(folderpath);
+				}
+				if (!Directory.Exists(carPath))
+				{
+					Directory.CreateDirectory(carPath);
+				}
+                for (int j = 0; j < 10; j++)
+                {
+					string filepath = Path.Combine(carPath, "values.csv");
+					using (StreamWriter sw = File.CreateText(filepath)) { }
+				}
+			}
+
+			Console.WriteLine("VALUES fertig");
 			Console.ReadKey();
 		}
 
