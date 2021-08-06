@@ -27,7 +27,7 @@ namespace LogManager
             // |                                   zipLogDaysAfterLogged, deleteLogDaysAfterLogged,                                    |
             // |                                   zipImgDaysAfterLogged, deleteImgDaysAfterLogged,                                    |
             // |                                   zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,                                    |
-            // |                                   startTime, interval                                                                 |
+            // |                                                                                                                       |
             // |                                                                                                                       |
             // |                                                                                                                       |
             // |                                                                                                                       |
@@ -37,63 +37,19 @@ namespace LogManager
 
             if (CheckArgsValidity(args))
             {
+                TaskSchedulerManager tScheduler = new TaskSchedulerManager(args);
+                ZipHelper zHelper = new ZipHelper(args);
                 string mode = args[0].ToLower();
-                string rootPath = args[1];
-                int zipLogDaysAfterLogged = Convert.ToInt32(args[2]);
-                int deleteLogDaysAfterLogged = Convert.ToInt32(args[3]);
-                int zipImgDaysAfterLogged = Convert.ToInt32(args[4]);
-                int deleteImgDaysAfterLogged = Convert.ToInt32(args[5]);
-                int zipCsvDaysAfterLogged = Convert.ToInt32(args[6]);
-                int deleteCsvDaysAfterLogged = Convert.ToInt32(args[7]);
                 switch (mode)
                 {
                     case "schedule_zip":
-                        mode = "zip";
-                        DateTime startTime;
-                        DateTime.TryParseExact(args[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out startTime);
-                        string interval = args[9];
-                        string exeFileDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                        switch (interval)
-                        {
-                            case "daily":
-                                TaskSchedulerManager.AddDailyTaskSchedule(
-                                    mode, exeFileDir, rootPath,
-                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
-                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
-                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
-                                    startTime);
-                                break;
-                            case "weekly":
-                                TaskSchedulerManager.AddWeeklyTaskSchedule(
-                                    mode, exeFileDir, rootPath,
-                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
-                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
-                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
-                                    startTime);
-                                break;
-                            case "monthly":
-                                TaskSchedulerManager.AddMonthlyTaskSchedule(
-                                    mode, exeFileDir, rootPath,
-                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
-                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
-                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
-                                    startTime);
-                                break;
-                        }
+                        tScheduler.Mode = "zip";
+                        tScheduler.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "zip":
                         List<string> temp = new List<string>();
-                        string zipFilePath = Path.Combine(args[1], "LOG.zip");
-
-
-                        DateTime zipDateLog = DateTime.Today.AddDays(-zipLogDaysAfterLogged);
-                        DateTime deleteDateLog = zipDateLog.AddDays(-deleteLogDaysAfterLogged);
-                        DateTime zipDateImg = DateTime.Today.AddDays(-zipImgDaysAfterLogged);
-                        DateTime deleteDateImg = zipDateImg.AddDays(-deleteImgDaysAfterLogged);
-                        DateTime zipDateCsv = DateTime.Today.AddDays(-zipCsvDaysAfterLogged);
-                        DateTime deleteDateCsv = zipDateCsv.AddDays(-deleteCsvDaysAfterLogged);
+                        string zipFilePath = Path.Combine(zHelper.RootPath, "LOG.zip");
 
                         if (!File.Exists(zipFilePath))
                         {
@@ -110,79 +66,33 @@ namespace LogManager
 
                         using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
                         {
-                            ZipHelper.UpdateZipFileEntries(archive, deleteDateLog, deleteDateImg, deleteDateCsv);
-                            ZipHelper.SortLoggedFiles(rootPath,
-                                zipDateLog, deleteDateLog,
-                                zipDateImg, deleteDateImg,
-                                zipDateCsv, deleteDateCsv,
-                                temp, archive);
+                            zHelper.UpdateZipFileEntries(archive);
+                            zHelper.SortLoggedFiles(temp, archive);
                         }
                         Console.WriteLine("Management Success.");
                         break;
 
                     case "schedule_no_zip":
-                        mode = "no_zip";
-                        DateTime.TryParseExact(args[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out startTime);
-                        interval = args[9];
-                        exeFileDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                        switch (interval)
-                        {
-                            case "daily":
-                                TaskSchedulerManager.AddDailyTaskSchedule(
-                                    mode, exeFileDir, rootPath,
-                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
-                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
-                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
-                                    startTime);
-                                break;
-                            case "weekly":
-                                TaskSchedulerManager.AddWeeklyTaskSchedule(
-                                    mode, exeFileDir, rootPath,
-                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
-                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
-                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
-                                    startTime);
-                                break;
-                            case "monthly":
-                                TaskSchedulerManager.AddMonthlyTaskSchedule(
-                                    mode, exeFileDir, rootPath,
-                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
-                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
-                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
-                                    startTime);
-                                break;
-                        }
+                        tScheduler.Mode = "no_zip";
+                        tScheduler.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "no_zip":
-                        zipDateLog = DateTime.Today.AddDays(-zipLogDaysAfterLogged);
-                        deleteDateLog = zipDateLog.AddDays(-deleteLogDaysAfterLogged);
-                        zipDateImg = DateTime.Today.AddDays(-zipImgDaysAfterLogged);
-                        deleteDateImg = zipDateImg.AddDays(-deleteImgDaysAfterLogged);
-                        zipDateCsv = DateTime.Today.AddDays(-zipCsvDaysAfterLogged);
-                        deleteDateCsv = zipDateCsv.AddDays(-deleteCsvDaysAfterLogged);
-
-                        ZipHelper.SortLoggedFiles(rootPath,
-                            zipDateLog, deleteDateLog,
-                            zipDateImg, deleteDateImg,
-                            zipDateCsv, deleteDateCsv,
-                            null, null);
+                        zHelper.SortLoggedFiles();
                         break;
 
                     case "schedule_delete":
-                        if (!string.IsNullOrEmpty(TaskSchedulerManager.CheckAlreadyRegistered()))
+                        if (!string.IsNullOrEmpty(tScheduler.CheckAlreadyRegistered()))
                         {
-                            TaskSchedulerManager.DeleteTaskSchedule();
+                            tScheduler.DeleteTaskSchedule();
                             Console.WriteLine("Successfully deleted!");
                         }
                         Console.WriteLine("No Scheduled LogManager to delete.");
                         break;
 
                     case "schedule_load":
-                        Console.WriteLine($"\nFound LogManager's Description: {TaskSchedulerManager.CheckAlreadyRegistered() ?? "None"}");
+                        Console.WriteLine($"\nFound LogManager's Description: {tScheduler.CheckAlreadyRegistered() ?? "None"}");
                         break;
-
                 }
             }
             else
