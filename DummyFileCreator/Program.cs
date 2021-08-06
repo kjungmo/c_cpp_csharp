@@ -24,10 +24,15 @@ namespace DummyFileCreator
 				Console.WriteLine("Invalid days input. 0 <= Days <= 365 ");
 				return;
             }
-			string logPath = @"E:\Dummy\LOG";
-			string ngPath = @"E:\Dummy\NG";
-			string okPath = @"E:\Dummy\OK";
-			string csvPath = @"E:\Dummy\VALUES";
+
+			Console.WriteLine("Log folder name : ");
+			string foldername = Console.ReadLine();
+			Console.WriteLine($"Input folder name : {foldername}");
+			string folder = Path.Combine(@"E:\", foldername);
+			string logPath = Path.Combine(folder, "LOG");
+			string ngPath = Path.Combine(folder, "NG");
+			string okPath = Path.Combine(folder, "OK");
+			string csvPath = Path.Combine(folder, "VALUES");
 
 			if (!Directory.Exists(logPath))
 			{
