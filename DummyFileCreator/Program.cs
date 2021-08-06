@@ -14,31 +14,41 @@ namespace DummyFileCreator
 	{
 		static void Main(string[] args)
 		{
-			int dates = -150;
+			Console.WriteLine("How many days to create dummy files : ");
+			string userInputDays = Console.ReadLine();
+			Console.WriteLine($"Input days : {userInputDays}");
+			int convertedDays = Convert.ToInt32(userInputDays);
+
+			if (convertedDays <= 0 && 365 <= convertedDays)
+            {
+				Console.WriteLine("Invalid days input. 0 <= Days <= 365 ");
+				return;
+            }
 			string logPath = @"E:\Dummy\LOG";
 			string ngPath = @"E:\Dummy\NG";
 			string okPath = @"E:\Dummy\OK";
 			string csvPath = @"E:\Dummy\VALUES";
+
 			if (!Directory.Exists(logPath))
 			{
 				Directory.CreateDirectory(logPath);
-				for (int i = 0; i > dates; i--)
-				{
-					string datetime = DateTime.Today.AddDays(i).ToString("yyyy-MM-dd");
-					string filepath = Path.Combine(logPath, datetime + ".log");
-					using (StreamWriter sw = File.CreateText(filepath)) { }
-
-				}
-				Console.WriteLine("LOG fertig");
 			}
+			for (int i = 0; i < convertedDays; i++)
+			{
+				string datetime = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
+				string filepath = Path.Combine(logPath, datetime + ".log");
+				using (StreamWriter sw = File.CreateText(filepath)) { }
+
+			}
+			Console.WriteLine("LOG fertig");
 
 			if (!Directory.Exists(ngPath))
 			{
 				Directory.CreateDirectory(ngPath);
 			}
-			for (int i = 0; i > dates; i--)
+			for (int i = 0; i < convertedDays; i++)
 			{
-				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
+				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
 				string folderpath = Path.Combine(ngPath, datetime);
 				string carPath = Path.Combine(folderpath, "CN7");
 				if (!Directory.Exists(folderpath))
@@ -60,9 +70,9 @@ namespace DummyFileCreator
 			{
 				Directory.CreateDirectory(okPath);
 			}
-			for (int i = 0; i > dates; i--)
+			for (int i = 0; i < convertedDays; i++)
 			{
-				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
+				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
 				string folderpath = Path.Combine(okPath, datetime);
 				string carPath = Path.Combine(folderpath, "CN7");
 				if (!Directory.Exists(folderpath))
@@ -84,9 +94,9 @@ namespace DummyFileCreator
             {
 				Directory.CreateDirectory(csvPath);
             }
-            for (int i = 0; i > dates; i--)
+            for (int i = 0; i < convertedDays; i++)
             {
-				string datetime = DateTime.Today.AddDays(i).ToString("yyyyMMdd");
+				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
 				string folderpath = Path.Combine(csvPath, datetime);
 				string carPath = Path.Combine(folderpath, "CN7");
 				if (!Directory.Exists(folderpath))
