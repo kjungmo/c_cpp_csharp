@@ -55,7 +55,7 @@
   <ItemGroup>
     <Compile Include="LogManagementSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZipExtension.cs" />
+    <Compile Include="TaskSchedulerManager.cs" />
     <Compile Include="ZipHelper.cs" />
   </ItemGroup>
   <ItemGroup>

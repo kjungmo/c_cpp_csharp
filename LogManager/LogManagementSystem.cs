@@ -13,68 +13,88 @@ namespace LogManager
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
             // |                                                                                                                       |
             // |                                                                                                                       |
-            // |      [SCHEDULER MODE] : "args" are Mode, RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int), interval        |
+            // |      [SCHEDULER MODE] : args ->  Mode, RootPath,                                                                      |
+            // |                                   zipLogDaysAfterLogged, deleteLogDaysAfterLogged,                                    |
+            // |                                   zipImgDaysAfterLogged, deleteImgDaysAfterLogged,                                    |
+            // |                                   zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,                                    |
+            // |                                   startTime, interval                                                                 |
             // |                                                                                                                       |
-            // |   [DEFAULT MODE(zip)] : "args" are RootPath, numOfDaysUntilZip(int), numOfDaysUntilDelete(int)                        |
+            // |                                                                                                                       |
+            // |                                                                                                                       |
+            // |                                                                                                                       |
+            // |                                                                                                                       |
+            // |     [ZIP/NO_ZIP MODE] : args ->  Mode, RootPath,                                                                      |
+            // |                                   zipLogDaysAfterLogged, deleteLogDaysAfterLogged,                                    |
+            // |                                   zipImgDaysAfterLogged, deleteImgDaysAfterLogged,                                    |
+            // |                                   zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,                                    |
+            // |                                   startTime, interval                                                                 |
+            // |                                                                                                                       |
+            // |                                                                                                                       |
             // |                                                                                                                       |
             // |                                                                                                                       |
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-            #region [[ Development mode ]] ( to be deleted ) 
-            //string rootPath = @"e:\Dummy\";
-            //List<string> temp = new List<string>();
-            //string zipFilePath = Path.Combine(rootPath, "LOG.zip");
-
-            //DateTime zipDate = new DateTime(2021, 5, 1);
-            //DateTime deleteDate = new DateTime(2021, 5, 11);
-            #endregion
-
-            #region [[ Release mode ]]
-            #region Variables
-            string[] cmdArgs = Environment.GetCommandLineArgs();
-            List<string> userInput = cmdArgs.Where(arg => arg != cmdArgs[0]).ToList();
-
-            //string rootPath = userInput[1];
-            //string zip = userInput[2];
-            //string del = userInput[3];
-            //string interval = userInput[4];
-
-            //List<string> temp = new List<string>();
-            //DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(zip));
-            //DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(del));
-            //string zipFilePath = Path.Combine(rootPath, "LOG.zip");
-            #endregion
-            //DateTime startZip = DateTime.Today.AddDays(-10);
-            //DateTime startZip = DateTime.Today.AddDays(-args1);
-
-            //DateTime startDel = startZip.AddDays(-10);
-            //DateTime startDel = startZip.AddDays(-args2);
-            #endregion
-
-            switch (userInput[0].ToLower())
+            if (CheckArgsValidity(args))
             {
-                case "scheduler_z":
-                    string rootPath = userInput[1];
-                    int numOfDaysUntilZip = Convert.ToInt32(userInput[2]);
-                    int numOfDaysUntilDelete = Convert.ToInt32(userInput[3]);
-                    string interval = userInput[4];
-                    string weekday = "monday";
-                    int month = 1;
-                    int dayInMonth = 1;
-                    ScheduleRegister.Scheduler taskScheduler = new ScheduleRegister.Scheduler("zip", rootPath, numOfDaysUntilZip, numOfDaysUntilDelete, interval, weekday, month, dayInMonth); // Setting Manager -> Date input
-                    taskScheduler.AddTaskSchedule();
-                    break;
+                string mode = args[0].ToLower();
+                string rootPath = args[1];
+                int zipLogDaysAfterLogged = Convert.ToInt32(args[2]);
+                int deleteLogDaysAfterLogged = Convert.ToInt32(args[3]);
+                int zipImgDaysAfterLogged = Convert.ToInt32(args[4]);
+                int deleteImgDaysAfterLogged = Convert.ToInt32(args[5]);
+                int zipCsvDaysAfterLogged = Convert.ToInt32(args[6]);
+                int deleteCsvDaysAfterLogged = Convert.ToInt32(args[7]);
+                switch (mode)
+                {
+                    case "schedule_zip":
+                        mode = "zip";
+                        DateTime startTime;
+                        DateTime.TryParseExact(args[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out startTime);
+                        string interval = args[9];
+                        string exeFileDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                        switch (interval)
+                        {
+                            case "daily":
+                                TaskSchedulerManager.AddDailyTaskSchedule(
+                                    mode, exeFileDir, rootPath,
+                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
+                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
+                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
+                                    startTime);
+                                break;
+                            case "weekly":
+                                TaskSchedulerManager.AddWeeklyTaskSchedule(
+                                    mode, exeFileDir, rootPath,
+                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
+                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
+                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
+                                    startTime);
+                                break;
+                            case "monthly":
+                                TaskSchedulerManager.AddMonthlyTaskSchedule(
+                                    mode, exeFileDir, rootPath,
+                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
+                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
+                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
+                                    startTime);
+                                break;
+                        }
+                        break;
 
-                case "zip":
-                    List<string> temp = new List<string>();
-                    rootPath = userInput[1];
-                    DateTime zipDate = DateTime.Today.AddDays(-Convert.ToInt32(userInput[2]));
-                    DateTime deleteDate = zipDate.AddDays(-Convert.ToInt32(userInput[3]));
-                    string zipFilePath = Path.Combine(rootPath, "LOG.zip");
+                    case "zip":
+                        List<string> temp = new List<string>();
+                        string zipFilePath = Path.Combine(args[1], "LOG.zip");
 
-                    if (Directory.Exists(rootPath))
-                    {
+
+                        DateTime zipDateLog = DateTime.Today.AddDays(-zipLogDaysAfterLogged);
+                        DateTime deleteDateLog = zipDateLog.AddDays(-deleteLogDaysAfterLogged);
+                        DateTime zipDateImg = DateTime.Today.AddDays(-zipImgDaysAfterLogged);
+                        DateTime deleteDateImg = zipDateImg.AddDays(-deleteImgDaysAfterLogged);
+                        DateTime zipDateCsv = DateTime.Today.AddDays(-zipCsvDaysAfterLogged);
+                        DateTime deleteDateCsv = zipDateCsv.AddDays(-deleteCsvDaysAfterLogged);
+
                         if (!File.Exists(zipFilePath))
                         {
                             try
@@ -90,38 +110,283 @@ namespace LogManager
 
                         using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
                         {
-                            archive.FilterZipFileEntries(deleteDate);
-                            archive.SortLogs(rootPath, zipDate, deleteDate);
-                            archive.SortImgs(rootPath, zipDate, deleteDate, temp);
-                            archive.SortCSVs(rootPath, zipDate, deleteDate, temp);
+                            ZipHelper.UpdateZipFileEntries(archive, deleteDateLog, deleteDateImg, deleteDateCsv);
+                            ZipHelper.SortLoggedFiles(rootPath,
+                                zipDateLog, deleteDateLog,
+                                zipDateImg, deleteDateImg,
+                                zipDateCsv, deleteDateCsv,
+                                temp, archive);
                         }
                         Console.WriteLine("Management Success.");
-                    }
-                    break;
+                        break;
 
-                case "scheduler":
-                    rootPath = userInput[1];
-                    string deleteLog = userInput[2];
-                    string deleteImg = userInput[3];
-                    string deleteCsv = userInput[4];
-                    taskScheduler = new ScheduleRegister.Scheduler("manage", rootPath, deleteLog, deleteImg, deleteCsv); // Setting Manager -> Date input
-                    taskScheduler.AddTaskSchedule();
-                    break;
+                    case "schedule_no_zip":
+                        mode = "no_zip";
+                        DateTime.TryParseExact(args[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out startTime);
+                        interval = args[9];
+                        exeFileDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                        switch (interval)
+                        {
+                            case "daily":
+                                TaskSchedulerManager.AddDailyTaskSchedule(
+                                    mode, exeFileDir, rootPath,
+                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
+                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
+                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
+                                    startTime);
+                                break;
+                            case "weekly":
+                                TaskSchedulerManager.AddWeeklyTaskSchedule(
+                                    mode, exeFileDir, rootPath,
+                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
+                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
+                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
+                                    startTime);
+                                break;
+                            case "monthly":
+                                TaskSchedulerManager.AddMonthlyTaskSchedule(
+                                    mode, exeFileDir, rootPath,
+                                    zipLogDaysAfterLogged, deleteLogDaysAfterLogged,
+                                    zipImgDaysAfterLogged, deleteImgDaysAfterLogged,
+                                    zipCsvDaysAfterLogged, deleteCsvDaysAfterLogged,
+                                    startTime);
+                                break;
+                        }
+                        break;
 
-                case "manage":
-                    rootPath = userInput[1];
+                    case "no_zip":
+                        zipDateLog = DateTime.Today.AddDays(-zipLogDaysAfterLogged);
+                        deleteDateLog = zipDateLog.AddDays(-deleteLogDaysAfterLogged);
+                        zipDateImg = DateTime.Today.AddDays(-zipImgDaysAfterLogged);
+                        deleteDateImg = zipDateImg.AddDays(-deleteImgDaysAfterLogged);
+                        zipDateCsv = DateTime.Today.AddDays(-zipCsvDaysAfterLogged);
+                        deleteDateCsv = zipDateCsv.AddDays(-deleteCsvDaysAfterLogged);
 
-                    ZipHelper.SortLogs(rootPath, DateTime.Today.AddDays(-Convert.ToInt32(userInput[2])));
-                    ZipHelper.SortImgs(rootPath, DateTime.Today.AddDays(-Convert.ToInt32(userInput[3])));
-                    ZipHelper.SortCSVs(rootPath, DateTime.Today.AddDays(-Convert.ToInt32(userInput[4])));
-                    break;
+                        ZipHelper.SortLoggedFiles(rootPath,
+                            zipDateLog, deleteDateLog,
+                            zipDateImg, deleteDateImg,
+                            zipDateCsv, deleteDateCsv,
+                            null, null);
+                        break;
 
-                case "schedule_delete":
-                    ScheduleRegister.Scheduler.DeleteTaskSchedule();
-                    break;
+                    case "schedule_delete":
+                        if (!string.IsNullOrEmpty(TaskSchedulerManager.CheckAlreadyRegistered()))
+                        {
+                            TaskSchedulerManager.DeleteTaskSchedule();
+                            Console.WriteLine("Successfully deleted!");
+                        }
+                        Console.WriteLine("No Scheduled LogManager to delete.");
+                        break;
 
+                    case "schedule_load":
+                        Console.WriteLine($"\nFound LogManager's Description: {TaskSchedulerManager.CheckAlreadyRegistered() ?? "None"}");
+                        break;
+
+                }
             }
-            Console.ReadKey();
+            else
+            {
+                Console.WriteLine("The Program Cannot be executed");
+            }
+        }
+
+        private static bool CheckArgsValidity(string[] modeArgs)
+        {
+            if (modeArgs.Length < 2)
+            {
+                List<string> modeSelection = new List<string> { "schedule_delete", "schedule_load", };
+                if (!modeSelection.Contains(modeArgs[0].ToLower()))
+                {
+                    Console.WriteLine("Correct Mode required. [ schedule_delete / schedule_load ]");
+                    return false;
+                }
+            }
+            else if (modeArgs.Length < 9)
+            {
+                if (!CheckZipNoZipArgs(modeArgs))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!CheckScheduleArgs(modeArgs))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static bool CheckZipNoZipArgs(string[] arguments)
+        {
+            List<string> modeSelection = new List<string> { "zip", "no_zip", };
+            if (!modeSelection.Contains(arguments[0].ToLower()))
+            {
+                Console.WriteLine("Correct Mode required. [ zip / no_zip ]");
+                return false;
+            }
+
+            if (!CheckLogPath(arguments[1]))
+            {
+                Console.WriteLine("Root path does not exist");
+                return false;
+            }
+
+            if (!CheckSixInputDays(
+                arguments[2], arguments[3],
+                arguments[4], arguments[5],
+                arguments[6], arguments[7]))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private static bool CheckLogPath(string rootPath)
+        {
+            bool isPath = true;
+            if (!Directory.Exists(rootPath))
+            {
+                Console.WriteLine("Root path does not exist");
+                isPath = false;
+            }
+            return isPath;
+        }
+
+        private static bool CheckSixInputDays(
+            string day1, string day2,
+            string day3, string day4,
+            string day5, string day6)
+        {
+
+            Dictionary<string, string> days = new Dictionary<string, string>()
+            {
+                [day1] = "zipLog",
+                [day2] = "delLog",
+                [day3] = "zipImg",
+                [day4] = "delImg",
+                [day5] = "zipCsv",
+                [day6] = "delCsv",
+            };
+
+            foreach (KeyValuePair<string, string> item in days)
+            {
+                if (!int.TryParse(item.Key, out _))
+                {
+                    Console.WriteLine($"Correct number of {item.Value} required");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool CheckScheduleArgs(string[] arguments)
+        {
+            List<string> modeSelection = new List<string> { "schedule_zip", "schedule_no_zip", };
+            if (!modeSelection.Contains(arguments[0].ToLower()))
+            {
+                Console.WriteLine("Correct Mode required. [ schedule_zip / schedule_no_zip ]");
+                return false;
+            }
+
+            if (!CheckLogPath(arguments[1]))
+            {
+                Console.WriteLine("Root path does not exist");
+                return false;
+            }
+
+            if (!CheckSixInputDays(
+                arguments[2], arguments[3],
+                arguments[4], arguments[5],
+                arguments[6], arguments[7]))
+            {
+                return false;
+            }
+
+            if (!CheckStartTimeArgs(arguments[8]))
+            {
+                return false;
+            }
+
+            List<string> intervalSelection = new List<string> { "daily", "weekly", "monthly", };
+            if (!intervalSelection.Contains(arguments[9].ToLower()))
+            {
+                Console.WriteLine("Correct Interval required. [ daily / weekly / monthly ]");
+                return false;
+            }
+
+            if (arguments[9] == "weekly" && arguments.Length == 11)
+            {
+                if (!CheckWeekTrigArgs(arguments[10]))
+                {
+                    return false;
+                }
+            }
+
+            if (arguments[9] == "monthly" && arguments.Length == 11)
+            {
+                if (!CheckMonTrigArgs(arguments[10]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool CheckStartTimeArgs(string startTime)
+        {
+            string format = "HH:mm";
+            bool rightTime = false;
+            try
+            {
+                System.Globalization.CultureInfo provider = System.Globalization.CultureInfo.InvariantCulture;
+                DateTime dt = DateTime.ParseExact(startTime, format, provider);
+                rightTime = true;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Wrong StartTime input. Time format is HH:mm(24H)");
+            }
+            return rightTime;
+        }
+
+        private static bool CheckWeekTrigArgs(string weekday)
+        {
+            bool isWeekday = true;
+            List<string> weekdays = new List<string>
+            {
+                "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+            };
+
+            if (!weekdays.Contains(weekday.ToLower()))
+            {
+                Console.WriteLine("Correct weekday required. [  monday / tuesday / wednesday / thursday / friday / saturday / sunday ]");
+                isWeekday = false;
+            }
+
+            return isWeekday;
+        }
+
+        private static bool CheckMonTrigArgs(string dayInMonth)
+        {
+            bool isMonth = true;
+            int day;
+            if (!int.TryParse(dayInMonth, out day))
+            {
+                isMonth = false;
+                Console.WriteLine($"Correct number of Day required");
+            }
+
+            else if (day != -1 || (day < 1 || day > 31))
+            {
+                Console.WriteLine($"Correct number of Day required : -1 for Last day, 1 <= day <= 31");
+            }
+
+            return isMonth;
         }
     }
 }
