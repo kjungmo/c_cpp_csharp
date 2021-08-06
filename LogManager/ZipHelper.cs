@@ -19,12 +19,12 @@ namespace LogManager
         public ZipHelper(string[] cLArguments)
         {
             RootPath = cLArguments[1];
-            ZipLogDaysAfterLogged = DateTime.Today.AddDays(Convert.ToInt32(cLArguments[2]));
-            DeleteLogDaysAfterLogged = ZipLogDaysAfterLogged.AddDays(Convert.ToInt32(cLArguments[3]));
-            ZipImgDaysAfterLogged = DateTime.Today.AddDays(Convert.ToInt32(cLArguments[4]));
-            DeleteImgDaysAfterLogged = ZipImgDaysAfterLogged.AddDays(Convert.ToInt32(cLArguments[5]));
-            ZipCsvDaysAfterLogged = DateTime.Today.AddDays(Convert.ToInt32(cLArguments[6]));
-            DeleteCsvDaysAfterLogged = ZipCsvDaysAfterLogged.AddDays(Convert.ToInt32(cLArguments[7]));
+            ZipLogDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(cLArguments[2]));
+            DeleteLogDaysAfterLogged = ZipLogDaysAfterLogged.AddDays(-Convert.ToInt32(cLArguments[3]));
+            ZipImgDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(cLArguments[4]));
+            DeleteImgDaysAfterLogged = ZipImgDaysAfterLogged.AddDays(-Convert.ToInt32(cLArguments[5]));
+            ZipCsvDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(cLArguments[6]));
+            DeleteCsvDaysAfterLogged = ZipCsvDaysAfterLogged.AddDays(-Convert.ToInt32(cLArguments[7]));
         }
         public void UpdateZipFileEntries(ZipArchive archive)
         {

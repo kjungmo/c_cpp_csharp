@@ -45,25 +45,28 @@ namespace LogManager
             DeleteImgDaysAfterLogged = Convert.ToInt32(cLArguments[5]);
             ZipCsvDaysAfterLogged = Convert.ToInt32(cLArguments[6]);
             DeleteCsvDaysAfterLogged = Convert.ToInt32(cLArguments[7]);
-            if (DateTime.TryParseExact(cLArguments[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
+            if (cLArguments.Length > 8)
+            {
+                if (DateTime.TryParseExact(cLArguments[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
                     System.Globalization.DateTimeStyles.None, out DateTime convertedStartTime))
-            {
-                StartTime = convertedStartTime;
-            }
-            Interval = cLArguments[9].ToLower();
-            if (Interval == "weekly")
-            {
-                if (cLArguments.Length == 11)
                 {
-                    WeekDay = cLArguments[10];
+                    StartTime = convertedStartTime;
                 }
-            }
-            else if (Interval == "monthly")
-            {
-                if (cLArguments.Length == 11)
+                Interval = cLArguments[9].ToLower();
+                if (Interval == "weekly")
                 {
-                    string theDay = cLArguments[10];
-                    DayInMonth = Convert.ToInt32(theDay);
+                    if (cLArguments.Length == 11)
+                    {
+                        WeekDay = cLArguments[10];
+                    }
+                }
+                else if (Interval == "monthly")
+                {
+                    if (cLArguments.Length == 11)
+                    {
+                        string theDay = cLArguments[10];
+                        DayInMonth = Convert.ToInt32(theDay);
+                    }
                 }
             }
         }
