@@ -41,41 +41,27 @@ namespace LogManager
                 switch (mode)
                 {
                     case "schedule_zip":
+                    case "schedule_no_zip":
                         TaskSchedulerManager.FillTaskScheduleArgs(args);
-                        TaskSchedulerManager.Mode = "zip";
+
+                        if (mode == "schedule_zip")
+                            TaskSchedulerManager.Mode = "zip";
+
+                        else 
+                            TaskSchedulerManager.Mode = "no_zip";
+
                         TaskSchedulerManager.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "zip":
-                        ZipHelper.FillLogManagerArgs(args);
                         List<string> temp = new List<string>();
-                        string zipFilePath = Path.Combine(ZipHelper.RootPath, "LOG.zip");
-
-                        if (!File.Exists(zipFilePath))
-                        {
-                            try
-                            {
-                                var myfile = File.Create(zipFilePath);
-                                myfile.Close();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine($"{e.Message} \nUnable to create zipfile");
-                            }
-                        }
-
-                        using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
+                        ZipHelper.FillLogManagerArgs(args);
+                        using (ZipArchive archive = ZipFile.Open(CreateZipFile(ZipHelper.RootPath, "LOG"), ZipArchiveMode.Update))
                         {
                             ZipHelper.UpdateZipFileEntries(archive);
                             ZipHelper.SortLoggedFiles(temp, archive);
                         }
                         Console.WriteLine("Management Success.");
-                        break;
-
-                    case "schedule_no_zip":
-                        TaskSchedulerManager.FillTaskScheduleArgs(args);
-                        TaskSchedulerManager.Mode = "zip";
-                        TaskSchedulerManager.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "no_zip":
@@ -299,6 +285,25 @@ namespace LogManager
             }
 
             return isMonth;
+        }
+
+        private static string CreateZipFile(string rootPath, string zipfileName)
+        {
+            string zipFilePath = Path.Combine(rootPath, string.Concat(zipfileName, ".zip"));
+
+            if (!File.Exists(zipFilePath))
+            {
+                try
+                {
+                    var myfile = File.Create(zipFilePath);
+                    myfile.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"{e.Message} \nUnable to create zipfile");
+                }
+            }
+            return zipFilePath;
         }
     }
 }
