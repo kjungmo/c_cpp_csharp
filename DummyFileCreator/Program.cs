@@ -29,9 +29,8 @@ namespace DummyFileCreator
 			string foldername = Console.ReadLine();
 			Console.WriteLine($"Input folder name : {foldername}");
 			string folder = Path.Combine(@"E:\", foldername);
+
 			string logPath = Path.Combine(folder, "LOG");
-			string ngPath = Path.Combine(folder, "NG");
-			string okPath = Path.Combine(folder, "OK");
 			string csvPath = Path.Combine(folder, "VALUES");
 
 			if (!Directory.Exists(logPath))
@@ -47,53 +46,8 @@ namespace DummyFileCreator
 			}
 			Console.WriteLine("LOG fertig");
 
-			if (!Directory.Exists(ngPath))
-			{
-				Directory.CreateDirectory(ngPath);
-			}
-			for (int i = 0; i < convertedDays; i++)
-			{
-				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
-				string folderpath = Path.Combine(ngPath, datetime);
-				string carPath = Path.Combine(folderpath, "CN7");
-				if (!Directory.Exists(folderpath))
-				{
-					Directory.CreateDirectory(folderpath);
-				}
-				if (!Directory.Exists(carPath))
-				{
-					Directory.CreateDirectory(carPath);
-				}
-				for (int j = 0; j < 15; j++)
-				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 200, 200);
-				}
-			}
-			Console.WriteLine("NG fertig");
-
-			if (!Directory.Exists(okPath))
-			{
-				Directory.CreateDirectory(okPath);
-			}
-			for (int i = 0; i < convertedDays; i++)
-			{
-				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
-				string folderpath = Path.Combine(okPath, datetime);
-				string carPath = Path.Combine(folderpath, "CN7");
-				if (!Directory.Exists(folderpath))
-				{
-					Directory.CreateDirectory(folderpath);
-				}
-				if (!Directory.Exists(carPath))
-				{
-					Directory.CreateDirectory(carPath);
-				}
-				for (int j = 0; j < 15; j++)
-				{
-					GenerateDummyJpegAt(Path.Combine(carPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 200, 200);
-				}
-			}
-			Console.WriteLine("OK fertig");
+			CreateDummyImageFilesByFolder(folder, "NG", convertedDays);
+			CreateDummyImageFilesByFolder(folder, "OK", convertedDays);
 
             if (!Directory.Exists(csvPath))
             {
@@ -121,6 +75,40 @@ namespace DummyFileCreator
 
 			Console.WriteLine("VALUES fertig");
 			Console.ReadKey();
+		}
+
+		private static void CreateDummyImageFilesByFolder(string sourcePath, string folderName, int convertedDays)
+        {
+			string folderPath = Path.Combine(sourcePath, folderName);
+			if (!Directory.Exists(folderPath))
+			{
+				Directory.CreateDirectory(folderPath);
+			}
+			for (int i = 0; i < convertedDays; i++)
+			{
+				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
+				string folderpath = Path.Combine(folderPath, datetime);
+				string carPath = Path.Combine(folderpath, "CN7");
+				string taskPath = Path.Combine(carPath, "FineLocalizer");
+				if (!Directory.Exists(folderpath))
+				{
+					Directory.CreateDirectory(folderpath);
+				}
+				if (!Directory.Exists(carPath))
+				{
+					Directory.CreateDirectory(carPath);
+				}
+				if (!Directory.Exists(taskPath))
+				{
+					Directory.CreateDirectory(taskPath);
+				}
+				for (int j = 0; j < 15; j++)
+				{
+					GenerateDummyJpegAt(Path.Combine(taskPath, j.ToString() + "." + ImageFormat.Png.ToString()), "Captured Window", 200, 200);
+				}
+			}
+			Console.WriteLine($"{folderName} fertig");
+
 		}
 
 		private static void GenerateDummyJpegAt(string outputPath, string nameToEmbed, int width, int height)
