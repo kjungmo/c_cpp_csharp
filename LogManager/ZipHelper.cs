@@ -7,33 +7,35 @@ using System.Linq;
 
 namespace LogManager
 {
-    public class ZipHelper
+    public static class ZipHelper
     {
-        public string RootPath { get; set; }
-        public DateTime ZipLogDaysAfterLogged { get; set; }
-        public DateTime DeleteLogDaysAfterLogged { get; set; }
-        public DateTime ZipImgDaysAfterLogged { get; set; }
-        public DateTime DeleteImgDaysAfterLogged { get; set; }
-        public DateTime ZipCsvDaysAfterLogged { get; set; }
-        public DateTime DeleteCsvDaysAfterLogged { get; set; }
-        public ZipHelper(string[] cLArguments)
+        public static string RootPath { get; set; }
+        public static DateTime ZipLogDaysAfterLogged { get; set; }
+        public static DateTime DeleteLogDaysAfterLogged { get; set; }
+        public static DateTime ZipImgDaysAfterLogged { get; set; }
+        public static DateTime DeleteImgDaysAfterLogged { get; set; }
+        public static DateTime ZipCsvDaysAfterLogged { get; set; }
+        public static DateTime DeleteCsvDaysAfterLogged { get; set; }
+
+        public static void FillLogManagerArgs(string[] arguments)
         {
-            RootPath = cLArguments[1];
-            ZipLogDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(cLArguments[2]));
-            DeleteLogDaysAfterLogged = ZipLogDaysAfterLogged.AddDays(-Convert.ToInt32(cLArguments[3]));
-            ZipImgDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(cLArguments[4]));
-            DeleteImgDaysAfterLogged = ZipImgDaysAfterLogged.AddDays(-Convert.ToInt32(cLArguments[5]));
-            ZipCsvDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(cLArguments[6]));
-            DeleteCsvDaysAfterLogged = ZipCsvDaysAfterLogged.AddDays(-Convert.ToInt32(cLArguments[7]));
+            RootPath = arguments[1];
+            ZipLogDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(arguments[2]));
+            DeleteLogDaysAfterLogged = ZipLogDaysAfterLogged.AddDays(-Convert.ToInt32(arguments[3]));
+            ZipImgDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(arguments[4]));
+            DeleteImgDaysAfterLogged = ZipImgDaysAfterLogged.AddDays(-Convert.ToInt32(arguments[5]));
+            ZipCsvDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(arguments[6]));
+            DeleteCsvDaysAfterLogged = ZipCsvDaysAfterLogged.AddDays(-Convert.ToInt32(arguments[7]));
         }
-        public void UpdateZipFileEntries(ZipArchive archive)
+
+        public static void UpdateZipFileEntries(ZipArchive archive)
         {
             UpdateZipFileLogEntries(archive);
             UpdateZipFileImageEntries(archive);
             UpdateZipFileCsvEntries(archive);
         }
 
-        private void UpdateZipFileLogEntries(ZipArchive archive)
+        private static void UpdateZipFileLogEntries(ZipArchive archive)
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("LOG"))
@@ -44,17 +46,17 @@ namespace LogManager
             }
         }
 
-        private bool CheckDueDate(DateTime setDate, DateTime fileDate)
+        private static bool CheckDueDate(DateTime setDate, DateTime fileDate)
         {
             return DateTime.Compare(setDate.Date, fileDate.Date) >= 0;
         }
 
-        private DateTime ParseFilenameToDateTime(string fileName, string pattern = "yyyy-MM-dd")
+        private static DateTime ParseFilenameToDateTime(string fileName, string pattern = "yyyy-MM-dd")
         {
             return ParseFoldernameToDateTime(fileName.Substring(0, pattern.Length), pattern);
         }
 
-        private void UpdateZipFileImageEntries(ZipArchive archive)
+        private static void UpdateZipFileImageEntries(ZipArchive archive)
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
@@ -64,12 +66,12 @@ namespace LogManager
                 archive.GetEntry(file.FullName).Delete();
             }
         }
-        private DateTime ParseImgArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
+        private static DateTime ParseImgArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
         {
             return ParseFoldernameToDateTime(folderName.Substring(3, pattern.Length));
         }
 
-        private void UpdateZipFileCsvEntries(ZipArchive archive)
+        private static void UpdateZipFileCsvEntries(ZipArchive archive)
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("VALUES"))
@@ -80,19 +82,19 @@ namespace LogManager
             }
         }
 
-        private DateTime ParseCsvArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
+        private static DateTime ParseCsvArchiveFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
         {
             return ParseFoldernameToDateTime(folderName.Substring(7, pattern.Length));
         }
 
-        public void SortLoggedFiles(List<string> fileList = null, ZipArchive archive = null)
+        public static void SortLoggedFiles(List<string> fileList = null, ZipArchive archive = null)
         {
             SortLogFiles(archive);
             SortImgFiles(fileList, archive);
             SortCsvFiles(fileList, archive);
         }
 
-        private void SortLogFiles(ZipArchive archive)
+        private static void SortLogFiles(ZipArchive archive)
         {
             foreach (var file in new DirectoryInfo(Path.Combine(RootPath, "LOG"))
             .GetFileSystemInfos()
@@ -110,13 +112,13 @@ namespace LogManager
             }
         }
 
-        private void CompressFileIntoZipFile(string sourcePath, FileSystemInfo file, ZipArchive archive)
+        private static void CompressFileIntoZipFile(string sourcePath, FileSystemInfo file, ZipArchive archive)
         {
             archive.CreateEntryFromFile(file.FullName, file.FullName.Substring(sourcePath.Length), CompressionLevel.Optimal);
             File.Delete(file.FullName);
         }
 
-        private bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
+        private static bool DeleteFileAfterDelDate(DateTime deleteDate, FileSystemInfo file)
         {
             if (CheckDueDate(deleteDate, ParseFilenameToDateTime(file.Name)))
             {
@@ -126,7 +128,7 @@ namespace LogManager
             return false;
         }
 
-        private void SortImgFiles(List<string> temp, ZipArchive archive)
+        private static void SortImgFiles(List<string> temp, ZipArchive archive)
         {
             List<string> imgFolders = new List<string> { "OK", "NG" };
             foreach (var folder in imgFolders)
@@ -148,7 +150,7 @@ namespace LogManager
             }
         }
 
-        private DateTime ParseFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
+        private static DateTime ParseFoldernameToDateTime(string folderName, string pattern = "yyyyMMdd")
         {
             return DateTime.TryParseExact(
                 folderName, pattern,
@@ -158,7 +160,7 @@ namespace LogManager
                 : DateTime.Today;
         }
 
-        private void CompressFolderIntoZipFile(string sourcePath, FileSystemInfo folderName,
+        private static void CompressFolderIntoZipFile(string sourcePath, FileSystemInfo folderName,
             List<string> compressable, ZipArchive archive)
         {
             compressable = GetFiles(folderName.FullName, ref compressable);
@@ -170,7 +172,7 @@ namespace LogManager
             Directory.Delete(folderName.FullName, true);
         }
 
-        private List<string> GetFiles(string rootPath, ref List<string> fileLists)
+        private static List<string> GetFiles(string rootPath, ref List<string> fileLists)
         {
             if ((File.GetAttributes(rootPath) & FileAttributes.Directory) == FileAttributes.Directory)
             {
@@ -194,7 +196,7 @@ namespace LogManager
             return fileLists;
         }
 
-        private void AddToFileList(string rootPath, ref List<string> fileLists)
+        private static void AddToFileList(string rootPath, ref List<string> fileLists)
         {
             var fileInfo = new FileInfo(rootPath);
             if (fileInfo.Extension == ".log"
@@ -203,7 +205,7 @@ namespace LogManager
                 fileLists.Add(fileInfo.FullName);
         }
 
-        private bool DeleteFolderAfterDelDate(DateTime deleteDate, FileSystemInfo directory)
+        private static bool DeleteFolderAfterDelDate(DateTime deleteDate, FileSystemInfo directory)
         {
             if (CheckDueDate(deleteDate, ParseFoldernameToDateTime(directory.Name)))
             {
@@ -213,7 +215,7 @@ namespace LogManager
             return false;
         }
 
-        private void SortCsvFiles(List<string> temp, ZipArchive archive)
+        private static void SortCsvFiles(List<string> temp, ZipArchive archive)
         {
             foreach (var dir in new DirectoryInfo(Path.Combine(RootPath, "VALUES"))
             .GetFileSystemInfos()

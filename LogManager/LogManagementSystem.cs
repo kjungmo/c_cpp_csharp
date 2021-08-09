@@ -37,19 +37,19 @@ namespace LogManager
 
             if (CheckArgsValidity(args))
             {
-                TaskSchedulerManager tScheduler = new TaskSchedulerManager(args);
-                ZipHelper zHelper = new ZipHelper(args);
                 string mode = args[0].ToLower();
                 switch (mode)
                 {
                     case "schedule_zip":
-                        tScheduler.Mode = "zip";
-                        tScheduler.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                        TaskSchedulerManager.FillTaskScheduleArgs(args);
+                        TaskSchedulerManager.Mode = "zip";
+                        TaskSchedulerManager.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "zip":
+                        ZipHelper.FillLogManagerArgs(args);
                         List<string> temp = new List<string>();
-                        string zipFilePath = Path.Combine(zHelper.RootPath, "LOG.zip");
+                        string zipFilePath = Path.Combine(ZipHelper.RootPath, "LOG.zip");
 
                         if (!File.Exists(zipFilePath))
                         {
@@ -66,32 +66,34 @@ namespace LogManager
 
                         using (ZipArchive archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Update))
                         {
-                            zHelper.UpdateZipFileEntries(archive);
-                            zHelper.SortLoggedFiles(temp, archive);
+                            ZipHelper.UpdateZipFileEntries(archive);
+                            ZipHelper.SortLoggedFiles(temp, archive);
                         }
                         Console.WriteLine("Management Success.");
                         break;
 
                     case "schedule_no_zip":
-                        tScheduler.Mode = "no_zip";
-                        tScheduler.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                        TaskSchedulerManager.FillTaskScheduleArgs(args);
+                        TaskSchedulerManager.Mode = "zip";
+                        TaskSchedulerManager.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "no_zip":
-                        zHelper.SortLoggedFiles();
+                        ZipHelper.FillLogManagerArgs(args);
+                        ZipHelper.SortLoggedFiles();
                         break;
 
                     case "schedule_delete":
-                        if (!string.IsNullOrEmpty(tScheduler.CheckAlreadyRegistered()))
+                        if (!string.IsNullOrEmpty(TaskSchedulerManager.CheckAlreadyRegistered()))
                         {
-                            tScheduler.DeleteTaskSchedule();
+                            TaskSchedulerManager.DeleteTaskSchedule();
                             Console.WriteLine("Successfully deleted!");
                         }
                         Console.WriteLine("No Scheduled LogManager to delete.");
                         break;
 
                     case "schedule_load":
-                        Console.WriteLine($"\nFound LogManager's Description: {tScheduler.CheckAlreadyRegistered() ?? "None"}");
+                        Console.WriteLine($"\nFound LogManager's Description: {TaskSchedulerManager.CheckAlreadyRegistered() ?? "None"}");
                         break;
                 }
             }
