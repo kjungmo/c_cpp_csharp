@@ -34,7 +34,6 @@ namespace LogManager
             // |                                                                                                                       |
             // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-
             if (CheckArgsValidity(args))
             {
                 string mode = args[0].ToLower();
@@ -43,20 +42,19 @@ namespace LogManager
                     case "schedule_zip":
                     case "schedule_no_zip":
                         TaskSchedulerManager.FillTaskScheduleArgs(args);
-
                         if (mode == "schedule_zip")
                             TaskSchedulerManager.Mode = "zip";
-
-                        else 
+                        else
                             TaskSchedulerManager.Mode = "no_zip";
-
                         TaskSchedulerManager.RegisterTaskScheduler(System.Reflection.Assembly.GetExecutingAssembly().Location);
                         break;
 
                     case "zip":
-                        List<string> temp = new List<string>();
                         ZipHelper.FillLogManagerArgs(args);
-                        using (ZipArchive archive = ZipFile.Open(CreateZipFile(ZipHelper.RootPath, "LOG"), ZipArchiveMode.Update))
+                        List<string> temp = new List<string>();
+
+                        using (ZipArchive archive =
+                            ZipFile.Open(ZipHelper.CreateZipArchivePath(ZipHelper.RootPath, "LOG"), ZipArchiveMode.Update))
                         {
                             ZipHelper.UpdateZipFileEntries(archive);
                             ZipHelper.SortLoggedFiles(temp, archive);
@@ -144,13 +142,12 @@ namespace LogManager
 
         private static bool CheckLogPath(string rootPath)
         {
-            bool isPath = true;
             if (!Directory.Exists(rootPath))
             {
                 Console.WriteLine("Root path does not exist");
-                isPath = false;
+                return false;
             }
-            return isPath;
+            return true;
         }
 
         private static bool CheckSixInputDays(
@@ -161,12 +158,12 @@ namespace LogManager
 
             Dictionary<string, string> days = new Dictionary<string, string>()
             {
-                [day1] = "zipLog",
-                [day2] = "delLog",
-                [day3] = "zipImg",
-                [day4] = "delImg",
-                [day5] = "zipCsv",
-                [day6] = "delCsv",
+                [day1] = "Zip Days for Log",
+                [day2] = "Delete Days for Log",
+                [day3] = "Zip Days for Img",
+                [day4] = "Delete Days for Img",
+                [day5] = "Zip Days for Csv",
+                [day6] = "Delete Days for Csv",
             };
 
             foreach (KeyValuePair<string, string> item in days)
@@ -177,7 +174,6 @@ namespace LogManager
                     return false;
                 }
             }
-
             return true;
         }
 
@@ -231,7 +227,6 @@ namespace LogManager
                     return false;
                 }
             }
-
             return true;
         }
 
@@ -254,7 +249,6 @@ namespace LogManager
 
         private static bool CheckWeekTrigArgs(string weekday)
         {
-            bool isWeekday = true;
             List<string> weekdays = new List<string>
             {
                 "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
@@ -263,47 +257,29 @@ namespace LogManager
             if (!weekdays.Contains(weekday.ToLower()))
             {
                 Console.WriteLine("Correct weekday required. [  monday / tuesday / wednesday / thursday / friday / saturday / sunday ]");
-                isWeekday = false;
+                return false;
             }
-
-            return isWeekday;
+            return true;
         }
 
         private static bool CheckMonTrigArgs(string dayInMonth)
         {
-            bool isMonth = true;
-            int day;
-            if (!int.TryParse(dayInMonth, out day))
+            bool isRightDay = false;
+            if (!int.TryParse(dayInMonth, out _))
             {
-                isMonth = false;
                 Console.WriteLine($"Correct number of Day required");
+                return isRightDay;
             }
-
-            else if (day != -1 || (day < 1 || day > 31))
+            else if (int.TryParse(dayInMonth, out int day))
             {
-                Console.WriteLine($"Correct number of Day required : -1 for Last day, 1 <= day <= 31");
-            }
-
-            return isMonth;
-        }
-
-        private static string CreateZipFile(string rootPath, string zipfileName)
-        {
-            string zipFilePath = Path.Combine(rootPath, string.Concat(zipfileName, ".zip"));
-
-            if (!File.Exists(zipFilePath))
-            {
-                try
+                if ((day != -1) || (day < 1 || day > 31))
                 {
-                    var myfile = File.Create(zipFilePath);
-                    myfile.Close();
+                    Console.WriteLine($"Correct number of Day required : -1 for Last day, 1 <= day <= 31");
+                    return isRightDay;
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"{e.Message} \nUnable to create zipfile");
-                }
+                isRightDay = true;
             }
-            return zipFilePath;
+            return isRightDay;
         }
     }
 }
