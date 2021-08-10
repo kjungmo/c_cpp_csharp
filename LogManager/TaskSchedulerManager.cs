@@ -92,18 +92,6 @@ namespace LogManager
                     CreateDailyTrigger());
         }
 
-        private static void AddWeeklyTaskSchedule(string exeFileDir)
-        {
-            AddTaskSchedule(CreateExeAction(exeFileDir),
-                    CreateWeeklyTrigger(Weekday));
-        }
-
-        private static void AddMonthlyTaskSchedule(string exeFileDir, int selectADayInMonth = 1)
-        {
-            AddTaskSchedule(CreateExeAction(exeFileDir),
-                    CreateMonthlyTrigger(selectADayInMonth));
-        }
-
         private static void AddTaskSchedule(ExecAction action, Trigger trigger)
         {
             TaskDefinition taskDefinition = TaskService.Instance.NewTask();
@@ -112,53 +100,6 @@ namespace LogManager
             taskDefinition.Actions.Add(action);
             taskDefinition.RegistrationInfo.Description = $"{action.Arguments} {trigger.StartBoundary:HH:mm}";
             TaskService.Instance.RootFolder.RegisterTaskDefinition(TaskScheduleName, taskDefinition);
-        }
-
-        public static System.Threading.Tasks.Task RegisterTaskSchedulerAsync(string exeFileDir)
-        {
-            return System.Threading.Tasks.Task.Run(() =>
-            {
-                switch (Interval)
-                {
-                    case "daily":
-                        System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
-                        CreateDailyTrigger())
-                    );
-                        break;
-                    case "weekly":
-                        System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
-                        CreateWeeklyTrigger(Weekday))
-                    );
-                        break;
-                    case "monthly":
-                        System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
-                        CreateMonthlyTrigger(DayInMonth))
-                    );
-                        break;
-                }
-            }
-            );
-        }
-
-        public static System.Threading.Tasks.Task AddDailyTaskScheduleAsync(string exeFileDir)
-        {
-            return System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
-                    CreateDailyTrigger())
-                );
-        }
-
-        public static System.Threading.Tasks.Task AddWeeklyTaskScheduleAsync(string exeFileDir)
-        {
-            return System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
-                    CreateWeeklyTrigger(Weekday))
-                );
-        }
-
-        public static System.Threading.Tasks.Task AddMonthlyTaskScheduleAsync(string exeFileDir)
-        {
-            return System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
-                    CreateMonthlyTrigger(DayInMonth))
-                );
         }
 
         private static ExecAction CreateExeAction(string exeFileDir)
@@ -185,6 +126,12 @@ namespace LogManager
             return dailyTrigger;
         }
 
+        private static void AddWeeklyTaskSchedule(string exeFileDir)
+        {
+            AddTaskSchedule(CreateExeAction(exeFileDir),
+                    CreateWeeklyTrigger(Weekday));
+        }
+
         private static WeeklyTrigger CreateWeeklyTrigger(string weekday)
         {
             WeeklyTrigger weeklyTrigger = new WeeklyTrigger
@@ -199,6 +146,12 @@ namespace LogManager
         private static DaysOfTheWeek SelectWeekday(string weekday)
         {
             return (DaysOfTheWeek)Enum.Parse(typeof(DaysOfTheWeek), weekday, true);
+        }
+
+        private static void AddMonthlyTaskSchedule(string exeFileDir)
+        {
+            AddTaskSchedule(CreateExeAction(exeFileDir),
+                    CreateMonthlyTrigger(DayInMonth));
         }
 
         private static MonthlyTrigger CreateMonthlyTrigger(int dayInMonth)
@@ -220,6 +173,32 @@ namespace LogManager
                 monthlyTrigger.RunOnLastDayOfMonth = false;
             }
             return monthlyTrigger;
+        }
+
+        public static System.Threading.Tasks.Task RegisterTaskSchedulerAsync(string exeFileDir)
+        {
+            return System.Threading.Tasks.Task.Run(() =>
+            {
+                switch (Interval)
+                {
+                    case "daily":
+                        System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
+                        CreateDailyTrigger())
+                    );
+                        break;
+                    case "weekly":
+                        System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
+                        CreateWeeklyTrigger(Weekday))
+                    );
+                        break;
+                    case "monthly":
+                        System.Threading.Tasks.Task.Run(() => AddTaskSchedule(CreateExeAction(exeFileDir),
+                        CreateMonthlyTrigger(DayInMonth))
+                    );
+                        break;
+                }
+            }
+            );
         }
 
         public static void DeleteTaskSchedule()
