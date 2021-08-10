@@ -10,22 +10,41 @@ namespace LogManager
     public static class ZipHelper
     {
         public static string RootPath { get; set; }
-        public static DateTime ZipLogDaysAfterLogged { get; set; }
-        public static DateTime DeleteLogDaysAfterLogged { get; set; }
-        public static DateTime ZipImgDaysAfterLogged { get; set; }
-        public static DateTime DeleteImgDaysAfterLogged { get; set; }
-        public static DateTime ZipCsvDaysAfterLogged { get; set; }
-        public static DateTime DeleteCsvDaysAfterLogged { get; set; }
+        public static DateTime ZipDaysLog { get; set; }
+        public static DateTime DeleteDaysLog { get; set; }
+        public static DateTime ZipDaysImg { get; set; }
+        public static DateTime DeleteDaysImg { get; set; }
+        public static DateTime ZipDaysCsv { get; set; }
+        public static DateTime DeleteDaysCsv { get; set; }
 
         public static void FillLogManagerArgs(string[] arguments)
         {
             RootPath = arguments[1];
-            ZipLogDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(arguments[2]));
-            DeleteLogDaysAfterLogged = ZipLogDaysAfterLogged.AddDays(-Convert.ToInt32(arguments[3]));
-            ZipImgDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(arguments[4]));
-            DeleteImgDaysAfterLogged = ZipImgDaysAfterLogged.AddDays(-Convert.ToInt32(arguments[5]));
-            ZipCsvDaysAfterLogged = DateTime.Today.AddDays(-Convert.ToInt32(arguments[6]));
-            DeleteCsvDaysAfterLogged = ZipCsvDaysAfterLogged.AddDays(-Convert.ToInt32(arguments[7]));
+            ZipDaysLog = DateTime.Today.AddDays(-Convert.ToInt32(arguments[2]));
+            DeleteDaysLog = ZipDaysLog.AddDays(-Convert.ToInt32(arguments[3]));
+            ZipDaysImg = DateTime.Today.AddDays(-Convert.ToInt32(arguments[4]));
+            DeleteDaysImg = ZipDaysImg.AddDays(-Convert.ToInt32(arguments[5]));
+            ZipDaysCsv = DateTime.Today.AddDays(-Convert.ToInt32(arguments[6]));
+            DeleteDaysCsv = ZipDaysCsv.AddDays(-Convert.ToInt32(arguments[7]));
+        }
+
+        public static string CreateZipArchivePath(string rootPath, string zipfileName)
+        {
+            string zipArchivePath = Path.Combine(rootPath, string.Concat(zipfileName, ".zip"));
+            if (!File.Exists(zipArchivePath))
+            {
+                try
+                {
+                    var myfile = File.Create(zipArchivePath);
+                    myfile.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"{e.Message} \nUnable to create zipfile");
+                    return "";
+                }
+            }
+            return zipArchivePath;
         }
 
         public static void UpdateZipFileEntries(ZipArchive archive)
@@ -39,7 +58,7 @@ namespace LogManager
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("LOG"))
-                .Where(x => CheckDueDate(DeleteLogDaysAfterLogged, ParseFilenameToDateTime(x.Name)))
+                .Where(x => CheckDueDate(DeleteDaysLog, ParseFilenameToDateTime(x.Name)))
                 .ToList())
             {
                 archive.GetEntry(file.FullName).Delete();
@@ -60,7 +79,7 @@ namespace LogManager
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("OK") || x.FullName.Contains("NG"))
-                .Where(x => CheckDueDate(DeleteImgDaysAfterLogged, ParseImgArchiveFoldernameToDateTime(x.FullName)))
+                .Where(x => CheckDueDate(DeleteDaysImg, ParseImgArchiveFoldernameToDateTime(x.FullName)))
                 .ToList())
             {
                 archive.GetEntry(file.FullName).Delete();
@@ -75,7 +94,7 @@ namespace LogManager
         {
             foreach (var file in archive.Entries
                 .Where(x => x.FullName.Contains("VALUES"))
-                .Where(x => CheckDueDate(DeleteCsvDaysAfterLogged, ParseCsvArchiveFoldernameToDateTime(x.FullName)))
+                .Where(x => CheckDueDate(DeleteDaysCsv, ParseCsvArchiveFoldernameToDateTime(x.FullName)))
                 .ToList())
             {
                 archive.GetEntry(file.FullName).Delete();
@@ -98,10 +117,10 @@ namespace LogManager
         {
             foreach (var file in new DirectoryInfo(Path.Combine(RootPath, "LOG"))
             .GetFileSystemInfos()
-            .Where(f => CheckDueDate(ZipLogDaysAfterLogged, ParseFilenameToDateTime(f.Name)))
+            .Where(f => CheckDueDate(ZipDaysLog, ParseFilenameToDateTime(f.Name)))
             .ToList())
             {
-                if (DeleteFileAfterDelDate(DeleteLogDaysAfterLogged, file))
+                if (DeleteFileAfterDelDate(DeleteDaysLog, file))
                 {
                     continue;
                 }
@@ -135,10 +154,10 @@ namespace LogManager
             {
                 foreach (var dir in new DirectoryInfo(Path.Combine(RootPath, folder))
                 .GetFileSystemInfos()
-                .Where(f => CheckDueDate(ZipImgDaysAfterLogged, ParseFoldernameToDateTime(f.Name)))
+                .Where(f => CheckDueDate(ZipDaysImg, ParseFoldernameToDateTime(f.Name)))
                 .ToList())
                 {
-                    if (DeleteFolderAfterDelDate(DeleteImgDaysAfterLogged, dir))
+                    if (DeleteFolderAfterDelDate(DeleteDaysImg, dir))
                     {
                         continue;
                     }
@@ -219,10 +238,10 @@ namespace LogManager
         {
             foreach (var dir in new DirectoryInfo(Path.Combine(RootPath, "VALUES"))
             .GetFileSystemInfos()
-            .Where(f => CheckDueDate(ZipCsvDaysAfterLogged, ParseFoldernameToDateTime(f.Name)))
+            .Where(f => CheckDueDate(ZipDaysCsv, ParseFoldernameToDateTime(f.Name)))
             .ToList())
             {
-                if (DeleteFolderAfterDelDate(DeleteCsvDaysAfterLogged, dir))
+                if (DeleteFolderAfterDelDate(DeleteDaysCsv, dir))
                 {
                     continue;
                 }
