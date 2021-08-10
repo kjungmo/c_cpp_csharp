@@ -6,18 +6,19 @@ namespace LogManager
     public static class TaskSchedulerManager
     {
         private const string TaskScheduleName = "CogAplex Log Management System";
+        private static string _interval = "daily";
         private static string _weekday = "monday";
         private static int _dayInMonth = 1;
         public static string Mode { get; set; }
         public static string RootPath { get; set; }
-        public static int ZipLogDaysAfterLogged { get; set; }
-        public static int DeleteLogDaysAfterLogged { get; set; }
-        public static int ZipImgDaysAfterLogged { get; set; }
-        public static int DeleteImgDaysAfterLogged { get; set; }
-        public static int ZipCsvDaysAfterLogged { get; set; }
-        public static int DeleteCsvDaysAfterLogged { get; set; }
+        public static int ZipDaysLog { get; set; }
+        public static int DeleteDaysLog { get; set; }
+        public static int ZipDaysImg { get; set; }
+        public static int DeleteDaysImg { get; set; }
+        public static int ZipDaysCsv { get; set; }
+        public static int DeleteDaysCsv { get; set; }
         public static DateTime StartTime { get; set; }
-        public static string Interval { get; set; }
+        public static string Interval { get { return _interval; } set { _interval = value; } }
         public static string Weekday { get { return _weekday; } private set { _weekday = value; } }
         public static int DayInMonth { get { return _dayInMonth; } private set { _dayInMonth = value; } }
 
@@ -34,12 +35,12 @@ namespace LogManager
         {
             Mode = arguments[0];
             RootPath = arguments[1];
-            ZipLogDaysAfterLogged = Convert.ToInt32(arguments[2]);
-            DeleteLogDaysAfterLogged = Convert.ToInt32(arguments[3]);
-            ZipImgDaysAfterLogged = Convert.ToInt32(arguments[4]);
-            DeleteImgDaysAfterLogged = Convert.ToInt32(arguments[5]);
-            ZipCsvDaysAfterLogged = Convert.ToInt32(arguments[6]);
-            DeleteCsvDaysAfterLogged = Convert.ToInt32(arguments[7]);
+            ZipDaysLog = Convert.ToInt32(arguments[2]);
+            DeleteDaysLog = Convert.ToInt32(arguments[3]);
+            ZipDaysImg = Convert.ToInt32(arguments[4]);
+            DeleteDaysImg = Convert.ToInt32(arguments[5]);
+            ZipDaysCsv = Convert.ToInt32(arguments[6]);
+            DeleteDaysCsv = Convert.ToInt32(arguments[7]);
             if (arguments.Length > 8)
             {
                 if (DateTime.TryParseExact(arguments[8], "HH:mm", System.Globalization.CultureInfo.InvariantCulture,
@@ -47,6 +48,9 @@ namespace LogManager
                 {
                     StartTime = convertedStartTime;
                 }
+            }
+            if (arguments.Length > 9)
+            {
                 Interval = arguments[9].ToLower();
                 if (Interval == "weekly")
                 {
@@ -80,17 +84,6 @@ namespace LogManager
                     AddMonthlyTaskSchedule(exeFileDir);
                     break;
             }
-
-        }
-
-        private static void AddTaskSchedule(ExecAction action, Trigger trigger)
-        {
-            TaskDefinition taskDefinition = TaskService.Instance.NewTask();
-            taskDefinition.RegistrationInfo.Author = "cogaplex@cogaplex.com";
-            taskDefinition.Triggers.Add(trigger);
-            taskDefinition.Actions.Add(action);
-            taskDefinition.RegistrationInfo.Description = $"{action.Arguments} {trigger.StartBoundary:HH:mm}";
-            TaskService.Instance.RootFolder.RegisterTaskDefinition(TaskScheduleName, taskDefinition);
         }
 
         private static void AddDailyTaskSchedule(string exeFileDir)
@@ -109,6 +102,16 @@ namespace LogManager
         {
             AddTaskSchedule(CreateExeAction(exeFileDir),
                     CreateMonthlyTrigger(selectADayInMonth));
+        }
+
+        private static void AddTaskSchedule(ExecAction action, Trigger trigger)
+        {
+            TaskDefinition taskDefinition = TaskService.Instance.NewTask();
+            taskDefinition.RegistrationInfo.Author = "cogaplex@cogaplex.com";
+            taskDefinition.Triggers.Add(trigger);
+            taskDefinition.Actions.Add(action);
+            taskDefinition.RegistrationInfo.Description = $"{action.Arguments} {trigger.StartBoundary:HH:mm}";
+            TaskService.Instance.RootFolder.RegisterTaskDefinition(TaskScheduleName, taskDefinition);
         }
 
         public static System.Threading.Tasks.Task RegisterTaskSchedulerAsync(string exeFileDir)
@@ -165,9 +168,9 @@ namespace LogManager
                 Path = exeFileDir,
                 Arguments =
                 $"{Mode} {RootPath} " +
-                $"{ZipLogDaysAfterLogged} {DeleteLogDaysAfterLogged} " +
-                $"{ZipImgDaysAfterLogged} {DeleteImgDaysAfterLogged} " +
-                $"{ZipCsvDaysAfterLogged} {DeleteCsvDaysAfterLogged}",
+                $"{ZipDaysLog} {DeleteDaysLog} " +
+                $"{ZipDaysImg} {DeleteDaysImg} " +
+                $"{ZipDaysCsv} {DeleteDaysCsv}",
             };
             return CogAplex;
         }
@@ -216,7 +219,6 @@ namespace LogManager
                 monthlyTrigger.DaysOfMonth = new int[] { dayInMonth };
                 monthlyTrigger.RunOnLastDayOfMonth = false;
             }
-
             return monthlyTrigger;
         }
 
