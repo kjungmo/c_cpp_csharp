@@ -35,8 +35,8 @@ namespace LogManager
             {
                 try
                 {
-                    var myfile = File.Create(zipArchivePath);
-                    myfile.Close();
+                    var Zipfile = File.Create(zipArchivePath);
+                    Zipfile.Close();
                 }
                 catch (Exception e)
                 {
