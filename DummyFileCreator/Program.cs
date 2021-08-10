@@ -20,64 +20,42 @@ namespace DummyFileCreator
 			int convertedDays = Convert.ToInt32(userInputDays);
 
 			if (convertedDays <= 0 && 365 <= convertedDays)
-            {
+			{
 				Console.WriteLine("Invalid days input. 0 <= Days <= 365 ");
 				return;
-            }
+			}
 
 			Console.WriteLine("Log folder name : ");
 			string foldername = Console.ReadLine();
 			Console.WriteLine($"Input folder name : {foldername}");
 			string folder = Path.Combine(@"E:\", foldername);
+			
+			CreateDummyFilesByFolderLog(folder, "LOG", convertedDays);
+			CreateDummyFilesByFolderImage(folder, "NG", convertedDays);
+			CreateDummyFilesByFolderImage(folder, "OK", convertedDays);
+			CreateDummyFilesByFolderCsv(folder, "VALUES", convertedDays);
 
-			string logPath = Path.Combine(folder, "LOG");
-			string csvPath = Path.Combine(folder, "VALUES");
+			Console.ReadKey();
+		}
 
-			if (!Directory.Exists(logPath))
+		private static void CreateDummyFilesByFolderLog(string sourcePath, string folderName, int convertedDays)
+        {
+			string folderPath = Path.Combine(sourcePath, folderName);
+			if (!Directory.Exists(folderPath))
 			{
-				Directory.CreateDirectory(logPath);
+				Directory.CreateDirectory(folderPath);
 			}
 			for (int i = 0; i < convertedDays; i++)
 			{
 				string datetime = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
-				string filepath = Path.Combine(logPath, datetime + ".log");
+				string filepath = Path.Combine(folderPath, datetime + ".log");
 				using (StreamWriter sw = File.CreateText(filepath)) { }
 
 			}
-			Console.WriteLine("LOG fertig");
-
-			CreateDummyImageFilesByFolder(folder, "NG", convertedDays);
-			CreateDummyImageFilesByFolder(folder, "OK", convertedDays);
-
-            if (!Directory.Exists(csvPath))
-            {
-				Directory.CreateDirectory(csvPath);
-            }
-            for (int i = 0; i < convertedDays; i++)
-            {
-				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
-				string folderpath = Path.Combine(csvPath, datetime);
-				string carPath = Path.Combine(folderpath, "CN7");
-				if (!Directory.Exists(folderpath))
-				{
-					Directory.CreateDirectory(folderpath);
-				}
-				if (!Directory.Exists(carPath))
-				{
-					Directory.CreateDirectory(carPath);
-				}
-                for (int j = 0; j < 10; j++)
-                {
-					string filepath = Path.Combine(carPath, "values.csv");
-					using (StreamWriter sw = File.CreateText(filepath)) { }
-				}
-			}
-
-			Console.WriteLine("VALUES fertig");
-			Console.ReadKey();
+			Console.WriteLine($"{folderName} fertig");
 		}
 
-		private static void CreateDummyImageFilesByFolder(string sourcePath, string folderName, int convertedDays)
+		private static void CreateDummyFilesByFolderImage(string sourcePath, string folderName, int convertedDays)
         {
 			string folderPath = Path.Combine(sourcePath, folderName);
 			if (!Directory.Exists(folderPath))
@@ -108,7 +86,35 @@ namespace DummyFileCreator
 				}
 			}
 			Console.WriteLine($"{folderName} fertig");
+		}
 
+		private static void CreateDummyFilesByFolderCsv(string sourcePath, string folderName, int convertedDays)
+        {
+			string folderPath = Path.Combine(sourcePath, folderName);
+			if (!Directory.Exists(folderPath))
+			{
+				Directory.CreateDirectory(folderPath);
+			}
+			for (int i = 0; i < convertedDays; i++)
+			{
+				string datetime = DateTime.Today.AddDays(-i).ToString("yyyyMMdd");
+				string folderpath = Path.Combine(folderPath, datetime);
+				string carPath = Path.Combine(folderpath, "CN7");
+				if (!Directory.Exists(folderpath))
+				{
+					Directory.CreateDirectory(folderpath);
+				}
+				if (!Directory.Exists(carPath))
+				{
+					Directory.CreateDirectory(carPath);
+				}
+				for (int j = 0; j < 10; j++)
+				{
+					string filepath = Path.Combine(carPath, "values.csv");
+					using (StreamWriter sw = File.CreateText(filepath)) { }
+				}
+			}
+			Console.WriteLine($"{folderName} fertig");
 		}
 
 		private static void GenerateDummyJpegAt(string outputPath, string nameToEmbed, int width, int height)
