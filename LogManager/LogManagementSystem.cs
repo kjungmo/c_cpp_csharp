@@ -249,6 +249,7 @@ namespace LogManager
 
         private static bool CheckWeekTrigArgs(string weekday)
         {
+            bool rightWeekTrigger = true;
             List<string> weekdays = new List<string>
             {
                 "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
@@ -257,27 +258,25 @@ namespace LogManager
             if (!weekdays.Contains(weekday.ToLower()))
             {
                 Console.WriteLine("Correct weekday required. [  monday / tuesday / wednesday / thursday / friday / saturday / sunday ]");
-                return false;
+                rightWeekTrigger = false;
             }
-            return true;
+            return rightWeekTrigger;
         }
 
         private static bool CheckMonTrigArgs(string dayInMonth)
         {
             bool isRightDay = false;
-            if (!int.TryParse(dayInMonth, out _))
+            if (!int.TryParse(dayInMonth, out int day))
             {
                 Console.WriteLine($"Correct number of Day required");
-                return isRightDay;
             }
-            else if (int.TryParse(dayInMonth, out int day))
+            else
             {
-                if ((day != -1) || (day < 1 || day > 31))
+                if ((day == -1) || ( 1 <= day && day <= 31))
                 {
-                    Console.WriteLine($"Correct number of Day required : -1 for Last day, 1 <= day <= 31");
-                    return isRightDay;
+                    return !isRightDay;
                 }
-                isRightDay = true;
+                Console.WriteLine($"Correct number of Day required : -1 for Last day OR 1 <= day <= 31");
             }
             return isRightDay;
         }
