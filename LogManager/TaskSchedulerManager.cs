@@ -33,6 +33,7 @@ namespace LogManager
 
         public static void FillTaskScheduleArgs(string[] arguments)
         {
+            InitializeProperties();
             Mode = arguments[0];
             RootPath = arguments[1];
             ZipDaysLog = Convert.ToInt32(arguments[2]);
@@ -63,11 +64,17 @@ namespace LogManager
                 {
                     if (arguments.Length == 11)
                     {
-                        string theDay = arguments[10];
-                        DayInMonth = Convert.ToInt32(theDay);
+                        DayInMonth = Convert.ToInt32(arguments[10]);
                     }
                 }
             }
+        }
+
+        private static void InitializeProperties()
+        {
+            Interval = "daily";
+            Weekday = "monday";
+            DayInMonth = 1;
         }
 
         public static void RegisterTaskScheduler(string exeFileDir)
