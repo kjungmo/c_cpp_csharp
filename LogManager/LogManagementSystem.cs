@@ -219,14 +219,22 @@ namespace LogManager
                     return false;
                 }
             }
-
-            if (arguments[9] == "monthly" && arguments.Length == 11)
+            else if (arguments[9] == "monthly" && arguments.Length == 11)
             {
                 if (!CheckMonTrigArgs(arguments[10]))
                 {
                     return false;
                 }
             }
+            else
+            {
+                if (arguments.Length > 10)
+                {
+                    Console.WriteLine("Unnecessary Arguments for Daily Interval given.");
+                    return false;
+                }
+            }
+
             return true;
         }
 
