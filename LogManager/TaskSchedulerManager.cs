@@ -11,14 +11,14 @@ namespace LogManager
         private static int _dayInMonth = 1;
         public static string Mode { get; set; }
         public static string RootPath { get; set; }
-        public static int ZipDaysLog { get; set; }
-        public static int DeleteDaysLog { get; set; }
-        public static int ZipDaysImg { get; set; }
-        public static int DeleteDaysImg { get; set; }
-        public static int ZipDaysCsv { get; set; }
-        public static int DeleteDaysCsv { get; set; }
-        public static DateTime StartTime { get; set; }
-        public static string Interval { get { return _interval; } set { _interval = value; } }
+        public static int ZipDaysLog { get; private set; }
+        public static int DeleteDaysLog { get; private set; }
+        public static int ZipDaysImg { get; private set; }
+        public static int DeleteDaysImg { get; private set; }
+        public static int ZipDaysCsv { get; private set; }
+        public static int DeleteDaysCsv { get; private set; }
+        public static DateTime StartTime { get; private set; }
+        public static string Interval { get { return _interval; } private set { _interval = value; } }
         public static string Weekday { get { return _weekday; } private set { _weekday = value; } }
         public static int DayInMonth { get { return _dayInMonth; } private set { _dayInMonth = value; } }
 
