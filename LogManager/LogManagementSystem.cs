@@ -130,10 +130,7 @@ namespace LogManager
                 return false;
             }
 
-            if (!CheckSixInputDays(
-                arguments[2], arguments[3],
-                arguments[4], arguments[5],
-                arguments[6], arguments[7]))
+            if (!CheckSixInputDays(ExtractDays(arguments)))
             {
                 return false;
             }
@@ -150,20 +147,17 @@ namespace LogManager
             return true;
         }
 
-        private static bool CheckSixInputDays(
-            string day1, string day2,
-            string day3, string day4,
-            string day5, string day6)
+        private static bool CheckSixInputDays(string[] inputDays)
         {
 
             Dictionary<string, string> days = new Dictionary<string, string>()
             {
-                [day1] = "Zip Days for Log",
-                [day2] = "Delete Days for Log",
-                [day3] = "Zip Days for Img",
-                [day4] = "Delete Days for Img",
-                [day5] = "Zip Days for Csv",
-                [day6] = "Delete Days for Csv",
+                [inputDays[0]] = "Zip Days for Log",
+                [inputDays[1]] = "Delete Days for Log",
+                [inputDays[2]] = "Zip Days for Img",
+                [inputDays[3]] = "Delete Days for Img",
+                [inputDays[4]] = "Zip Days for Csv",
+                [inputDays[5]] = "Delete Days for Csv",
             };
 
             foreach (KeyValuePair<string, string> item in days)
@@ -175,6 +169,16 @@ namespace LogManager
                 }
             }
             return true;
+        }
+
+        private static string[] ExtractDays(string[] arguments)
+        {
+            return new string[] 
+            { 
+                arguments[2], arguments[3], 
+                arguments[4], arguments[5], 
+                arguments[6], arguments[7], 
+            };
         }
 
         private static bool CheckScheduleArgs(string[] arguments)
@@ -192,10 +196,7 @@ namespace LogManager
                 return false;
             }
 
-            if (!CheckSixInputDays(
-                arguments[2], arguments[3],
-                arguments[4], arguments[5],
-                arguments[6], arguments[7]))
+            if (!CheckSixInputDays(ExtractDays(arguments)))
             {
                 return false;
             }
