@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClient", "TcpClient\TcpC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServer", "TcpServer\TcpServer.csproj", "{61DC4C27-4522-4B46-827C-62A77292689E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingChecker", "PingChecker\PingChecker.csproj", "{4581AEA3-EDB9-4825-865B-EE2D2D3048C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{61DC4C27-4522-4B46-827C-62A77292689E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61DC4C27-4522-4B46-827C-62A77292689E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61DC4C27-4522-4B46-827C-62A77292689E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4581AEA3-EDB9-4825-865B-EE2D2D3048C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4581AEA3-EDB9-4825-865B-EE2D2D3048C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4581AEA3-EDB9-4825-865B-EE2D2D3048C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4581AEA3-EDB9-4825-865B-EE2D2D3048C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
