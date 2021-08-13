@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Timers;
+
 
 namespace TcpConnection
 {
@@ -14,16 +16,18 @@ namespace TcpConnection
         static void Main(string[] args)
         {
             Timer timer = new Timer();
-            timer.Interval = 10;
+            timer.Interval = Convert.ToInt32(ConfigurationManager.AppSettings["SENDTIME"]); ;
             timer.Elapsed += new ElapsedEventHandler(ElapsedTime);
+
+            Int32 port = Convert.ToInt32(ConfigurationManager.AppSettings["PORT"]);
+            string ipAddress = ConfigurationManager.AppSettings["IPADDRESS"];
+            
             try
             {
                 string strRecvMsg;
                 string strSendMsg;
 
-                string ipconfigIP = "192.168.0.12";
-
-                TcpClient sockClient = new TcpClient(ipconfigIP, 8240); //소켓생성,커넥트
+                TcpClient sockClient = new TcpClient(ipAddress, port);
                 NetworkStream networkstream = sockClient.GetStream();
                 StreamReader sr = new StreamReader(networkstream);
                 StreamWriter sw = new StreamWriter(networkstream);
@@ -35,6 +39,7 @@ namespace TcpConnection
 
                 while (TimeoutChecker)
                 {
+                    System.Threading.Thread.Sleep(2000);
                     strSendMsg = "Sending Sequential Number";
                     sw.WriteLine(strSendMsg);
                     sw.Flush();
@@ -50,7 +55,7 @@ namespace TcpConnection
 
                 Console.WriteLine("접속 종료!");
             }
-            catch (SocketException e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }

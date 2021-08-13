@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,24 +14,25 @@ namespace TcpServer
     {
         static void Main(string[] args)
         {
-            try
+
+            string strMsg;
+            Int32 port = Convert.ToInt32(ConfigurationManager.AppSettings["PORT"]);
+            int timeout = Convert.ToInt32(ConfigurationManager.AppSettings["RECEIVETIMEOUT"]);
+            TcpListener sockServer = new TcpListener(IPAddress.Any, port);
+            sockServer.Start();
+            while (true)
             {
-                string strMsg;
+                Console.WriteLine("Server 시작! Client 연결 대기중...");
+                TcpClient client = sockServer.AcceptTcpClient();
+                client.ReceiveTimeout = timeout;
+                Console.WriteLine("Client 접속성공!");
+
+                NetworkStream ns = client.GetStream();
                 
-                Int32 port = 8240;
-                TcpListener sockServer = new TcpListener(IPAddress.Any, port); //IP, Port
-                sockServer.Start();
-
-                while (true)
+                StreamReader sr = new StreamReader(ns);
+                StreamWriter sw = new StreamWriter(ns);
+                try
                 {
-                    Console.WriteLine("Server 시작! Client 연결 대기중...");
-                    TcpClient client = sockServer.AcceptTcpClient();//Accept
-                    Console.WriteLine("Client 접속성공!");
-
-                    NetworkStream ns = client.GetStream();
-                    StreamReader sr = new StreamReader(ns);
-                    StreamWriter sw = new StreamWriter(ns);
-
                     string welcome = "Server Connnect Success!";
                     sw.WriteLine(welcome);
                     sw.Flush();
@@ -43,19 +45,20 @@ namespace TcpServer
                             break;
                         }
                         Console.WriteLine(strMsg);
-
                     }
-
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+                finally
+                {
                     sw.Close();
                     sr.Close();
                     ns.Close();
                     client.Close();
                     Console.WriteLine("Client 연결 종료!");
                 }
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine(e.ToString());
             }
         }
     }
