@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TcpConnection
@@ -12,10 +13,10 @@ namespace TcpConnection
     public class CoPickTcpSocket : IDisposable
     {
         Socket _socket;
-        readonly string _host;
-        readonly int _port;
-        readonly uint _keepAliveInterval;
-        readonly uint _retryInterval;
+        string _host;
+        int _port;
+        uint _keepAliveInterval;
+        uint _retryInterval;
         bool _connected;
         public bool IsConnected { get { return _connected; } }
 
@@ -27,6 +28,49 @@ namespace TcpConnection
             _retryInterval = retryInterval;
         }
 
+        public int SendTimeOut
+        {
+            get
+            {
+                if (_connected == false)
+                {
+                    return Timeout.Infinite;
+                }
+                return (int)_socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout); 
+            }
+            set
+            {
+                if (_connected == false)
+                {
+                    return;
+                }
+
+                _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, value); 
+            }
+        }
+
+        public int ReceiveTimeout
+        {
+            get
+            {
+                if (_connected == false)
+                {
+                    return Timeout.Infinite;
+                }
+
+                return (int)_socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout); 
+            }
+            set
+            {
+                if (_connected == false)
+                {
+                    return;
+                } 
+                
+                _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, value); 
+            }
+        }
+
         public bool Connect()
         {
             try
@@ -34,13 +78,24 @@ namespace TcpConnection
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 _socket.Connect(_host, _port);
 
-                int size = Marshal.SizeOf((uint)0);
-                byte[] keepAlive = new byte[size * 3];
-                Buffer.BlockCopy(BitConverter.GetBytes((uint)1), 0, keepAlive, 0, size);
-                Buffer.BlockCopy(BitConverter.GetBytes(_keepAliveInterval), 0, keepAlive, 0, size);
-                Buffer.BlockCopy(BitConverter.GetBytes(_retryInterval), 0, keepAlive, 0, size);
+                //int size = Marshal.SizeOf((uint)0);
+                //byte[] keepAlive = new byte[size * 3];
+                //Buffer.BlockCopy(BitConverter.GetBytes((uint)1), 0, keepAlive, 0, size);
+                //Buffer.BlockCopy(BitConverter.GetBytes(_keepAliveInterval), 0, keepAlive, 0, size);
+                //Buffer.BlockCopy(BitConverter.GetBytes(_retryInterval), 0, keepAlive, 0, size);
 
-                _socket.IOControl(IOControlCode.KeepAliveValues, keepAlive, null);
+                //_socket.IOControl(IOControlCode.KeepAliveValues, keepAlive, null);
+
+                int size = sizeof(UInt32);
+                UInt32 on = 1;
+                UInt32 keepAliveInterval = 1000; //Send a packet once every 10 seconds.
+                UInt32 retryInterval = 500; //If no response, resend every second.
+                byte[] inArray = new byte[size * 3];
+                Array.Copy(BitConverter.GetBytes(on), 0, inArray, 0, size);
+                Array.Copy(BitConverter.GetBytes(keepAliveInterval), 0, inArray, size, size);
+                Array.Copy(BitConverter.GetBytes(retryInterval), 0, inArray, size * 2, size);
+
+                _socket.IOControl(IOControlCode.KeepAliveValues, inArray, null);
 
                 _connected = true;
 
@@ -100,23 +155,6 @@ namespace TcpConnection
 
             ConnectionLost();
         }
-
-        public int SendTimeOut
-        {
-            get
-            { return (int)_socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout); }
-            set
-            { _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, value); }
-        }
-
-        public int ReceiveTimeout
-        {
-            get
-            { return (int)_socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout); }
-            set
-            { _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, value); }
-        }
-
         public int Write(byte[] buffer)
         {
             if (_connected == false)

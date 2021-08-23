@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using CoPick;
 
 namespace TcpConnection
 {
@@ -51,17 +52,38 @@ namespace TcpConnection
                 return;
             }
 
-            CoPickTcpSocket tcpSocket = new CoPickTcpSocket(_ipAddress, port, keepAliveInterval, retryInterval)
-            {
-                SendTimeOut = sendTimeout,
-            };
+
+            byte[] buff = new byte[4];
+            TcpClient client = TimeOutSocket.Connect(_ipAddress, port, 1000);
+            NetworkStream ns = client.GetStream();
+
             while (true)
             {
-                byte[] buff = new byte[4];
-                Console.WriteLine("Reading...");
-                tcpSocket.Read(buff);
-                Console.WriteLine(tcpSocket.IsConnected);
+                ns.Write(buff, 0, buff.Length);
             }
+
+
+            //CoPickTcpSocket tcpSocket = new CoPickTcpSocket(_ipAddress, port, keepAliveInterval, retryInterval);
+            //while (true)
+            //{
+            //    System.Threading.Thread.Sleep(20);
+            //    Console.WriteLine($"Connection trial Starts : {DateTime.Now.ToString("HH:mm:ss:fff")}");
+            //    tcpSocket.Connect();
+            //    Console.WriteLine($"Connection Success : {DateTime.Now.ToString("HH:mm:ss:fff")}");
+            //    tcpSocket.SendTimeOut = sendTimeout;
+            //    while (tcpSocket.IsConnected)
+            //    {
+            //        byte[] buff = new byte[4];
+            //        System.Threading.Thread.Sleep(1000);
+            //        Console.WriteLine("Reading...");
+            //        Console.WriteLine($"Write buff : {DateTime.Now.ToString("HH:mm:ss:fff")}");
+            //        tcpSocket.Write(buff);
+            //        Console.WriteLine(tcpSocket.IsConnected);
+            //    }
+            //    tcpSocket.Close();
+            //    Console.WriteLine($"Connection ended : {DateTime.Now.ToString("HH:mm:ss:fff")}");
+            //}
+            
 
 
             //TcpClient client = null;
