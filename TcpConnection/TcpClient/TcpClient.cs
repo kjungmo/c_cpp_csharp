@@ -52,15 +52,19 @@ namespace TcpConnection
                 return;
             }
 
+            CoPickTcpSocket tcpSocket = new CoPickTcpSocket(_ipAddress, port, keepAliveInterval, retryInterval);
 
-            byte[] buff = new byte[4];
-            TcpClient client = TimeOutSocket.Connect(_ipAddress, port, 1000);
-            NetworkStream ns = client.GetStream();
+            tcpSocket.Connect(sendTimeout);
 
-            while (true)
-            {
-                ns.Write(buff, 0, buff.Length);
-            }
+
+            //byte[] buff = new byte[4];
+            //TcpClient client = TimeOutSocket.Connect(_ipAddress, port, 1000);
+            //NetworkStream ns = client.GetStream();
+
+            //while (true)
+            //{
+            //    ns.Write(buff, 0, buff.Length);
+            //}
 
 
             //CoPickTcpSocket tcpSocket = new CoPickTcpSocket(_ipAddress, port, keepAliveInterval, retryInterval);

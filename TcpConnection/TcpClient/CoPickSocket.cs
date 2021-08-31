@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TcpConnection
+namespace CoPick
 {
     public class CoPickTcpSocket : IDisposable
     {
@@ -18,6 +18,13 @@ namespace TcpConnection
         uint _keepAliveInterval;
         uint _retryInterval;
         bool _connected;
+        #region [[[[[[[ TimeoutSocket ]]]]]]]]
+        private bool _isConnectionSuccessful = false;
+        private Exception socketException;
+        private ManualResetEvent TimeoutObject = new ManualResetEvent(false);
+        #endregion
+
+
         public bool IsConnected { get { return _connected; } }
 
         public CoPickTcpSocket(string host, int port, uint keepAliveInterval, uint retryInterval)
@@ -71,32 +78,33 @@ namespace TcpConnection
             }
         }
 
-        public bool Connect()
+        public bool Connect(int timeoutMilSec)
         {
+            TimeoutObject.Reset();
+            socketException = null;
+
             try
             {
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                _socket.Connect(_host, _port);
+                //_socket.Connect(_host, _port);
+                _socket.BeginConnect(_host, _port, new AsyncCallback(CallBackMethod), _socket);
 
-                //int size = Marshal.SizeOf((uint)0);
-                //byte[] keepAlive = new byte[size * 3];
-                //Buffer.BlockCopy(BitConverter.GetBytes((uint)1), 0, keepAlive, 0, size);
-                //Buffer.BlockCopy(BitConverter.GetBytes(_keepAliveInterval), 0, keepAlive, 0, size);
-                //Buffer.BlockCopy(BitConverter.GetBytes(_retryInterval), 0, keepAlive, 0, size);
+                if (TimeoutObject.WaitOne(timeoutMilSec, false))
+                {
+                    if (_isConnectionSuccessful)
+                    {
 
-                //_socket.IOControl(IOControlCode.KeepAliveValues, keepAlive, null);
-
-                int size = sizeof(UInt32);
-                UInt32 on = 1;
-                UInt32 keepAliveInterval = 1000; //Send a packet once every 10 seconds.
-                UInt32 retryInterval = 500; //If no response, resend every second.
-                byte[] inArray = new byte[size * 3];
-                Array.Copy(BitConverter.GetBytes(on), 0, inArray, 0, size);
-                Array.Copy(BitConverter.GetBytes(keepAliveInterval), 0, inArray, size, size);
-                Array.Copy(BitConverter.GetBytes(retryInterval), 0, inArray, size * 2, size);
-
-                _socket.IOControl(IOControlCode.KeepAliveValues, inArray, null);
-
+                    }
+                    else
+                    {
+                        throw socketException;
+                    }
+                }
+                else
+                {
+                    _socket.Close();
+                    throw new TimeoutException("Connection Trial Timeout Exception");
+                }
                 _connected = true;
 
                 OnConnected();
@@ -108,6 +116,29 @@ namespace TcpConnection
             }
 
             return false;
+        }
+
+        private void CallBackMethod(IAsyncResult asyncResult)
+        {
+            try
+            {
+                _isConnectionSuccessful = false;
+                Socket socket = asyncResult.AsyncState as Socket;
+                if (socket != null)
+                {
+                    socket.EndConnect(asyncResult);
+                    _isConnectionSuccessful = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _isConnectionSuccessful = false;
+                socketException = ex;
+            }
+            finally
+            {
+                TimeoutObject.Set();
+            }
         }
 
         public void Close()
