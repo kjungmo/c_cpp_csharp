@@ -1,4 +1,5 @@
 #-*- coding:utf-8 -*-
+import re
 file1 = open('FineLocalizerForm2.cs', 'r', encoding='utf-8')
 appliedCode = ''
 while True:
