@@ -4,7 +4,7 @@ import os
 import sys
 import openpyxl
 
-def tokenize_localization_key_by_regex(cs_filename, xlsx_filename):
+def tokenize_localization_key_by_regex(cs_filename):
     if not os.path.exists(cs_filename):
         print('no .cs file')
         return
