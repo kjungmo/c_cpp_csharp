@@ -157,7 +157,7 @@ namespace FineLocalizer
 
             if (!LicenseValidator.ValidateLicenseKey(false))
             {
-                MessageBox.Show(Lang.MsgBoxFineLo.InvalidLicense, Lang.MsgBoxFineLo.WarningTitle);
+                MessageBox.Show("!@InvalidLicense", "!@WarningTitle");
                 Environment.Exit(0);
             }
 
@@ -169,7 +169,7 @@ namespace FineLocalizer
                 Logger.MaxLine = 1000;
                 FineLocalizerVehicleEngineAPI.LogCallback = Logger.WriteLog;
 
-                Logger.Info(Lang.Msgs.ProgramStart);
+                Logger.Info("!@ProgramStart");
 
                 InfoSettingsToEngine();
                 RefPosesFileManager.LoadCamSettings();
