@@ -1,0 +1,37 @@
+name: python cs tokenizer
+
+on:
+  push:
+    branches: main
+    paths:
+      - '/**.cs'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: docker
+      run: |
+        cd ./
+        docker-compose up -d
+   
+    - name: get tokens from cs and write to xlsx
+      if: hashFiles('./CoPick.Logging.xlsx') != ''
+      run: |
+        docker exec xl2resx_container python3 CSharpener.py FineLocalizerForm2.cs CoPick.Logging.xlsx
+        
+    - name: commit
+      run: |
+        git config --local user.email "dev@cogaplex.com"
+        git config --local user.name "CoPickDev[bot]"
+        git add .
+        git status
+        git commit -m "Updates localization changes"
+
+    - name: push
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}

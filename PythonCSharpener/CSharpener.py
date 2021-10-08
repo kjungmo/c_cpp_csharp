@@ -2,7 +2,7 @@
 import re
 import os
 import sys
-import openpyxl
+from openpyxl import load_workbook
 
 def tokenize_localization_key_by_regex(cs_filename):
     if not os.path.exists(cs_filename):
@@ -35,7 +35,7 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
 
     tokens_from_cs = list_of_tokens
 
-    workbook = openpyxl.load_workbook(xlsx_filename)
+    workbook = load_workbook(xlsx_filename)
     worksheet = workbook["Msgs"]
 
     tokens_from_xlsx = []

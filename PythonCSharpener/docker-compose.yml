@@ -1,0 +1,7 @@
+version: '3'
+services:
+    xl2resx_container:
+        image: 'chodurkhyun/xl2resx' # 'xl2resx'
+        container_name: 'xl2resx_container'
+        volumes: 
+            - ./:/root/workspace
