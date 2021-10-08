@@ -56,4 +56,4 @@ if __name__ == '__main__':
         match = tokenize_localization_key_by_regex(sys.argv[1])
         add_new_tokens_to_xlsx(sys.argv[2], match)
     else:
-        print("Usage : python3 CSharpener.py filename.cs")
+        print("Usage : python3 CSharpener.py cs_filename.cs xlsx_filename.xlsx")
