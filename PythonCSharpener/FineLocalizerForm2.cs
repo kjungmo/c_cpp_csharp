@@ -169,7 +169,7 @@ namespace FineLocalizer
                 Logger.MaxLine = 1000;
                 FineLocalizerVehicleEngineAPI.LogCallback = Logger.WriteLog;
 
-                Logger.Info("!@ProgramStart");
+                Logger.Info(Lang.Msgs.ProgramStart);
 
                 InfoSettingsToEngine();
                 RefPosesFileManager.LoadCamSettings();
