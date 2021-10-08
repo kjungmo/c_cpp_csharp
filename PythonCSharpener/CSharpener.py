@@ -18,7 +18,7 @@ def tokenize_localization_key_by_regex(cs_filename):
             if not line:
                 break
             match = re.findall('"!@(\w+)"', ''.join(line))
-            line = re.sub('"!@(\w+)"', r'Lang.Msg.\1', line, flags=re.MULTILINE)
+            line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
             appliedCode = line
             
     with open(cs_filename, 'w', encoding='utf-8') as file:
