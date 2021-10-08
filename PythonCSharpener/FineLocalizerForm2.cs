@@ -157,7 +157,7 @@ namespace FineLocalizer
 
             if (!LicenseValidator.ValidateLicenseKey(false))
             {
-                MessageBox.Show("!@InvalidLicense", "!@WarningTitle");
+                MessageBox.Show(Lang.Msgs.InvalidLicense, Lang.Msgs.WarningTitle);
                 Environment.Exit(0);
             }
 
@@ -169,7 +169,7 @@ namespace FineLocalizer
                 Logger.MaxLine = 1000;
                 FineLocalizerVehicleEngineAPI.LogCallback = Logger.WriteLog;
 
-                Logger.Info("!@ProgramStart");
+                Logger.Info(Lang.Msgs.ProgramStart);
 
                 InfoSettingsToEngine();
                 RefPosesFileManager.LoadCamSettings();
@@ -178,7 +178,7 @@ namespace FineLocalizer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{"!@LoadingConfigError"} {ex.Message}");
+                MessageBox.Show($"{Lang.Msgs.LoadingConfigError} {ex.Message}");
             }
 
             _plcStatusPainter = new PlcStatusPainter(groupBoxPLC.CreateGraphics(), 20, 22);
@@ -405,12 +405,12 @@ namespace FineLocalizer
             _refPoses = RefPosesFileManager.LoadFromFile($"{_config[-1].VehicleRefDataPath}/ref_pose.dat", _config[-1].VehicleCamera);
             if (_refPoses.Values == null)
             {
-                Logger.Warning("!@LoadingVehicleRefPoseFailed");
+                Logger.Warning(Lang.Msgs.LoadingVehicleRefPoseFailed);
                 return false;
             }
             else
             {
-                Logger.Info("!@LoadingVehicleRefPoseDone");
+                Logger.Info(Lang.Msgs.LoadingVehicleRefPoseDone);
                 return true;
             }
         }
@@ -498,7 +498,7 @@ namespace FineLocalizer
 
         private void FineLocalizerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("!@MainFormClosingCheck", Lang.MsgBoxFineLo.WarningTitle, MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show(Lang.Msgs.MainFormClosingCheck, Lang.MsgBoxFineLo.WarningTitle, MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 _plcComm?.StopMonitoring();
                 _plcComm?.StopHeartbeat();
@@ -517,14 +517,14 @@ namespace FineLocalizer
 
             if (!_isCameraConnected)
             {
-                Logger.Warning("!@CameraConnectionNeeded");
+                Logger.Warning(Lang.Msgs.CameraConnectionNeeded);
                 btnSender.Enabled = true;
                 return;
             }
 
             if (!await _fineLocalizerVehicle.ReadyVehicleCheckerAsync())
             {
-                Logger.Warning("!@ReadyVehicleError");
+                Logger.Warning(Lang.Msgs.ReadyVehicleError);
                 return;
             }
 
@@ -564,7 +564,7 @@ namespace FineLocalizer
                 var curPose = await _fineLocalizerVehicle.ScanRobot.ReadRobotCurrentPoseAsync();
                 if (curPose == null)
                 {
-                    Logger.Error("!@CantReadRobotCurrentPose");
+                    Logger.Error(Lang.Msgs.CantReadRobotCurrentPose);
                     return false;
                 }
                 UpdateRobotPoseToUI(curPose, _gbPoints[pointNum - 1]);
@@ -590,7 +590,7 @@ namespace FineLocalizer
             }
             catch (Exception ex)
             {
-                Logger.Error($"{"!@VehicleScanPointError"} ({ex})");
+                Logger.Error($"{Lang.Msgs.VehicleScanPointError} ({ex})");
                 return false;
             }
         }
@@ -605,12 +605,12 @@ namespace FineLocalizer
 
             if (await _fineLocalizerVehicle.TriggerScanVehicleAsync(pointNum, true, saveImg))
             {
-                Logger.Info($"{"!@ScanningPointDone"} (point= {pointNum})");
+                Logger.Info($"{Lang.Msgs.ScanningPointDone} (point= {pointNum})");
                 Invoke(new MethodInvoker(() => SetButtonsOnOff(pointNum + 1)));
             }
             else
             {
-                Logger.Error($"{"!@ScanningPointFailed"} (point= {pointNum})");
+                Logger.Error($"{Lang.Msgs.ScanningPointFailed} (point= {pointNum})");
                 return;
             }
 
@@ -629,11 +629,11 @@ namespace FineLocalizer
 
                     RefPosesFileManager.SaveToFile(_refPoses, $"{_config[-1].VehicleRefDataPath}/ref_pose.dat", _config[-1].VehicleCamera);
 
-                    Logger.Info($"{"!@SavingRefPoseDone"} (point= {pointNum})");
+                    Logger.Info($"{Lang.Msgs.SavingRefPoseDone} (point= {pointNum})");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"{"!@SavingRefPoseFailed"} (point= {pointNum}) <{ex.Message}>");
+                    Logger.Error($"{Lang.Msgs.SavingRefPoseFailed} (point= {pointNum}) <{ex.Message}>");
                 }
             }
         }
@@ -654,17 +654,17 @@ namespace FineLocalizer
 
             bool ret = await _fineLocalizerVehicle.UpdateInstallPosesToRobot(_calPositions.Select(p => p + offset).ToList());
 
-            Logger.Info($"{"!@CalculatedVehicleShiftValue"}: {_calPositions[0]}");
-            Logger.Info($"{"!@VehicleOffsetValue"}: {offset}");
-            Logger.Info($"{"!@ModifiedVehicleShiftValue"}: {_calPositions[0] + offset}");
+            Logger.Info($"{Lang.Msgs.CalculatedVehicleShiftValue}: {_calPositions[0]}");
+            Logger.Info($"{Lang.Msgs.VehicleOffsetValue}: {offset}");
+            Logger.Info($"{Lang.Msgs.ModifiedVehicleShiftValue}: {_calPositions[0] + offset}");
 
             if (ret)
             {
-                Logger.Info("!@UpdateInstallPosesToRobotDone");
+                Logger.Info(Lang.Msgs.UpdateInstallPosesToRobotDone);
             }
             else
             {
-                Logger.Error("!@UpdateInstallPosesToRobotError");
+                Logger.Error(Lang.Msgs.UpdateInstallPosesToRobotError);
             }
 
             return ret;
@@ -677,11 +677,11 @@ namespace FineLocalizer
             RegisterPlcEventHandlers();
             if (_plcComm.Connect())
             {
-                Logger.Info("!@PlcConnectDone");
+                Logger.Info(Lang.Msgs.PlcConnectDone);
             }
             else
             {
-                Logger.Info("!@PlcConnectFailed");
+                Logger.Info(Lang.Msgs.PlcConnectFailed);
             }
         }
 
@@ -700,11 +700,11 @@ namespace FineLocalizer
             {
                 IsPLCConnected = false;
                 ResetAllPlcSignalStatus();
-                Logger.Info("!@PlcDisconnectDone");
+                Logger.Info(Lang.Msgs.PlcDisconnectDone);
             }
             else
             {
-                Logger.Warning("!@PlcDisconnectFailed");
+                Logger.Warning(Lang.Msgs.PlcDisconnectFailed);
             }
         }
 
@@ -982,7 +982,7 @@ namespace FineLocalizer
             }
             catch (Exception ex)
             {
-                Logger.Warning($"{"!@InfoSettingsFailed"} ({ex})");
+                Logger.Warning($"{Lang.Msgs.InfoSettingsFailed} ({ex})");
             }
         }
 
@@ -1015,7 +1015,7 @@ namespace FineLocalizer
 
                 for (var i = 0; i < _calPositions.Count; ++i)
                 {
-                    Logger.Info($"{"!@CalculatedInstallPose"} : [{i + 1}] {_calPositions[i]}");
+                    Logger.Info($"{Lang.Msgs.CalculatedInstallPose} : [{i + 1}] {_calPositions[i]}");
                 }
 
                 UpdateRobotPoseToUI(_calPositions[0], gbSV_);
@@ -1027,18 +1027,18 @@ namespace FineLocalizer
                     btnUpdate_.Enabled = _mode != OperationMode.Auto;
                     btnUpdate_.BackColor = Color.Lime;
 
-                    Logger.Info("!@VehicleCalculationDone");
+                    Logger.Info(Lang.Msgs.VehicleCalculationDone);
                 }
                 else
                 {
-                    Logger.Error("!@VehicleCalculationFailed");
+                    Logger.Error(Lang.Msgs.VehicleCalculationFailed);
                 }
 
                 return ret.isOK;
             }
             catch (Exception ex)
             {
-                Logger.Error($"{"!@VehicleCalculationFailed"} ({ex})");
+                Logger.Error($"{Lang.Msgs.VehicleCalculationFailed} ({ex})");
                 return false;
             }
         }
@@ -1054,7 +1054,7 @@ namespace FineLocalizer
             }
             else
             {
-                Logger.Error("!@VehicleCalculationFailed");
+                Logger.Error(Lang.Msgs.VehicleCalculationFailed);
                 Invoke(new MethodInvoker(() => DisplayVehicleVisionStatus(VisionStatus.NG)));
                 Logger.CaptureFineLocalizer(VisionStatus.NG, "vehicle", _config[-1].CarName, $"{_currentCarSeq}");
                 return;
@@ -1064,14 +1064,14 @@ namespace FineLocalizer
             {
                 if ((_refGapPoses.Values?.Count ?? 0) < 1)
                 {
-                    Logger.Error("!@ReadingGapCheckRefPosesFailed");
+                    Logger.Error(Lang.Msgs.ReadingGapCheckRefPosesFailed);
                     return;
                 }
 
                 var ret = await _gapChecker.EstimateAndUpdateGapScanPosesAsync();
                 if (!ret.isSuccess)
                 {
-                    Logger.Error("!@GapCheckFailed");
+                    Logger.Error(Lang.Msgs.GapCheckFailed);
                 }
                 UpdateRobotPoseToUI(ret.shiftValue, gbGapSV_);
             }
@@ -1230,26 +1230,26 @@ namespace FineLocalizer
                     {
                         _isCameraConnected = false;
                         btnCameraConnect_.Text = Lang.FineLo.btnCameraConnect_;
-                        Logger.Info("!@CameraDisconnectionDone");
+                        Logger.Info(Lang.Msgs.CameraDisconnectionDone);
                     }
                     else
                     {
-                        Logger.Warning("!@CameraDisconnectionFailed");
+                        Logger.Warning(Lang.Msgs.CameraDisconnectionFailed);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warning($"{"!@CameraDisconnectionFailed"} ({ex.Message})");
+                    Logger.Warning($"{Lang.Msgs.CameraDisconnectionFailed} ({ex.Message})");
                 }
             }
             else
             {
-                Logger.Info("!@WaitingForCameraConnection");
+                Logger.Info(Lang.Msgs.WaitingForCameraConnection);
                 if ((_config[-1].UseGapChecker && !_config.CameraConfigs.ContainsKey(_config[-1].GapCamera ?? "")) ||
                     !_config.CameraConfigs.ContainsKey(_config[-1].VehicleCamera ?? "") ||
                     (_config[-1].UseGlassChecker && !_config.CameraConfigs.ContainsKey(_config[-1].GlassCamera ?? "")))
                 {
-                    Logger.Warning("!@CameraInfoNotSet");
+                    Logger.Warning(Lang.Msgs.CameraInfoNotSet);
                     btnCameraConnect_.Enabled = _mode != OperationMode.Auto;
                     _isCameraConnecting = false;
                     return;
@@ -1261,16 +1261,16 @@ namespace FineLocalizer
                     {
                         _isCameraConnected = true;
                         btnCameraConnect_.Text = Lang.FineLo.btnCameraDisconnect_;
-                        Logger.Info("!@CameraConnectionDone");
+                        Logger.Info(Lang.Msgs.CameraConnectionDone);
                     }
                     else
                     {
-                        Logger.Warning("!@CameraConnectionFailed");
+                        Logger.Warning(Lang.Msgs.CameraConnectionFailed);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warning($"{"!@CameraConnectionFailed"} ({ex.Message})");
+                    Logger.Warning($"{Lang.Msgs.CameraConnectionFailed} ({ex.Message})");
                 }
             }
 
@@ -1925,11 +1925,11 @@ namespace FineLocalizer
             int idx = Convert.ToInt32(btn.Name[11]) - 48;
             if (FineLocalizerVehicleEngineAPI.TeachGap(idx))
             {
-                Logger.Info($"{"!@GapTeachCompleted"} (idx= {idx})");
+                Logger.Info($"{Lang.Msgs.GapTeachCompleted} (idx= {idx})");
             }
             else
             {
-                Logger.Warning($"{"!@GapTeachFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.Msgs.GapTeachFailed} (idx= {idx})");
             }
         }
 
@@ -1939,11 +1939,11 @@ namespace FineLocalizer
             int idx = Convert.ToInt32(btn.Name[9]) - 48;
             if (FineLocalizerVehicleEngineAPI.AddGapData(idx))
             {
-                Logger.Info($"{"!@GapAddCompleted"} (idx= {idx})");
+                Logger.Info($"{Lang.Msgs.GapAddCompleted} (idx= {idx})");
             }
             else
             {
-                Logger.Warning($"{"!@GapAddFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.Msgs.GapAddFailed} (idx= {idx})");
             }
         }
 
@@ -1953,11 +1953,11 @@ namespace FineLocalizer
             int idx = Convert.ToInt32(btn.Name[12]) - 48;
             if (FineLocalizerVehicleEngineAPI.ManageGapData(idx))
             {
-                Logger.Info($"{"!@GapManageCompleted"} (idx= {idx})");
+                Logger.Info($"{Lang.Msgs.GapManageCompleted} (idx= {idx})");
             }
             else
             {
-                Logger.Warning($"{"!@GapManageFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.Msgs.GapManageFailed} (idx= {idx})");
             }
         }
     }
