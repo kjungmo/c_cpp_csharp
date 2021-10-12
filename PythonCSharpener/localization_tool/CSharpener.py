@@ -23,9 +23,6 @@ def create_tokens_for_localization(project_directory):
                     break
                     
                 tokens = re.findall('"!@(\w+)"', ''.join(line))
-                if not tokens:
-                    switch = True
-                    break
 
                 for items in tokens:
                     match.append(items)
@@ -33,24 +30,19 @@ def create_tokens_for_localization(project_directory):
 
                 line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
                 applied_cs_code = line
-        
-        if switch == True:
-            switch == False
-            continue
-            
+
         with open(cs_file, 'w', encoding='utf-8') as file:
             file.write(applied_cs_code)
             file.close()
           
     print("regex applied\n")
+    print(match)
     return match
 
 def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
     if not os.path.exists(xlsx_filename):
         print('no .xlsx file')
         return
-
-    tokens_from_cs = list_of_tokens
 
     workbook = load_workbook(xlsx_filename)
     worksheet = workbook["Msgs"]
@@ -60,8 +52,7 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
     for cell in col_a:
         tokens_from_xlsx.append(cell.value)
 
-    set_of_tokens = set(tokens_from_xlsx)
-    tokens_to_be_added = [x for x in tokens_from_cs if x not in set_of_tokens]
+    tokens_to_be_added = [x for x in list_of_tokens if x not in set(tokens_from_xlsx)]
 
     for i in range(len(tokens_to_be_added)):
         worksheet.cell(len(tokens_from_xlsx) + 1 + i, 1, value = tokens_to_be_added[i]) # row , col 
