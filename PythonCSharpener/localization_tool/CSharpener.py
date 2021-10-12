@@ -2,56 +2,46 @@
 import re
 import os
 import sys
+import glob
 from openpyxl import load_workbook
 
-def create_tokens_for_localization(project_name):
-#     input each project folder name 
-#     in order to check if the os.chdir("../") is applied correctly to the intended folder to work with
-    os.chdir("../")
-    os.chdir("./" + project_name)
-    folder_name = os.path.basename(os.getcwd())
-    
-    if not os.path.isdir(os.getcwd()):
+def create_tokens_for_localization(project_directory):
+
+    if not os.path.isdir("../" + project_directory):
         print('no folder')
         return
     
-    cs_file_list = [file for file in os.listdir(os.getcwd()) if file.endswith(".cs")]
-    
+    switch = False
     match = []
-    appliedCode = ''
-    # now loop cs_file_list and check if there is regex to change
-    # match should be outside of the loop in order to add tokenized values
-    # appliedCode should be reset if a cs file is done editing 
-    
-    for cs_file in glob.glob(os.getcwd() + "/*.cs"):
+
+    for cs_file in glob.glob(os.path.abspath("../" + project_directory + "/*.cs")):
+        applied_cs_code = ''
         with open(cs_file, 'r', encoding='utf-8') as file:
             while True:
-            line = file.read()
-            if not line:
-                break
-            match = re.findall('"!@(\w+)"', ''.join(line))
-            line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
-            appliedCode = line
+                line = file.read()
+                if not line:
+                    break
+                    
+                tokens = re.findall('"!@(\w+)"', ''.join(line))
+                if not tokens:
+                    switch = True
+                    break
+
+                for items in tokens:
+                    match.append(items)
+                    match = list(dict.fromkeys(match))
+
+                line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
+                applied_cs_code = line
+        
+        if switch == True:
+            switch == False
+            continue
             
         with open(cs_file, 'w', encoding='utf-8') as file:
-        file.write(appliedCode)
-        file.close()
-            
-            
-            
-    with open(cs_filename, 'r', encoding='utf-8') as file:
-        while True:
-            line = file.read()
-            if not line:
-                break
-            match = re.findall('"!@(\w+)"', ''.join(line))
-            line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
-            appliedCode = line
-            
-    with open(cs_filename, 'w', encoding='utf-8') as file:
-        file.write(appliedCode)
-        file.close()
-
+            file.write(applied_cs_code)
+            file.close()
+          
     print("regex applied\n")
     return match
 
@@ -80,7 +70,7 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        match = tokenize_localization_key_by_regex(sys.argv[1])
+        match = create_tokens_for_localization(sys.argv[1])
         add_new_tokens_to_xlsx(sys.argv[2], match)
     else:
         print("Usage : python3 CSharpener.py cs_filename.cs xlsx_filename.xlsx")
