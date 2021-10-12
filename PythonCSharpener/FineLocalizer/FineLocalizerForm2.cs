@@ -610,7 +610,7 @@ namespace FineLocalizer
             }
             else
             {
-                Logger.Error($"{Lang.MsgBoxFineLo.ScanningPointFailed} (point= {pointNum})");
+                Logger.Error($"{"!@ScanningPointFailed"} (point= {pointNum})");
                 return;
             }
 
