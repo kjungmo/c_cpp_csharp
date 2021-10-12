@@ -8,25 +8,28 @@ from openpyxl import load_workbook
 def create_tokens_for_localization(cs_filename):
     match = []
     applied_cs_code = ''
-    with open(cs_filename, 'r', encoding='utf-8') as file:
-        while True:
-            line = file.read()
-            if not line:
-                break
+    
+    for cs_file in glob.glob("./" + sys.argv[1] + "/*.cs"):
+        applied_cs_code = ''
+        with open(cs_filename, 'r', encoding='utf-8') as file:
+            while True:
+                line = file.read()
+                if not line:
+                    break
 
-            tokens = re.findall('"!@(\w+)"', ''.join(line))
+                tokens = re.findall('"!@(\w+)"', ''.join(line))
 
-            for items in tokens:
-                match.append(items)
-                match = list(dict.fromkeys(match))
+                for items in tokens:
+                    match.append(items)
 
-            line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
-            applied_cs_code = line
+                line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
+                applied_cs_code = line
 
-    with open(cs_filename, 'w', encoding='utf-8') as file:
-        file.write(applied_cs_code)
-        file.close()
-          
+        with open(cs_filename, 'w', encoding='utf-8') as file:
+            file.write(applied_cs_code)
+            file.close()
+    
+    match = list(set(match))
     return match
 
 def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
@@ -69,13 +72,6 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        print(os.listdir(os.getcwd()))
-        if os.path.isdir("./" + sys.argv[1]):
-            match = []
-            for cs_file in glob.glob(os.path.abspath("./" + sys.argv[1] + "/*.cs")):
-                for item in create_tokens_for_localization(cs_file):
-                    match.append(item)
-
             match = list(set(match))
             print("\nregex applied\n")
             print(match)
