@@ -9,7 +9,7 @@ def create_tokens_for_localization(cs_filename):
     match = []
     applied_cs_code = ''
     
-    for cs_file in glob.glob("./" + sys.argv[1] + "/*.cs"):
+    for cs_file in glob.glob(sys.argv[1] + "/*.cs"):
         applied_cs_code = ''
         with open(cs_filename, 'r', encoding='utf-8') as file:
             while True:
@@ -72,13 +72,9 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-            match = list(set(match))
-            print("\nregex applied\n")
-            print(match)
-            add_new_tokens_to_xlsx(sys.argv[2], match)
-            
-        else:
-            print('no folder')
-        
+        match = create_tokens_for_localization(sys.argv[1])
+        print("\nregex applied\n")
+        print(match)
+        add_new_tokens_to_xlsx(sys.argv[2], match)
     else:
         print("Usage : python3 CSharpener.py CS_FOLDERNAME FILENAME.xlsx")
