@@ -157,7 +157,7 @@ namespace FineLocalizer
 
             if (!LicenseValidator.ValidateLicenseKey(false))
             {
-                MessageBox.Show(Lang.MsgBoxFineLo.InvalidLicense, Lang.MsgBoxFineLo.WarningTitle);
+                MessageBox.Show("!@InvalidLicense", Lang.MsgBoxFineLo.WarningTitle);
                 Environment.Exit(0);
             }
 
