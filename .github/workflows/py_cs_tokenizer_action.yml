@@ -18,9 +18,9 @@ jobs:
         docker-compose up -d
    
     - name: get tokens from cs and write to xlsx
-      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
+      if: hashFiles('.PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
       run: |
-        docker exec xl2resx_container python3 ./PythonCSharpener/localization_tool/CSharpener.py ./PythonCSharpener/FineLocalizer/ ./PythonCSharpener/localization_tool/CoPick.Logging.xlsx
+        docker exec xl2resx_container python3 CSharpener.py ../FineLocalizer/ CoPick.Logging.xlsx
         
     - name: commit
       run: |
