@@ -4,14 +4,41 @@ import os
 import sys
 from openpyxl import load_workbook
 
-def tokenize_localization_key_by_regex(cs_filename):
-    if not os.path.exists(cs_filename):
-        print('no .cs file')
+def create_tokens_for_localization(project_name):
+#     input each project folder name 
+#     in order to check if the os.chdir("../") is applied correctly to the intended folder to work with
+    os.chdir("../")
+    os.chdir("./" + project_name)
+    folder_name = os.path.basename(os.getcwd())
+    
+    if not os.path.isdir(os.getcwd()):
+        print('no folder')
         return
-
+    
+    cs_file_list = [file for file in os.listdir(os.getcwd()) if file.endswith(".cs")]
+    
     match = []
     appliedCode = ''
+    # now loop cs_file_list and check if there is regex to change
+    # match should be outside of the loop in order to add tokenized values
+    # appliedCode should be reset if a cs file is done editing 
     
+    for cs_file in glob.glob(os.getcwd() + "/*.cs"):
+        with open(cs_file, 'r', encoding='utf-8') as file:
+            while True:
+            line = file.read()
+            if not line:
+                break
+            match = re.findall('"!@(\w+)"', ''.join(line))
+            line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
+            appliedCode = line
+            
+        with open(cs_file, 'w', encoding='utf-8') as file:
+        file.write(appliedCode)
+        file.close()
+            
+            
+            
     with open(cs_filename, 'r', encoding='utf-8') as file:
         while True:
             line = file.read()
