@@ -14,7 +14,7 @@ jobs:
 
     - name: docker
       run: |
-        cd ./
+        cd ./PythonCSharpener/localization_tool
         docker-compose up -d
    
     - name: get tokens from cs and write to xlsx
