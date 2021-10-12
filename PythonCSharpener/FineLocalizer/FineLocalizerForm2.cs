@@ -597,7 +597,7 @@ namespace FineLocalizer
 
         private async Task SaveCurrentRobotPoseAndImage(int pointNum)
         {
-            bool saveImg = MessageBox.Show($"{Lang.MsgBoxFineLo.WantSaveRefImg}", "", MessageBoxButtons.YesNo) == DialogResult.Yes;
+            bool saveImg = MessageBox.Show($"{"!@WantSaveRefImg"}", "", MessageBoxButtons.YesNo) == DialogResult.Yes;
             bool savePose = MessageBox.Show($"{Lang.MsgBoxFineLo.WantSaveRefPose}", "", MessageBoxButtons.YesNo) == DialogResult.Yes;
 
             var curPose = await _fineLocalizerVehicle.ScanRobot.ReadRobotCurrentPoseAsync();
