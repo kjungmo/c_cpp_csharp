@@ -13,7 +13,7 @@ def create_tokens_for_localization(project_directory):
     switch = False
     match = []
 
-    for cs_file in glob.glob(os.path.abspath("../" + project_directory + "/*.cs"):
+    for cs_file in glob.glob(os.path.abspath("../" + project_directory + "/*.cs")):
         applied_cs_code = ''
         with open(cs_file, 'r', encoding='utf-8') as file:
             while True:
