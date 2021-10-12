@@ -498,7 +498,7 @@ namespace FineLocalizer
 
         private void FineLocalizerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("!@MainFormClosingCheck", Lang.MsgBoxFineLo.WarningTitle, MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("!@MainFormClosingCheck", "!@WarningTitle", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 _plcComm?.StopMonitoring();
                 _plcComm?.StopHeartbeat();
