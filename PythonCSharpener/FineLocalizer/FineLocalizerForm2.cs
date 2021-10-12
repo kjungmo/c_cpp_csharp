@@ -549,7 +549,7 @@ namespace FineLocalizer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{"!@PointScanError"} {ex.Message}", Lang.MsgBoxFineLo.WarningTitle);
+                MessageBox.Show($"{"!@PointScanError"} {ex.Message}", "!@WarningTitle");
             }
             finally
             {
