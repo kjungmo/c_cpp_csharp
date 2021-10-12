@@ -20,7 +20,7 @@ jobs:
     - name: get tokens from cs and write to xlsx
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
       run: |
-        cd ../PythonCSharpener
+        cd ./PythonCSharpener
         docker exec xl2resx_container python3 ./localization_tool/CSharpener.py FineLocalizer ./localization_tool/CoPick.Logging.xlsx
         
     - name: commit
