@@ -70,9 +70,9 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         print(os.listdir(os.getcwd()))
-        if os.path.isdir("../" + sys.argv[1]):
+        if os.path.isdir("./" + sys.argv[1]):
             match = []
-            for cs_file in glob.glob(os.path.abspath("../" + sys.argv[1] + "/*.cs")):
+            for cs_file in glob.glob(os.path.abspath("./" + sys.argv[1] + "/*.cs")):
                 for item in create_tokens_for_localization(cs_file):
                     match.append(item)
 
