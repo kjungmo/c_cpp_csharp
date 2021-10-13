@@ -6,31 +6,25 @@ import glob
 from openpyxl import load_workbook
 
 def create_tokens_for_localization(cs_filename):
-    match = []
+    matched_tokens = []
     applied_cs_code = ''
     
     for cs_file in glob.glob(cs_filename + "/*.cs"):
         applied_cs_code = ''
         with open(cs_file, 'r', encoding='utf-8') as file:
-            while True:
-                line = file.read()
-                if not line:
-                    break
+            cs_code = file.read()
+            tokens = re.findall('"!@(\w+)"', ''.join(cs_code))
+            for items in tokens:
+                matched_tokens.append(items)
 
-                tokens = re.findall('"!@(\w+)"', ''.join(line))
-
-                for items in tokens:
-                    match.append(items)
-
-                line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
-                applied_cs_code = line
+            cs_code = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', cs_code, flags=re.MULTILINE)
+            applied_cs_code = cs_code
 
         with open(cs_file, 'w', encoding='utf-8') as file:
             file.write(applied_cs_code)
-            file.close()
     
-    match = list(set(match))
-    return match
+    matched_tokens = list(set(matched_tokens))
+    return matched_tokens
 
 def add_new_tokens_to_xlsx(xlsx_filename, list_of_new_tokens):
     if not os.path.exists(xlsx_filename):
@@ -45,8 +39,9 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_new_tokens):
 
     tokens_to_be_added = list(set(list_of_new_tokens) - set(tokens_from_xlsx))
             
+    num_of_existing_tokens = len(tokens_from_xlsx)
     for i in range(len(tokens_to_be_added)):
-        worksheet.cell(len(tokens_from_xlsx) + 1 + i, 1, value = tokens_to_be_added[i])
+        worksheet.cell(num_of_existing_tokens + 1 + i, 1, value = tokens_to_be_added[i])
 
     workbook.save(xlsx_filename)
     return tokens_to_be_added
