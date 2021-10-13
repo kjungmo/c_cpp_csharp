@@ -36,8 +36,8 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_new_tokens):
     if not os.path.exists(xlsx_filename):
         print('no .xlsx file')
         return
-
-    worksheet = load_workbook(xlsx_filename)["Msgs"]
+    workbook = load_workbook(xlsx_filename)
+    worksheet = workbook["Msgs"]
 
     tokens_from_xlsx = []
     for cell in worksheet['A']:
