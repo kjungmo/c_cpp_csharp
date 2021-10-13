@@ -9,9 +9,9 @@ def create_tokens_for_localization(cs_filename):
     match = []
     applied_cs_code = ''
     
-    for cs_file in glob.glob(sys.argv[1] + "/*.cs"):
+    for cs_file in glob.glob(cs_filename + "/*.cs"):
         applied_cs_code = ''
-        with open(cs_filename, 'r', encoding='utf-8') as file:
+        with open(cs_file, 'r', encoding='utf-8') as file:
             while True:
                 line = file.read()
                 if not line:

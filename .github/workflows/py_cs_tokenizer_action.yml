@@ -21,7 +21,7 @@ jobs:
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
       run: |
         cd ./PythonCSharpener
-        docker exec xl2resx_container python3 ./localization_tool/CSharpener.py FineLocalizer ./localization_tool/CoPick.Logging.xlsx
+        docker exec xl2resx_container python3 ./PythonCSharpener/localization_tool/CSharpener.py ./PythonCSharpener/FineLocalizer ./PythonCSharpener/localization_tool/CoPick.Logging.xlsx
         
     - name: commit
       run: |
