@@ -721,7 +721,7 @@ namespace FineLocalizer
                 }
                 else if (res == DialogResult.No)
                 {
-                    MessageBox.Show("!@ChangeModePasswordFailed", Lang.MsgBoxFineLo.WarningTitle);
+                    MessageBox.Show("!@ChangeModePasswordFailed", "!@WarningTitle");
                     _isJustModeSelection = true;
                     rbAuto_.Checked = true;
                     return false;
