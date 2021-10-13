@@ -45,21 +45,18 @@ def add_new_tokens_to_xlsx(xlsx_filename, list_of_new_tokens):
 
     tokens_to_be_added = list(set(list_of_new_tokens) - set(tokens_from_xlsx))
             
-    print("\n[[[ tokens from excel ]]] : ")
-    print(tokens_from_xlsx)
-    
-    print("\n[[[ tokens to be added ]]] : ")
-    print(tokens_to_be_added)
-
     for i in range(len(tokens_to_be_added)):
         worksheet.cell(len(tokens_from_xlsx) + 1 + i, 1, value = tokens_to_be_added[i])
 
     workbook.save(xlsx_filename)
+    return tokens_to_be_added
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         match = create_tokens_for_localization(sys.argv[1])
         print("\nregex applied\n")
-        add_new_tokens_to_xlsx(sys.argv[2], match)
+        added = add_new_tokens_to_xlsx(sys.argv[2], match)
+        print("\n[[[ New tokens ]]] : ")
+        print(added)
     else:
         print("Usage : python3 CSharpener.py CS_FOLDERNAME FILENAME.xlsx")
