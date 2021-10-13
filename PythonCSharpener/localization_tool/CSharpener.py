@@ -32,49 +32,34 @@ def create_tokens_for_localization(cs_filename):
     match = list(set(match))
     return match
 
-def add_new_tokens_to_xlsx(xlsx_filename, list_of_tokens):
+def add_new_tokens_to_xlsx(xlsx_filename, list_of_new_tokens):
     if not os.path.exists(xlsx_filename):
         print('no .xlsx file')
         return
 
-    workbook = load_workbook(xlsx_filename)
-    worksheet = workbook["Msgs"]
+    worksheet = load_workbook(xlsx_filename)["Msgs"]
 
     tokens_from_xlsx = []
-    col_a = worksheet['A']
-    for cell in col_a:
+    for cell in worksheet['A']:
         tokens_from_xlsx.append(cell.value)
-        
-    print("\ntokens from excel : ")
+
+    tokens_to_be_added = list(set(list_of_new_tokens) - set(tokens_from_xlsx))
+            
+    print("\n[[[ tokens from excel ]]] : ")
     print(tokens_from_xlsx)
-    print("\nlist of tokens : ")
-    print(list_of_tokens)
     
-    tokens_to_be_added = list(set(list_of_tokens) - set(tokens_from_xlsx))
-    print("\ntokens to be added : ")
+    print("\n[[[ tokens to be added ]]] : ")
     print(tokens_to_be_added)
 
     for i in range(len(tokens_to_be_added)):
-        worksheet.cell(len(tokens_from_xlsx) + 1 + i, 1, value = tokens_to_be_added[i]) # row , col 
+        worksheet.cell(len(tokens_from_xlsx) + 1 + i, 1, value = tokens_to_be_added[i])
 
     workbook.save(xlsx_filename)
-    
-#     workbook = load_workbook(xlsx_filename)
-#     worksheet = workbook["Msgs"]
-#     tokens_from_xlsx_after = []
-#     col_a_after = worksheet['A']
-#     for cell in col_a:
-#         tokens_from_xlsx_after.append(cell.value)
-        
-#     print("\ntokens from excel afterwards : ")
-#     print(tokens_from_xlsx_after)
-    
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         match = create_tokens_for_localization(sys.argv[1])
         print("\nregex applied\n")
-        print(match)
         add_new_tokens_to_xlsx(sys.argv[2], match)
     else:
         print("Usage : python3 CSharpener.py CS_FOLDERNAME FILENAME.xlsx")
