@@ -16,7 +16,7 @@ jobs:
       run: |
         cd ./PythonCSharpener/localization_tool
         docker-compose up -d
-        cd ../
+        cd ..
    
     - name: get tokens from cs and write to xlsx
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
