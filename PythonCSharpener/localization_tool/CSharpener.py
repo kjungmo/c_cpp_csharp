@@ -25,7 +25,7 @@ def create_tokens_for_localization(cs_filename):
                 line = re.sub('"!@(\w+)"', r'Lang.Msgs.\1', line, flags=re.MULTILINE)
                 applied_cs_code = line
 
-        with open(cs_filename, 'w', encoding='utf-8') as file:
+        with open(cs_file, 'w', encoding='utf-8') as file:
             file.write(applied_cs_code)
             file.close()
     
