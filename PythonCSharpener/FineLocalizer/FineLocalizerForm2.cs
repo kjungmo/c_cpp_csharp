@@ -1675,7 +1675,7 @@ namespace FineLocalizer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{"!@InvalidPath"} {ex}", "!@WarningTitle");
+                MessageBox.Show($"{Lang.Msgs.InvalidPath} {ex}", Lang.Msgs.WarningTitle);
                 tb.Text = _sConfAcc.Get(_config[-1], tb.Name.Substring(2)).ToString();
                 return;
             }
