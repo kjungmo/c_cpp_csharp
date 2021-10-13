@@ -633,7 +633,7 @@ namespace FineLocalizer
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"{"!@SavingRefPoseFailed"} (point= {pointNum}) <{ex.Message}>");
+                    Logger.Error($"{Lang.MsgBoxFineLo.SavingRefPoseFailed} (point= {pointNum}) <{ex.Message}>");
                 }
             }
         }
