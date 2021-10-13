@@ -1943,7 +1943,7 @@ namespace FineLocalizer
             }
             else
             {
-                Logger.Warning($"{"!@GapAddFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.Msgs.GapAddFailed} (idx= {idx})");
             }
         }
 
