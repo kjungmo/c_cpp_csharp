@@ -629,7 +629,7 @@ namespace FineLocalizer
 
                     RefPosesFileManager.SaveToFile(_refPoses, $"{_config[-1].VehicleRefDataPath}/ref_pose.dat", _config[-1].VehicleCamera);
 
-                    Logger.Info($"{Lang.MsgBoxFineLo.SavingRefPoseDone} (point= {pointNum})");
+                    Logger.Info($"{"!@SavingRefPoseDone"} (point= {pointNum})");
                 }
                 catch (Exception ex)
                 {
