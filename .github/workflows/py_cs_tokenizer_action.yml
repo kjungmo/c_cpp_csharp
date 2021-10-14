@@ -30,7 +30,14 @@ jobs:
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter.outputs.cs2xlsx == 'true'
       run: |
         docker exec xl2resx_container python3 ./localization_tool/cs2xlsx.py ./FineLocalizer ./localization_tool/CoPick.Logging.xlsx
-        
+    
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          xl2resx:
+            - 'PythonCSharpener/localization_tool/**.xlsx'
+
     - name: make the resources of FineLocalizer
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter.outputs.xl2resx == 'true'
       run: |
