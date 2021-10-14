@@ -15,6 +15,7 @@ jobs:
     - name: docker
       run: |
         cd ./PythonCSharpener/localization_tool
+        mkdir out
         docker-compose up -d
    
     - name: get tokens from cs and write to xlsx
@@ -22,6 +23,12 @@ jobs:
       run: |
         docker exec xl2resx_container python3 ./localization_tool/CSharpener.py ./FineLocalizer ./localization_tool/CoPick.Logging.xlsx
         
+    - name: make the resources of FineLocalizer
+      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
+      run: |
+        docker exec xl2resx_container python3 ./localization_tool/xl2resx.py ./localization_tool/CoPick.Logging.xlsx
+        sudo mv ./localization_tool/out/*.resx ./FineLocalizer/Lang/
+
     - name: commit
       run: |
         git config --local user.email "dev@cogaplex.com"
