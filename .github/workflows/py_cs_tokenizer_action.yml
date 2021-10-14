@@ -4,7 +4,7 @@ on:
   push:
     branches: main
     paths:
-      - 'PythonCSharpener/FineLocalizer/**.cs'
+      - 'PythonCSharpener/'
 
 jobs:
   build:
