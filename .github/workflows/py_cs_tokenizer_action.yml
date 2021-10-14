@@ -27,7 +27,7 @@ jobs:
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
       run: |
         docker exec xl2resx_container python3 ./localization_tool/xl2resx.py ./localization_tool/CoPick.Logging.xlsx
-        sudo mv ./localization_tool/out/*.resx ./FineLocalizer/Lang/
+        sudo mv ./PythonCSharpener/localization_tool/out/*.resx ./PythonCSharpener/FineLocalizer/Lang/
 
     - name: commit
       run: |
