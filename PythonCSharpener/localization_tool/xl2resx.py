@@ -19,9 +19,9 @@ def convert_xlsx_to_resx(filename):
             with open('tmp.txt', 'w') as f:
                 f.writelines([f'{n}={v}\n' for n, v in zip(res_dict['name'], res_dict[k]) if n is not None])
 
-            subprocess.run(['resgen', 'tmp.txt', f'/root/workspace/out/{ws.title}.{k}.resx'])
+            subprocess.run(['resgen', 'tmp.txt', f'/root/workspace/localization_tool/out/{ws.title}.{k}.resx'])
 
-        copyfile(f'/root/workspace/out/{ws.title}.{keys[1]}.resx', f'/root/workspace/out/{ws.title}.resx')
+        copyfile(f'/root/workspace/localization_tool/out/{ws.title}.{keys[1]}.resx', f'/root/workspace/localization_tool/out/{ws.title}.resx')
 
     os.remove('tmp.txt')
 
