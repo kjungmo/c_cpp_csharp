@@ -1,10 +1,10 @@
 name: python cs tokenizer
 
-on:
-  push:
-    branches: main
-    paths:
-      - 'PythonCSharpener/**'
+on: [push]
+  # push:
+  #   branches: main
+  #   paths:
+  #     - 'PythonCSharpener/**'
 
 jobs:
   build:
