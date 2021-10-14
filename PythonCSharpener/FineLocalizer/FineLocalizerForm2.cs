@@ -1957,7 +1957,7 @@ namespace FineLocalizer
             }
             else
             {
-                Logger.Warning($"{"!@GapManageFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.MsgBoxFineLo.GapManageFailed} (idx= {idx})");
             }
         }
     }
