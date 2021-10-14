@@ -7,7 +7,7 @@ on:
       - 'PythonCSharpener/FineLocalizer/**.cs'
 
 jobs:
-  build:
+  build-on:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
