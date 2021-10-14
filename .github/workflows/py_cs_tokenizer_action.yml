@@ -17,7 +17,7 @@ jobs:
         filters: |
           cs2xlsx:
             - 'PythonCSharpener/FineLocalizer/**.cs'
-          xl2resx
+          xl2resx:
             - 'PythonCSharpener/localization_tool/**.xlsx'
 
     - name: docker
