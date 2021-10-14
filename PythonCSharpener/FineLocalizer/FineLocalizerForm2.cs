@@ -1943,7 +1943,7 @@ namespace FineLocalizer
             }
             else
             {
-                Logger.Warning($"{"!@GapAddFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.Msgs.GapAddFailed} (idx= {idx})");
             }
         }
 
@@ -1953,11 +1953,11 @@ namespace FineLocalizer
             int idx = Convert.ToInt32(btn.Name[12]) - 48;
             if (FineLocalizerVehicleEngineAPI.ManageGapData(idx))
             {
-                Logger.Info($"{"!@GapManageCompleted"} (idx= {idx})");
+                Logger.Info($"{Lang.Msgs.GapManageCompleted} (idx= {idx})");
             }
             else
             {
-                Logger.Warning($"{"!@GapManageFailed"} (idx= {idx})");
+                Logger.Warning($"{Lang.Msgs.GapManageFailed} (idx= {idx})");
             }
         }
     }
