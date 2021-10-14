@@ -1958,7 +1958,7 @@ namespace FineLocalizer
             else
             {
                 Logger.Warning($"{Lang.Msgs.GapManageFailed} (idx= {idx})");
-            }
-        }
+            } // "!@레젝스가바뀌나"
+        } //"한글이 들어가도 되나"
     }
 }
