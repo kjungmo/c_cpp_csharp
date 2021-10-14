@@ -1953,7 +1953,7 @@ namespace FineLocalizer
             int idx = Convert.ToInt32(btn.Name[12]) - 48;
             if (FineLocalizerVehicleEngineAPI.ManageGapData(idx))
             {
-                Logger.Info($"{Lang.Msgs.GapManageCompleted} (idx= {idx})");
+                Logger.Info($"{"!@GapManageCompleted"} (idx= {idx})");
             }
             else
             {
