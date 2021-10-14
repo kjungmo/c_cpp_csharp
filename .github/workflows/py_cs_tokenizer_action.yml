@@ -7,10 +7,18 @@ on:
       - 'PythonCSharpener/FineLocalizer/**.cs'
 
 jobs:
-  build-on:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          cs2xlsx:
+            - 'PythonCSharpener/FineLocalizer/**.cs'
+          xl2resx
+            - 'PythonCSharpener/localization_tool/**.xlsx'
 
     - name: docker
       run: |
@@ -19,12 +27,12 @@ jobs:
         docker-compose up -d
    
     - name: get tokens from cs and write to xlsx
-      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
+      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter.outputs.cs2xlsx == 'true'
       run: |
-        docker exec xl2resx_container python3 ./localization_tool/CSharpener.py ./FineLocalizer ./localization_tool/CoPick.Logging.xlsx
+        docker exec xl2resx_container python3 ./localization_tool/cs2xlsx.py ./FineLocalizer ./localization_tool/CoPick.Logging.xlsx
         
     - name: make the resources of FineLocalizer
-      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != ''
+      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter.outputs.xl2resx == 'true'
       run: |
         docker exec xl2resx_container python3 ./localization_tool/xl2resx.py ./localization_tool/CoPick.Logging.xlsx
         sudo mv ./PythonCSharpener/localization_tool/out/*.resx ./PythonCSharpener/FineLocalizer/Lang/
