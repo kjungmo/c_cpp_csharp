@@ -21,31 +21,27 @@ jobs:
             - 'PythonCSharpener/localization_tool/**.xlsx'
 
     - name: docker
+      if: steps.filter.outputs.cs2xlsx == 'true' || steps.filter.outputs.xl2resx == 'true'
       run: |
         cd ./PythonCSharpener/localization_tool
         mkdir out
         docker-compose up -d
    
-    - name: get tokens from cs and write to xlsx
+    - name:  make tokens and add to excel and make the resources of FineLocalizer
       if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter.outputs.cs2xlsx == 'true'
       run: |
-        docker exec xl2resx_container python3 ./localization_tool/cs2xlsx.py ./FineLocalizer ./localization_tool/CoPick.Logging.xlsx
-    
-    - uses: dorny/paths-filter@v2
-      id: filter2
-      with:
-        filters: |
-          xl2resx:
-            - 'PythonCSharpener/localization_tool/**.xlsx'
+        docker exec xl2resx_container python3 ./localization_tool/cs2xl2resx.py ./FineLocalizer ./localization_tool/CoPick.Logging.xlsx
+        sudo mv ./PythonCSharpener/localization_tool/out/*.resx ./PythonCSharpener/FineLocalizer/Lang/
 
     - name: make the resources of FineLocalizer
-      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter2.outputs.xl2resx == 'true'
+      if: hashFiles('./PythonCSharpener/localization_tool/CoPick.Logging.xlsx') != '' && steps.filter.outputs.cs2xlsx == 'false' && steps.filter.outputs.xl2resx == 'true'
       run: |
-        docker exec xl2resx_container python3 ./localization_tool/xl2resx.py ./localization_tool/CoPick.Logging.xlsx
+        docker exec xl2resx_container python3 ./localization_tool/cs2xl2resx.py ./localization_tool/CoPick.Logging.xlsx
         sudo mv ./PythonCSharpener/localization_tool/out/*.resx ./PythonCSharpener/FineLocalizer/Lang/
 
     - name: commit
       run: |
+        sudo rm -r ./PythonCSharpener/localization_tool/out
         git config --local user.email "dev@cogaplex.com"
         git config --local user.name "CoPickDev[bot]"
         git add .
