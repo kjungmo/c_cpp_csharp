@@ -1959,7 +1959,6 @@ namespace FineLocalizer
             {
                 Logger.Warning($"{Lang.Msgs.GapManageFailed} (idx= {idx})");
             }
-            Logger.Warning(Lang.Msgs.GithubActionAnotherTest)
         }
     }
 }
