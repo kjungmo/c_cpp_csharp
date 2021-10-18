@@ -29,10 +29,11 @@
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, resgen, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, resgen, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null</value></resheader><data name="ProcessNameInvalid"><value>프로세스 이름이 유효하지 않습니다.</value></data>
   <data name="WriteCsvFailed"><value>CSV 파일 쓰기에 실패하였습니다.</value></data>
-  <data name="NoWindowToBeCaptured"><value>캡쳐 가능 영역이 없습니다.</value></data>
+  <data name="NoWindowToBeCaptured"><value>캡쳐 가능 영역이 없습니다. 달라진 xlsx와 같이 코드 올리면?</value></data>
   <data name="ProcessNameNotSet"><value>프로세스 이름이 설정되지 않았습니다.</value></data>
   <data name="ScreenShotCaptureFailure"><value>스크린샷 캡쳐에 실패하였습니다.</value></data>
   <data name="WriteLogToFileError"><value>로그 파일 쓰기에 실패. 폴더 경로와 남은 용량을 확인해주세요.</value></data>
+  <data name="GithubActionTestToSee"><value>None</value></data>
   <data name="CantCreateCaptureDir"><value>캡쳐 이미지 경로 생성에 실패하였습니다.</value></data>
-  <data name="LogPathInvalid"><value>로그 경로가 유효하지 않습니까?</value></data>
+  <data name="LogPathInvalid"><value>로그 경로가 유효하지 않습니다. 번역값이 달라지면</value></data>
   </root>

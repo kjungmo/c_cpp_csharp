@@ -33,6 +33,7 @@
   <data name="ProcessNameNotSet"><value>Process Name Not Set.</value></data>
   <data name="ScreenShotCaptureFailure"><value>Failed Capturing Screenshot.</value></data>
   <data name="WriteLogToFileError"><value>Failed with writing a log to the file. Check folder path and available space.</value></data>
+  <data name="GithubActionTestToSee"><value>None</value></data>
   <data name="CantCreateCaptureDir"><value>Cannot Create Captured Image Directory.</value></data>
   <data name="LogPathInvalid"><value>Invalid log path! Log files could not be written.</value></data>
   </root>
