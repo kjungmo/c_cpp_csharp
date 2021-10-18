@@ -51,7 +51,7 @@
   <data name="ScanningPointFailed"><value>None</value></data>
   <data name="GapCheckFailed"><value>None</value></data>
   <data name="CameraInfoNotSet"><value>None</value></data>
-  <data name="GithubActionTestToSee"><value>None</value></data>
+  <data name="GithubActionTestToSee"><value>깃허브 액션 테스트 중, 기능 정상 작동중인지 확인용.</value></data>
   <data name="ProcessNameNotSet"><value>프로세스 이름이 설정되지 않았습니다.</value></data>
   <data name="SavingRefPoseFailed"><value>None</value></data>
   <data name="GapAddCompleted"><value>None</value></data>
@@ -62,6 +62,7 @@
   <data name="ProcessNameInvalid"><value>프로세스 이름이 유효하지 않습니다.</value></data>
   <data name="PlcDisconnectFailed"><value>None</value></data>
   <data name="GapTeachCompleted"><value>None</value></data>
+  <data name="GithubActionAnotherTest"><value>None</value></data>
   <data name="CalculatedInstallPose"><value>None</value></data>
   <data name="WaitingForCameraConnection"><value>None</value></data>
   <data name="VehicleOffsetValue"><value>None</value></data>
