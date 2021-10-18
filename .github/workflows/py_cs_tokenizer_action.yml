@@ -2,10 +2,8 @@ name: python cs tokenizer
 
 on: 
   push:
-    branches:
-    - main
-    paths:
-    - 'PythonCSharpner/**'
+    branches: [ features/localization, main ]
+    tags: [ localization, token ]
 
 jobs:
   build:
