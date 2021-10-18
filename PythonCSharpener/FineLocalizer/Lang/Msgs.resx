@@ -27,7 +27,8 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, resgen, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, resgen, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null</value></resheader><data name="ProcessNameInvalid"><value>Invalid Process Name.</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, resgen, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, resgen, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null</value></resheader><data name="TestingGithubAction"><value>None</value></data>
+  <data name="ProcessNameInvalid"><value>Invalid Process Name.</value></data>
   <data name="WriteCsvFailed"><value>Failed with writing values to the csv file.</value></data>
   <data name="NoWindowToBeCaptured"><value>No Window is capturable.</value></data>
   <data name="ProcessNameNotSet"><value>Process Name Not Set.</value></data>
